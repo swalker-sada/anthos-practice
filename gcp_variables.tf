@@ -1,5 +1,5 @@
 # vpc and project
-variable "project_id" { default = "PROJECT_ID" }
+variable "project_id" { default = "qwiklabs-gcp-03-77d50d025fc0" }
 variable "vpc_name" { default = "vpc01" }
 
 # subnet_01

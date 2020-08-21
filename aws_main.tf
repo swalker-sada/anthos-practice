@@ -19,27 +19,46 @@ provider "template" {
   version = "~> 2.1"
 }
 
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_id
+data "aws_eks_cluster" "eks1_cluster" {
+  name = module.eks1.cluster_id
 }
 
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_id
+data "aws_eks_cluster_auth" "eks1_cluster" {
+  name = module.eks1.cluster_id
+}
+
+data "aws_eks_cluster" "eks2_cluster" {
+  name = module.eks2.cluster_id
+}
+
+data "aws_eks_cluster_auth" "eks2_cluster" {
+  name = module.eks2.cluster_id
 }
 
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
+  host                   = data.aws_eks_cluster.eks1_cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks1_cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.eks1_cluster.token
   load_config_file       = false
   version                = "~> 1.11"
+  alias                  = "eks1"
+}
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.eks2_cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks2_cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.eks2_cluster.token
+  load_config_file       = false
+  version                = "~> 1.11"
+  alias                  = "eks2"
 }
 
 data "aws_availability_zones" "available" {
 }
 
 locals {
-  cluster_name = "eks-${var.project_id}"
+  eks1_cluster_name = "eks1"
+  eks2_cluster_name = "eks2"
 }
 
 resource "random_string" "suffix" {
@@ -108,19 +127,53 @@ module "aws_vpc" {
   enable_dns_hostnames = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/cluster/${local.eks1_cluster_name}" = "shared"
+    "kubernetes.io/cluster/${local.eks2_cluster_name}" = "shared"
     "kubernetes.io/role/elb"                      = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/cluster/${local.eks1_cluster_name}" = "shared"
+    "kubernetes.io/cluster/${local.eks2_cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"             = "1"
   }
 }
 
-module "eks" {
+module "eks1" {
   source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = local.cluster_name
+  providers        = { kubernetes = kubernetes.eks1 }
+  cluster_name    = local.eks1_cluster_name
+  cluster_version = "1.17"
+  subnets         = module.aws_vpc.private_subnets
+
+  tags = {
+    Environment = "test"
+    GithubRepo  = "terraform-aws-eks"
+    GithubOrg   = "terraform-aws-modules"
+  }
+
+  vpc_id = module.aws_vpc.vpc_id
+
+  worker_groups = [
+    {
+      name                          = "worker-group-1"
+      instance_type                 = "t3.2xlarge"
+      additional_userdata           = "echo foo bar"
+      asg_desired_capacity          = 3
+      additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
+    },
+  ]
+
+  worker_additional_security_group_ids = [aws_security_group.all_worker_mgmt.id]
+  map_roles                            = var.map_roles
+  map_users                            = var.map_users
+  map_accounts                         = var.map_accounts
+}
+
+module "eks2" {
+  source          = "terraform-aws-modules/eks/aws"
+  providers        = { kubernetes = kubernetes.eks2 }
+  cluster_name    = local.eks2_cluster_name
   cluster_version = "1.17"
   subnets         = module.aws_vpc.private_subnets
 
