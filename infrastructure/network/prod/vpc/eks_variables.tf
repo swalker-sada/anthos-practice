@@ -1,0 +1,1 @@
+../../../ops/prod/eks/variables.tf
