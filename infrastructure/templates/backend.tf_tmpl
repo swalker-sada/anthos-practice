@@ -14,7 +14,7 @@
 
 terraform {
  backend "gcs" {
-   bucket  = "PROJECT_ID"
+   bucket  = "GOOGLE_PROJECT"
    prefix  = "tfstate/ENV/RESOURCE"
  }
 }
