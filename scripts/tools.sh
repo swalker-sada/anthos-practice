@@ -86,16 +86,26 @@ else
 fi
 
 # AWS CLI and Authenticator
-curl -O https://bootstrap.pypa.io/get-pip.py
-sudo apt update && sudo apt-get install -y python3-distutils
- 
-python3 get-pip.py --user
-pip3 install awscli --upgrade --user
-rm -rf get-pip.py
-aws --version
+title_no_wait "Installing aws cli..."
+if [[ $(which aws) ]]; then
+  title_no_wait "aws cli is already installed."
+else
+  curl -O https://bootstrap.pypa.io/get-pip.py
+  sudo apt update && sudo apt-get install -y python3-distutils 
 
-curl -o ${HOME}/.local/bin/aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/aws-iam-authenticator
-chmod +x ${HOME}/.local/bin/aws-iam-authenticator
-aws-iam-authenticator help
+  python3 get-pip.py --user
+  pip3 install awscli --upgrade --user
+  rm -rf get-pip.py
+  aws --version
+fi
+
+title_no_wait "Installing aws-iam-authenticator..."
+if [[ $(which aws-iam-authenticator) ]]; then
+  title_no_wait "aws-iam-authenticator is already installed."
+else
+  curl -o ${HOME}/.local/bin/aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/aws-iam-authenticator
+  chmod +x ${HOME}/.local/bin/aws-iam-authenticator
+  aws-iam-authenticator help
+fi
 
 grep -q ".asm.bash" ${HOME}/.bashrc || (echo "source ${HOME}/.asm.bash" >> ${HOME}/.bashrc)
