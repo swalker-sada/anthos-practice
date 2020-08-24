@@ -35,9 +35,9 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
 secrets:
-- kmsKeyName: projects/GOOGLE_PROJECT/locations/global/keyRings/aws-creds/cryptoKeys/aws-access-id
+- kmsKeyName: projects/qwiklabs-gcp-ml-6f6b6d10d019/locations/global/keyRings/aws-creds/cryptoKeys/aws-access-id
   secretEnv:
-    AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID_ENCRYPTED_KEY'
-- kmsKeyName: projects/GOOGLE_PROJECT/locations/global/keyRings/aws-creds/cryptoKeys/aws-secret-access-key
+    AWS_ACCESS_KEY_ID: 'CiQApwazpCgD8kElMT5Yln6HOy66DdfniOGzBpBPSpX/23/LLYwSPQAPcp6q7/YH2IFLOydi3PuX4w1lIR5wdIcMf/lqpYBlibIFn6JGoAXLPd4T2qOUi5ltbRFx8qY5LNSP/tk='
+- kmsKeyName: projects/qwiklabs-gcp-ml-6f6b6d10d019/locations/global/keyRings/aws-creds/cryptoKeys/aws-secret-access-key
   secretEnv:
-    AWS_SECRET_ACCESS_KEY: 'AWS_SECRET_ACCESS_KEY_ENCRYPTED_KEY'
+    AWS_SECRET_ACCESS_KEY: 'CiQARKQCqYvM/LFA2Bs9f6IhK3KRirW4a8Aoq0CLjDp6vGOIH+4SUQAjoly8W8ml3kHSb2qzJcgLADxSJHjQVrSJDN7F/PSqvAswpf0iqtE5rOHFuga/5HxIVetrudr0LZVxrHb555B2xwx8SVILW1ZB0b5x0lo2oA=='

@@ -135,9 +135,15 @@ echo -n "${AWS_ACCESS_KEY_ID}" | gcloud kms encrypt --plaintext-file=- --ciphert
 title_no_wait "Preparing bootstrap.sh script..."
 export AWS_ACCESS_KEY_ID_ENCRYPTED_PASS=$(echo -n "${AWS_ACCESS_KEY_ID}" | gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=aws-creds --key=aws-access-id | base64) 
 export AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS=$(echo -n "${AWS_SECRET_ACCESS_KEY}" | gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=aws-creds --key=aws-secret-access-key | base64)
+export AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES="$(echo -e "${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS}" | tr -d '[:space:]')"
+export AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES="$(echo -e "${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS}" | tr -d '[:space:]')"
+echo $AWS_ACCESS_KEY_ID_ENCRYPTED_PASS
+echo $AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS
+echo $AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES
+echo $AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES
 sed -i -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../infrastructure/cloudbuild.yaml
-sed -i -e s/AWS_ACCESS_KEY_ID_ENCRYPTED_PASS/$AWS_ACCESS_KEY_ID_ENCRYPTED_PASS/g ${SCRIPT_DIR}/../infrastructure/cloudbuild.yaml
-sed -i -e s/AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS/$AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS/g ${SCRIPT_DIR}/../infrastructure/cloudbuild.yaml
+sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../infrastructure/cloudbuild.yaml
+sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../infrastructure/cloudbuild.yaml
 
 title_no_wait "Preparing terraform backends and shared states files..."
 # Define an array of GCP resources
@@ -172,7 +178,7 @@ do
     tfvar_tmpl_file=${SCRIPT_DIR}/../infrastructure/${folders[idx]}/terraform.tfvars_tmpl
     if [ -f "$tfvar_tmpl_file" ]; then
         envsubst < ${SCRIPT_DIR}/../infrastructure/${folders[idx]}/terraform.tfvars_tmpl \
-        > i${SCRIPT_DIR}/../infrastructure/${folders[idx]}/terraform.tfvars
+        > ${SCRIPT_DIR}/../infrastructure/${folders[idx]}/terraform.tfvars
     fi
 
     # Create vars from variables.auto.tfvars_tmpl files
