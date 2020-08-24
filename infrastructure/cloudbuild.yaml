@@ -1,0 +1,70 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+timeout: 3600s
+logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
+steps:
+  - name: "gcr.io/kaniko-project/executor:v0.15.0"
+    id: "build-installer-image"
+    args:
+      - --destination=gcr.io/${PROJECT_ID}/asm-installer
+      - --cache=true
+      - --cache-ttl=12h
+  - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "tf-vpc"
+    dir: network/prod/vpc
+    entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "tf-gke"
+    dir: ops/prod/gke
+    waitFor:
+    - "tf-vpc"
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "tf-eks"
+    dir: ops/prod/eks
+    waitFor:
+    - "tf-vpc"
+    entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
+secrets:
+- kmsKeyName: projects/qwiklabs-gcp-01-1f76566f291a/locations/global/keyRings/aws-creds/cryptoKeys/aws-access-id
+  secretEnv:
+    AWS_ACCESS_KEY_ID: 'CiQAtCw5boJOy6PLlDfSjGOkmSJ0XdITUvgVxy2SzjKbJi1PdQ0SPQC0hRIv/Qtqpeyv7GZ8i6O/XfcgFw3M79/aYtGhi9GWatL0rBYWQlxGyXnSEtuKWSnnDq9LA6BKWvH/iyc='
+- kmsKeyName: projects/qwiklabs-gcp-01-1f76566f291a/locations/global/keyRings/aws-creds/cryptoKeys/aws-secret-access-key
+  secretEnv:
+    AWS_SECRET_ACCESS_KEY: 'CiQA2KvrdpNTZqX5XAZs0qFQpecE8zuXrP7LlCkizoimloUEzGwSUQBv1IkfplKoF6wcZknxDGktiB4p0530ldw5bNkkhUKdyyDpC7UDZik9dHHNq2MxPG418RMjM9ulpalNEiNEUq6XnyhQlQr/2wrSbkWZPrzQkQ=='
