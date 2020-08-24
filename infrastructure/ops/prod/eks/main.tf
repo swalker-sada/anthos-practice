@@ -34,7 +34,7 @@ data "aws_eks_cluster_auth" "eks2_cluster" {
 
 resource "aws_security_group" "worker_group_mgmt_one" {
   name_prefix = "worker_group_mgmt_one"
-  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id      = data.terraform_remote_state.vpc.outputs.aws_vpc_id
 
   ingress {
     from_port = 22
@@ -49,7 +49,7 @@ resource "aws_security_group" "worker_group_mgmt_one" {
 
 resource "aws_security_group" "worker_group_mgmt_two" {
   name_prefix = "worker_group_mgmt_two"
-  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id      = data.terraform_remote_state.vpc.outputs.aws_vpc_id
 
   ingress {
     from_port = 22
@@ -64,7 +64,7 @@ resource "aws_security_group" "worker_group_mgmt_two" {
 
 resource "aws_security_group" "all_worker_mgmt" {
   name_prefix = "all_worker_management"
-  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id      = data.terraform_remote_state.vpc.outputs.aws_vpc_id
 
   ingress {
     from_port = 22
@@ -84,13 +84,13 @@ module "eks1" {
   providers        = { kubernetes = kubernetes.eks1 }
   cluster_name    = var.eks1_cluster_name
   cluster_version = "1.17"
-  subnets         = data.terraform_remote_state.vpc.outputs.vpc_private_subnets
+  subnets         = data.terraform_remote_state.vpc.outputs.aws_vpc_private_subnets
 
   tags = {
     Environment = "prod"
   }
 
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id = data.terraform_remote_state.vpc.outputs.aws_vpc_id
 
   worker_groups = [
     {
@@ -113,13 +113,13 @@ module "eks2" {
   providers        = { kubernetes = kubernetes.eks2 }
   cluster_name    = var.eks2_cluster_name
   cluster_version = "1.17"
-  subnets         = data.terraform_remote_state.vpc.outputs.vpc_private_subnets
+  subnets         = data.terraform_remote_state.vpc.outputs.aws_vpc_private_subnets
 
   tags = {
     Environment = "prod"
   }
 
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id = data.terraform_remote_state.vpc.outputs.aws_vpc_id
 
   worker_groups = [
     {
