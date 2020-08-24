@@ -16,7 +16,7 @@ data "terraform_remote_state" "provider" {
   backend = "gcs"
 
   config = {
-    bucket  = "qwiklabs-gcp-ml-6f6b6d10d019"
+    bucket  = "qwiklabs-gcp-01-1f76566f291a"
     prefix  = "tfstate/prod/provider"
   }
 }

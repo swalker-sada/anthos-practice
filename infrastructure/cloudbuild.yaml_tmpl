@@ -62,9 +62,9 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
 secrets:
-- kmsKeyName: projects/qwiklabs-gcp-01-1f76566f291a/locations/global/keyRings/aws-creds/cryptoKeys/aws-access-id
+- kmsKeyName: projects/GOOGLE_PROJECT/locations/global/keyRings/aws-creds/cryptoKeys/aws-access-id
   secretEnv:
-    AWS_ACCESS_KEY_ID: 'CiQAtCw5bgC484oi+3QEH/2lHnS2a/GWsdLheFdE19LRz4+coV4SPQC0hRIv4h7p4SjqIUQxH8MeKUrULsIs2LCralOGlgXf2eD/m3/MNDxtvEbe57K8oVaA/HGwY8aeyhcvEkk='
-- kmsKeyName: projects/qwiklabs-gcp-01-1f76566f291a/locations/global/keyRings/aws-creds/cryptoKeys/aws-secret-access-key
+    AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID_ENCRYPTED_PASS'
+- kmsKeyName: projects/GOOGLE_PROJECT/locations/global/keyRings/aws-creds/cryptoKeys/aws-secret-access-key
   secretEnv:
-    AWS_SECRET_ACCESS_KEY: 'CiQA2KvrdpMZ7YP4AbSiIK9G5pQx5KbSkrzrlSdYDjAtKWmvncASUQBv1Ikf178kzjW/UiWFnjjkNdbNey+XqJmcN8dVxB1Q2yKZCUruvazp01X3VPNNvu/eYMsPaPE41QGrjAJkunzRTGTigbNOLjekIJCpRUo4Dw=='
+    AWS_SECRET_ACCESS_KEY: 'AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS'
