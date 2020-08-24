@@ -1,6 +1,6 @@
 # Create GKE cluster
 data "google_project" "project" {
-  project_id = data.terraform_remote_state.gcp_vpc.outputs.project_id
+  project_id = data.terraform_remote_state.vpc.outputs.project_id
 }
 
 data "google_client_config" "default" {
@@ -9,13 +9,13 @@ data "google_client_config" "default" {
 
 module "gke1" {
   source                  = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/beta-public-cluster"
-  project_id              = data.terraform_remote_state.gcp_vpc.outputs.project_id
+  project_id              = data.terraform_remote_state.vpc.outputs.project_id
   name                    = var.gke1
   regional                = false
   region                  = var.subnet_01_region
   zones                   = ["${var.subnet_01_region}-a"]
   release_channel         = "RAPID"
-  network                 = data.terraform_remote_state.gcp_vpc.outputs.network_name
+  network                 = data.terraform_remote_state.vpc.outputs.network_name
   subnetwork              = var.subnet_01_name
   ip_range_pods           = var.subnet_01_secondary_pod_name
   ip_range_services       = var.subnet_01_secondary_svc_1_name
@@ -35,13 +35,13 @@ module "gke1" {
 
 module "gke2" {
   source                  = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/beta-public-cluster"
-  project_id              = data.terraform_remote_state.gcp_vpc.outputs.project_id
+  project_id              = data.terraform_remote_state.vpc.outputs.project_id
   name                    = var.gke2
   regional                = false
   region                  = var.subnet_01_region
   zones                   = ["${var.subnet_01_region}-b"]
   release_channel         = "RAPID"
-  network                 = data.terraform_remote_state.gcp_vpc.outputs.network_name
+  network                 = data.terraform_remote_state.vpc.outputs.network_name
   subnetwork              = var.subnet_01_name
   ip_range_pods           = var.subnet_01_secondary_pod_name
   ip_range_services       = var.subnet_01_secondary_svc_2_name
