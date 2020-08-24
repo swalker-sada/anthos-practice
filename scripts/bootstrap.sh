@@ -145,12 +145,7 @@ title_no_wait "Preparing terraform backends and shared states files..."
 # Define an array of GCP resources
 declare -a folders
 folders=(
-    'gcp/prod/provider'
-    'gcp/dev/provider'
-    'gcp/stage/provider'
     'network/prod/vpc'
-    'network/dev/vpc'
-    'network/stage/vpc'
     'ops/prod/gke'
     'ops/prod/eks'
     )

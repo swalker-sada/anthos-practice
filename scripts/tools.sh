@@ -53,10 +53,9 @@ if [ -f ${KUSTOMIZE_FILEPATH} ]; then
 else
     nopv_and_execute "curl -s \"https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh\"  | bash"
 fi
-export PATH=$PATH:${HOME}/bin
-[[ ! -e ${HOME}/.asm.bash ]] && touch ${HOME}/.asm.bash
-grep -q "export PATH=.*\${HOME}/bin.*" ${HOME}/.asm.bash || echo "export PATH=\$PATH:\${HOME}/bin" >> ${HOME}/.asm.bash
-grep -q "export PATH=.*\${HOME}/.local/bin.*" ${HOME}/.asm.bash || echo "export PATH=\$PATH:\${HOME}/.local/bin" >> ${HOME}/.asm.bash
+export PATH=$PATH:${HOME}/bin:${HOME}/.local/bin
+grep -q "export PATH=.*\${HOME}/bin.*" ${HOME}/.gcp-workshop.bash || echo "export PATH=$PATH:${HOME}/bin:${HOME}/.local/bin" >> ${HOME}/.gcp-workshop.bash
+echo -e "\n"
 
 export PV_INSTALLED=`which pv`
 if [ -z ${PV_INSTALLED} ]; then
@@ -65,6 +64,8 @@ if [ -z ${PV_INSTALLED} ]; then
 else
     title_no_wait "pv is already installed and in the ${PV_INSTALLED} folder."
 fi
+
+[[ ! -e ${HOME}/.gcp-workshop.bash ]] && touch ${HOME}/.gcp-workshop.bash
 
 export KREW_FILEPATH="${HOME}/.krew"
 if [ -d ${KREW_FILEPATH} ]; then
@@ -80,14 +81,15 @@ else
     )
     "
     export PATH="${PATH}:${HOME}/.krew/bin"
-    grep -q "export PATH=.*\${HOME}/.krew/bin" ${HOME}/.asm.bash || echo -e "export PATH="${PATH}:${HOME}/.krew/bin"" >> ~/.asm.bash
+    grep -q "export PATH=.*\${HOME}/.krew/bin" ${HOME}/.gcp-workshop.bash || echo -e "export PATH="${PATH}:${HOME}/.krew/bin"" >> ~/.gcp-workshop.bash
     kubectl krew install ctx
     kubectl krew install ns
 fi
 
 # AWS CLI and Authenticator
 title_no_wait "Installing aws cli..."
-if [[ $(which aws) ]]; then
+export AWS_INSTALLED=`which aws`
+if [[ ${AWS_INSTALLED} ]]; then
   title_no_wait "aws cli is already installed."
 else
   curl -O https://bootstrap.pypa.io/get-pip.py
@@ -100,7 +102,8 @@ else
 fi
 
 title_no_wait "Installing aws-iam-authenticator..."
-if [[ $(which aws-iam-authenticator) ]]; then
+export AWS_AUTHENTICATOR_INSTALLED=`which aws-iam-authenticator`
+if [[ ${AWS_AUTHENTICATOR_INSTALLED} ]]; then
   title_no_wait "aws-iam-authenticator is already installed."
 else
   curl -o ${HOME}/.local/bin/aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/aws-iam-authenticator
@@ -108,4 +111,4 @@ else
   aws-iam-authenticator help
 fi
 
-grep -q ".asm.bash" ${HOME}/.bashrc || (echo "source ${HOME}/.asm.bash" >> ${HOME}/.bashrc)
+grep -q ".gcp-workshop.bash" ${HOME}/.bashrc || (echo "source ${HOME}/.gcp-workshop.bash" >> ${HOME}/.bashrc)
