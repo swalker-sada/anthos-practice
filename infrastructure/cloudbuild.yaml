@@ -26,6 +26,7 @@ steps:
     id: "tf-vpc"
     dir: network/prod/vpc
     entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
       - "-xe"
       - "-c"
@@ -33,3 +34,10 @@ steps:
         terraform init
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
+secrets:
+- kmsKeyName: projects/GOOGLE_PROJECT/locations/global/keyRings/aws-creds/cryptoKeys/aws-access-id
+  secretEnv:
+    AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID_ENCRYPTED_KEY'
+- kmsKeyName: projects/GOOGLE_PROJECT/locations/global/keyRings/aws-creds/cryptoKeys/aws-secret-access-key
+  secretEnv:
+    AWS_SECRET_ACCESS_KEY: 'AWS_SECRET_ACCESS_KEY_ENCRYPTED_KEY'

@@ -1,5 +1,5 @@
 # vpc and project
-variable "project_id" { default = "GOOGLE_PROJECT" }
+variable "project_id" {}
 variable "vpc_name" { default = "vpc01" }
 
 # subnet_01

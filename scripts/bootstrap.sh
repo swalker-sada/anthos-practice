@@ -105,6 +105,44 @@ fi
 title_no_wait "Setting default project and credentials..."
 print_and_execute "export GOOGLE_PROJECT=${GOOGLE_PROJECT}"
 
+title_no_wait "Creating KMS keyring for AWS credentials..."
+if [[ $(gcloud kms keyrings describe aws-creds --location global &> /dev/null || echo $?) ]]; then
+  gcloud kms keyrings create aws-creds --location global
+else
+  title_no_wait "KMS keyring aws-creds already created."
+fi
+
+title_no_wait "Creating KMS key aws-access-id..."
+if [[ $(gcloud kms keys describe aws-access-id --location=global --keyring=aws-creds &> /dev/null || echo $?) ]]; then
+  gcloud kms keys create aws-access-id \
+      --location global --keyring aws-creds \
+      --purpose encryption
+  echo -n "${AWS_ACCESS_KEY_ID}" | gcloud kms encrypt --plaintext-file=- \
+     --ciphertext-file=- --location=global --keyring=aws-creds \
+     --key=aws-access-id | base64 > ${SCRIPT_DIR}/aws_access_key_id_encrypted_pass.txt
+else
+  title_no_wait "KMS key aws-access-id already created."
+fi
+
+title_no_wait "Creating KMS key aws-secret-access-key..."
+if [[ $(gcloud kms keys describe aws-secret-access-key --location=global --keyring=aws-creds &> /dev/null || echo $?) ]]; then
+  gcloud kms keys create aws-secret-access-key \
+      --location global --keyring aws-creds \
+      --purpose encryption
+  echo -n "${AWS_SECRET_ACCESS_KEY}" | gcloud kms encrypt --plaintext-file=- \
+     --ciphertext-file=- --location=global --keyring=aws-creds \
+     --key=aws-secret-access-key | base64 > ${SCRIPT_DIR}/aws_secret_access_key_encrypted_pass.txt
+else
+  title_no_wait "KMS key aws-secret-access-key already created."
+fi
+
+title_no_wait "Preparing bootstrap.sh script..."
+export AWS_ACCESS_KEY_ID_ENCRYPTED_PASS=$(cat ${SCRIPT_DIR}/aws_access_key_id_encrypted_pass.txt)
+export AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS=$(cat ${SCRIPT_DIR}/aws_secret_access_key_encrypted_pass.txt)
+sed -i -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../scripts/bootstrap.sh
+sed -i -e s/AWS_ACCESS_KEY_ID_ENCRYPTED_PASS/$AWS_ACCESS_KEY_ID_ENCRYPTED_PASS/g ${SCRIPT_DIR}/../scripts/bootstrap.sh
+sed -i -e s/AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS/$AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS/g ${SCRIPT_DIR}/../scripts/bootstrap.sh
+
 title_no_wait "Preparing terraform backends and shared states files..."
 # Define an array of GCP resources
 declare -a folders
