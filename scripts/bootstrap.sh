@@ -148,6 +148,7 @@ folders=(
     'network/prod/vpc'
     'ops/prod/gke'
     'ops/prod/eks'
+    'ops/prod/acm'
     )
 
 # Build backends and shared states for each GCP prod resource
