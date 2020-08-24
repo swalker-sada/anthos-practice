@@ -135,8 +135,6 @@ else
   title_no_wait "KMS key aws-secret-access-key already created."
 fi
 
-echo -n "${AWS_ACCESS_KEY_ID}" | gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=aws-creds --key=aws-access-id | base64 > ${SCRIPT_DIR}/aws_access_key_id_encrypted_pass.txt
-
 title_no_wait "Preparing bootstrap.sh script..."
 export AWS_ACCESS_KEY_ID_ENCRYPTED_PASS=$(echo -n "${AWS_ACCESS_KEY_ID}" | gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=aws-creds --key=aws-access-id | base64) 
 export AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS=$(echo -n "${AWS_SECRET_ACCESS_KEY}" | gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=aws-creds --key=aws-secret-access-key | base64)
