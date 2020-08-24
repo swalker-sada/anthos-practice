@@ -7,6 +7,7 @@ certs/*
 k8s-repo/*
 scripts/test.sh
 
+infrastructure/cloudbuild.yaml
 infrastructure/*/*/*/backend.tf
 infrastructure/*/*/*/tfplan
 infrastructure/*/*/*/terraform.tfvars
