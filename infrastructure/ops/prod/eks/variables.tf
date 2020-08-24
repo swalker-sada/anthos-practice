@@ -1,5 +1,6 @@
 variable "eks1_cluster_name" { default = "eks1" }
 variable "eks2_cluster_name" { default = "eks2" }
+variable "gke_hub_sa" { default = "gke-hub-sa" }
 
 variable "map_accounts" {
   description = "Additional AWS account numbers to add to the aws-auth configmap."

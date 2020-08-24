@@ -155,3 +155,47 @@ resource "null_resource" "exec_eks_kubeconfig" {
   ]
 }
 
+# Create a GKE Hub SA to be able to register attached clusters
+resource "google_service_account" "gke_hub_sa" {
+  account_id   = var.gke_hub_sa
+  display_name = "GKE Hub SA"
+  project      = data.terraform_remote_state.vpc.outputs.project_id
+}
+
+# IAM binding to grant GKE Hub service account access to the project.
+resource "google_project_iam_member" "gke_hub_sa_owner" {
+  project = google_service_account.gke_hub_sa.project
+  role    = "roles/gkehub.admin"
+  member  = "serviceAccount:${google_service_account.gke_hub_sa.email}"
+}
+
+resource "google_service_account_key" "gke_hub_sa_key" {
+  service_account_id = google_service_account.gke_hub_sa.name
+  public_key_type    = "TYPE_X509_PEM_FILE"
+}
+
+resource "local_file" "gke_hub_sa_key_file" {
+    content     = base64decode(google_service_account_key.gke_hub_sa_key.private_key)
+    filename = "${path.module}/gke_hub_sa_key.json"
+}
+
+
+module "eks1_hub_registration" {
+  source  = "terraform-google-modules/gcloud/google"
+
+  platform = "linux"
+
+  create_cmd_body        = "container hub memberships register ${module.eks1.cluster_id} --project=${google_service_account.gke_hub_sa.project} --context=eks_${module.eks1.cluster_id} --kubeconfig=${module.eks1.kubeconfig_filename} --service-account-key-file=${local_file.gke_hub_sa_key_file.filename}"
+ 
+  destroy_cmd_body       = "version"
+}
+
+module "eks2_hub_registration" {
+  source  = "terraform-google-modules/gcloud/google"
+
+  platform = "linux"
+
+  create_cmd_body        = "container hub memberships register ${module.eks2.cluster_id} --project=${google_service_account.gke_hub_sa.project} --context=eks_${module.eks2.cluster_id} --kubeconfig=${module.eks2.kubeconfig_filename} --service-account-key-file=${local_file.gke_hub_sa_key_file.filename}"
+ 
+  destroy_cmd_body       = "version"
+}

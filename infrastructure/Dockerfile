@@ -37,3 +37,7 @@ RUN wget -O- https://github.com/kubernetes-sigs/kustomize/releases/download/kust
     tar zxvf - kustomize && \
     chmod +x kustomize && \
     mv kustomize /usr/local/bin
+
+# Install aws-iam-authenticator
+RUN curl -o /usr/local/bin/aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/aws-iam-authenticator && \
+    chmod +x /usr/local/bin/aws-iam-authenticator

@@ -72,6 +72,11 @@ print_and_execute "gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT} \
 --member serviceAccount:${TF_CLOUDBUILD_SA} \
 --role roles/owner"
 
+title_no_wait "Giving Cloudbuild SA cluster admin role"
+print_and_execute "gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT} \
+--member serviceAccount:${TF_CLOUDBUILD_SA} \
+--role roles/container.admin"
+
 if [[ $(gsutil ls | grep "gs://${GOOGLE_PROJECT}/") ]]; then
     title_no_wait "Bucket gs://${GOOGLE_PROJECT} already exists."
 else    
