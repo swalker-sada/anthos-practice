@@ -136,3 +136,22 @@ module "eks2" {
   map_users                            = var.map_users
   map_accounts                         = var.map_accounts
 }
+
+resource "null_resource" "exec_eks_kubeconfig" {
+  provisioner "local-exec" {
+    interpreter = ["bash", "-exc"]
+    command     = "${path.module}/eks_kubeconfig.sh"
+    environment = {
+      PROJECT_ID         = data.terraform_remote_state.vpc.outputs.project_id
+    }
+  }
+
+  triggers = {
+    script_sha1          = sha1(file("eks_kubeconfig.sh"))
+  }
+  depends_on = [
+    module.eks1,
+    module.eks2,
+  ]
+}
+
