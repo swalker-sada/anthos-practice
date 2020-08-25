@@ -41,3 +41,8 @@ RUN wget -O- https://github.com/kubernetes-sigs/kustomize/releases/download/kust
 # Install aws-iam-authenticator
 RUN curl -o /usr/local/bin/aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/aws-iam-authenticator && \
     chmod +x /usr/local/bin/aws-iam-authenticator
+
+# Install nomos
+# RUN gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos /usr/bin/local/nomos && \
+    # chmod +x /usr/bin/local/nomos && \
+    # nomos version
