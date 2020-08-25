@@ -23,6 +23,17 @@ steps:
       - --cache=true
       - --cache-ttl=12h
   - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "tf-gitlab"
+    dir: ops/prod/gitlab
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/asm-installer
     id: "tf-vpc"
     dir: network/prod/vpc
     entrypoint: "bash"

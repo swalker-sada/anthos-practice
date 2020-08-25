@@ -175,6 +175,7 @@ folders=(
     'ops/prod/gke'
     'ops/prod/eks'
     'ops/prod/acm'
+    'ops/prod/gitlab'
     )
 
 # Build backends and shared states for each GCP prod resource
