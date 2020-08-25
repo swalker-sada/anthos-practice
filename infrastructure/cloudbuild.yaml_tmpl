@@ -23,9 +23,10 @@ steps:
       - --cache=true
       - --cache-ttl=12h
   - name: gcr.io/${PROJECT_ID}/asm-installer
-    id: "tf-gitlab"
-    dir: ops/prod/gitlab
+    id: "tf-vpc"
+    dir: network/prod/vpc
     entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
       - "-xe"
       - "-c"
@@ -34,11 +35,11 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/asm-installer
-    id: "tf-vpc"
-    dir: network/prod/vpc
-    waitFor: ['-']
+    id: "tf-gitlab"
+    dir: ops/prod/gitlab
+    waitFor:
+    - "tf-vpc"
     entrypoint: "bash"
-    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
       - "-xe"
       - "-c"
