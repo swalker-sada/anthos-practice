@@ -184,12 +184,12 @@ module "eks1_hub_registration" {
   source  = "terraform-google-modules/gcloud/google"
   platform = "linux"
   create_cmd_body        = "container hub memberships register ${module.eks1.cluster_id} --project=${google_service_account.gke_hub_sa.project} --context=eks_${module.eks1.cluster_id} --kubeconfig=${module.eks1.kubeconfig_filename} --service-account-key-file=${local_file.gke_hub_sa_key_file.filename}"
-  destroy_cmd_body        = "container hub memberships unregister ${module.eks1.cluster_id} --project=${google_service_account.gke_hub_sa.project} --context=eks_${module.eks1.cluster_id} --kubeconfig=${module.eks1.kubeconfig_filename} --service-account-key-file=${local_file.gke_hub_sa_key_file.filename}"
+  destroy_cmd_body       = "container hub memberships unregister ${module.eks1.cluster_id} --project=${google_service_account.gke_hub_sa.project} --context=eks_${module.eks1.cluster_id} --kubeconfig=${module.eks1.kubeconfig_filename} --service-account-key-file=${local_file.gke_hub_sa_key_file.filename}"
 }
 
 module "eks2_hub_registration" {
   source  = "terraform-google-modules/gcloud/google"
   platform = "linux"
   create_cmd_body        = "container hub memberships register ${module.eks2.cluster_id} --project=${google_service_account.gke_hub_sa.project} --context=eks_${module.eks2.cluster_id} --kubeconfig=${module.eks2.kubeconfig_filename} --service-account-key-file=${local_file.gke_hub_sa_key_file.filename}"
-  destroy_cmd_body        = "container hub memberships unregister ${module.eks2.cluster_id} --project=${google_service_account.gke_hub_sa.project} --context=eks_${module.eks2.cluster_id} --kubeconfig=${module.eks2.kubeconfig_filename} --service-account-key-file=${local_file.gke_hub_sa_key_file.filename}"
+  destroy_cmd_body       = "container hub memberships unregister ${module.eks2.cluster_id} --project=${google_service_account.gke_hub_sa.project} --context=eks_${module.eks2.cluster_id} --kubeconfig=${module.eks2.kubeconfig_filename} --service-account-key-file=${local_file.gke_hub_sa_key_file.filename}"
 }
