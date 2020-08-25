@@ -36,6 +36,7 @@ steps:
   - name: gcr.io/${PROJECT_ID}/asm-installer
     id: "tf-vpc"
     dir: network/prod/vpc
+    waitFor: ['-']
     entrypoint: "bash"
     secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
@@ -76,7 +77,6 @@ steps:
     id: "tf-acm"
     dir: ops/prod/acm
     waitFor:
-    - "tf-vpc"
     - "tf-gke"
     - "tf-eks"
     entrypoint: "bash"
