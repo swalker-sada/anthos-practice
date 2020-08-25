@@ -37,6 +37,8 @@ infrastructure/ops/prod/k8s_repo/istio-operator-*.yaml
 infrastructure/ops/prod/k8s_repo/data.zip
 infrastructure/ops/prod/k8s_repo/tmp/
 
+infrastructure/ops/prod/acm/csr-key*
+
 infrastructure/vm-migration/vm/
 infrastructure/vm-migration/istio-*
 infrastructure/*/*.env

@@ -13,5 +13,7 @@ if [[ $(gsutil ls gs://$PROJECT_ID/ssh-key &> /dev/null || echo $?) ]]; then
   gsutil cp -r csr-key.pub gs://$PROJECT_ID/ssh-key/csr-key.pub
 else
   echo "SSH Key pairs already exist."
+  gsutil cp -r gs://$PROJECT_ID/ssh-key/csr-key csr-key
+  gsutil cp -r gs://$PROJECT_ID/ssh-key/csr-key.pub csr-key.pub
 fi
 

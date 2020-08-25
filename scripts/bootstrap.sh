@@ -144,6 +144,29 @@ sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../infrastructure/cloudb
 sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../infrastructure/cloudbuild.yaml
 sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../infrastructure/cloudbuild.yaml
 
+title_no_wait "Create ACM SSH key pair for CSR Repo..."
+# Check if there is already a csr key present
+if [[ $(gsutil ls gs://$GOOGLE_PROJECT/ssh-key &> /dev/null || echo $?) ]]; then
+  title_no_wait "Creating SSH key pair..."
+  # Create an SSH key pair
+  ssh-keygen -t rsa -b 4096 \
+  -C "${USER}@qwiklabs.net" \
+  -N '' \
+  -f csr-key
+  # Copy to GCS bucket
+  gsutil cp -r csr-key gs://$GOOGLE_PROJECT/ssh-key/csr-key
+  gsutil cp -r csr-key.pub gs://$GOOGLE_PROJECT/ssh-key/csr-key.pub
+  # Move key pair to the acm folder
+  mv csr-key* ${SCRIPT_DIR}/../infrastructure/ops/prod/acm
+else
+  title_no_wait "SSH Key pairs already exist."
+  # Copy from GCS bucket
+  gsutil cp -r gs://$GOOGLE_PROJECT/ssh-key/csr-key csr-key
+  gsutil cp -r gs://$GOOGLE_PROJECT/ssh-key/csr-key.pub csr-key.pub
+  # Move to acm folder
+  mv csr-key* ${SCRIPT_DIR}/../infrastructure/ops/prod/acm
+fi
+
 title_no_wait "Preparing terraform backends and shared states files..."
 # Define an array of GCP resources
 declare -a folders
