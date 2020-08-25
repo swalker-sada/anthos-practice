@@ -37,8 +37,7 @@ steps:
   - name: gcr.io/${PROJECT_ID}/asm-installer
     id: "tf-gitlab"
     dir: ops/prod/gitlab
-    waitFor:
-    - "tf-vpc"
+    waitFor: ['-']
     entrypoint: "bash"
     args:
       - "-xe"
