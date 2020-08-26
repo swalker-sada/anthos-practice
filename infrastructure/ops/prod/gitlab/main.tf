@@ -48,5 +48,8 @@ resource "null_resource" "exec_gitlab_creds" {
       GITLAB_HOSTNAME = module.cloud-endpoints-dns-gitlab.endpoint_computed
     }
   }
+  triggers = {
+    script_sha1          = sha1(file("gitlab_creds.sh"))
+  }
   depends_on = [module.gke-gitlab]
 }

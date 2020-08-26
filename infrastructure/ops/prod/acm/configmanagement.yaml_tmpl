@@ -1,0 +1,13 @@
+apiVersion: configmanagement.gke.io/v1
+kind: ConfigManagement
+metadata:
+  name: config-management
+spec:
+  # clusterName is required and must be unique among all managed clusters
+  clusterName: CLUSTER_NAME
+  policyController:
+    enabled: true
+    templateLibraryInstalled: true
+  git:
+    syncRepo: REPO_URL
+    secretType: ssh

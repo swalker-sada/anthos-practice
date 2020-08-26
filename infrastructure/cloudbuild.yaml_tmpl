@@ -81,6 +81,7 @@ steps:
     - "tf-eks"
     - "tf-gitlab"
     entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
       - "-xe"
       - "-c"

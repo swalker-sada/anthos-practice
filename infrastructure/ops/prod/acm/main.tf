@@ -25,3 +25,33 @@ module "gke2_acm" {
   create_ssh_key   = false
   sync_repo        = "ssh://${var.user}@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
 }
+
+resource "null_resource" "exec_eks1_acm" {
+  provisioner "local-exec" {
+    interpreter = ["bash", "-exc"]
+    command     = "${path.module}/eks_acm.sh ${data.terraform_remote_state.eks.outputs.eks1_cluster_id}"
+    environment = {
+      PROJECT_ID = data.terraform_remote_state.vpc.outputs.project_id
+      GCLOUD_USER = var.user
+      REPO_NAME = var.acm_repo
+    }
+  }
+  triggers = {
+    script_sha1          = sha1(file("eks_acm.sh"))
+  }
+}
+resource "null_resource" "exec_eks2_acm" {
+  provisioner "local-exec" {
+    interpreter = ["bash", "-exc"]
+    command     = "${path.module}/eks_acm.sh ${data.terraform_remote_state.eks.outputs.eks2_cluster_id}"
+    environment = {
+      PROJECT_ID = data.terraform_remote_state.vpc.outputs.project_id
+      GCLOUD_USER = var.user
+      REPO_NAME = var.acm_repo
+    }
+  }
+  triggers = {
+    script_sha1          = sha1(file("eks_acm.sh"))
+  }
+  depends_on = [null_resource.exec_eks1_acm]
+}
