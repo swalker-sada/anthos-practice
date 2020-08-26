@@ -89,6 +89,20 @@ steps:
         terraform init
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "tf-asm"
+    dir: ops/prod/asm
+    waitFor:
+    - "tf-acm"
+    entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
 secrets:
 - kmsKeyName: projects/GOOGLE_PROJECT/locations/global/keyRings/aws-creds/cryptoKeys/aws-access-id
   secretEnv:
