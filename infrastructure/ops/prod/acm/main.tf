@@ -12,7 +12,7 @@ module "gke1_acm" {
   cluster_endpoint = data.terraform_remote_state.gke.outputs.gke1_endpoint
   ssh_auth_key     = file("csr-key")
   create_ssh_key   = false
-  sync_repo        = "ssh://${var.user}@qwiklabs.net@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
+  sync_repo        = "ssh://${var.user}@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
 }
 
 module "gke2_acm" {
@@ -23,5 +23,5 @@ module "gke2_acm" {
   cluster_endpoint = data.terraform_remote_state.gke.outputs.gke2_endpoint
   ssh_auth_key     = file("csr-key")
   create_ssh_key   = false
-  sync_repo        = "ssh://${var.user}@qwiklabs.net@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
+  sync_repo        = "ssh://${var.user}@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
 }
