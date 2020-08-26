@@ -34,7 +34,7 @@ steps:
         terraform init
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
-  - name: gcr.io/${PROJECT_ID}/asm-installer
+  -
     id: "tf-gitlab"
     dir: ops/prod/gitlab
     waitFor: ['build-installer-image']
@@ -79,6 +79,7 @@ steps:
     waitFor:
     - "tf-gke"
     - "tf-eks"
+    - "tf-gitlab"
     entrypoint: "bash"
     args:
       - "-xe"

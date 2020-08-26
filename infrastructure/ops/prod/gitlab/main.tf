@@ -38,3 +38,15 @@ resource "google_compute_address" "gitlab" {
 resource "random_id" "database_id" {
   byte_length = 8
 }
+
+resource "null_resource" "exec_gitlab_creds" {
+  provisioner "local-exec" {
+    interpreter = ["bash", "-exc"]
+    command     = "${path.module}/gitlab_creds.sh"
+    environment = {
+      PROJECT_ID = var.project_id
+      GITLAB_HOSTNAME = module.cloud-endpoints-dns-gitlab.endpoint_computed
+    }
+  }
+  depends_on = [module.gke-gitlab]
+}
