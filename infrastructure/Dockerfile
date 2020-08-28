@@ -13,7 +13,7 @@
 # limitations under the License.
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:debian_component_based
-RUN apt install -y jq python3 openssl gettext coreutils wget unzip
+RUN apt install -y jq python3 openssl gettext coreutils wget unzip curl dnsutils
 
 ENV TERRAFORM_VERSION=0.12.26
 ENV KUBECTL_VERSION=1.18.0

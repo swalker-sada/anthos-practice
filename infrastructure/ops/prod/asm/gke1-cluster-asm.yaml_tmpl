@@ -1,0 +1,44 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  addonComponents:
+    kiali:
+      enabled: true
+    grafana:
+      enabled: true
+  values:
+    # selfSigned is required if Citadel is enabled, that is when values.global.istiod.enabled is false.
+    # security:
+      # selfSigned: false
+
+    global:
+      mtls:
+        enabled: true
+      multiCluster:
+        clusterName: ${GKE1}
+      network: ${GCP_NETWORK}
+
+      # Mesh network configuration. This is optional and may be omitted if
+      # all clusters are on the same network.
+      meshNetworks:
+        ${GCP_NETWORK}:
+          endpoints:
+          # Always use Kubernetes as the registry name for the main cluster in the mesh network configuration
+          - fromRegistry: ${GKE1}
+          - fromRegistry: ${GKE2}
+          gateways:
+          - registry_service_name: istio-ingressgateway.istio-system.svc.cluster.local
+            port: 443
+
+        ${AWS_NETWORK}:
+          endpoints:
+          - fromRegistry: ${EKS1}
+          - fromRegistry: ${EKS2}
+          gateways:
+          - address: ${EKS1_ISTIOINGRESS_IP}
+            port: 443
+          - address: ${EKS2_ISTIOINGRESS_IP}
+            port: 443
+
+    kiali:
+      createDemoSecret: true
