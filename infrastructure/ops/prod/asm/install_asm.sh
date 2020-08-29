@@ -22,6 +22,12 @@ kubectl config rename-context eks_${EKS2} ${EKS2}
 kubectl config rename-context gke_${PROJECT_ID}_${GKE1_LOCATION}_${GKE1} ${GKE1}
 kubectl config rename-context gke_${PROJECT_ID}_${GKE2_LOCATION}_${GKE2} ${GKE2}
 
+# Wait until gatekeeper Pods are up
+./is_deployment_ready.sh ${GKE1} gatekeeper-system gatekeeper-controller-manager
+./is_deployment_ready.sh ${GKE2} gatekeeper-system gatekeeper-controller-manager
+./is_deployment_ready.sh ${EKS1} gatekeeper-system gatekeeper-controller-manager
+./is_deployment_ready.sh ${EKS2} gatekeeper-system gatekeeper-controller-manager
+
 # Create istio-system namespace and certs
 kubectl create namespace istio-system --dry-run -o yaml > istio-system.yaml
 kubectl create secret generic cacerts -n istio-system \
