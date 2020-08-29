@@ -123,4 +123,8 @@ fi
 title_no_wait "Enabling kubectl autocompletion..."
 grep -q "kubectl completion bash" ${HOME}/.gcp-workshop.bash || echo 'source <(kubectl completion bash)' >> ${HOME}/.gcp-workshop.bash 
 
+title_no_wait "Creating custom shell prompt file..."
+print_and_execute "cp ${SCRIPT_DIR}/../scripts/krompt.bash ${HOME}/.krompt.bash"
+grep -q ".krompt.bash" ${HOME}/.gcp-workshop.bash || (echo "source ${HOME}/.krompt.bash" >> ${HOME}/.gcp-workshop.bash)
+
 grep -q ".gcp-workshop.bash" ${HOME}/.bashrc || (echo "source ${HOME}/.gcp-workshop.bash" >> ${HOME}/.bashrc)
