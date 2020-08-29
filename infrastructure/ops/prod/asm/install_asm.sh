@@ -61,10 +61,10 @@ kubectl config rename-context gke_${PROJECT_ID}_${GKE1_LOCATION}_${GKE1} ${GKE1}
 kubectl config rename-context gke_${PROJECT_ID}_${GKE2_LOCATION}_${GKE2} ${GKE2}
 
 # Wait until gatekeeper Pods are up
-is_deployment_ready.sh() ${GKE1} gatekeeper-system gatekeeper-controller-manager
-is_deployment_ready.sh() ${GKE2} gatekeeper-system gatekeeper-controller-manager
-is_deployment_ready.sh() ${EKS1} gatekeeper-system gatekeeper-controller-manager
-is_deployment_ready.sh() ${EKS2} gatekeeper-system gatekeeper-controller-manager
+is_deployment_ready.sh ${GKE1} gatekeeper-system gatekeeper-controller-manager
+is_deployment_ready.sh ${GKE2} gatekeeper-system gatekeeper-controller-manager
+is_deployment_ready.sh ${EKS1} gatekeeper-system gatekeeper-controller-manager
+is_deployment_ready.sh ${EKS2} gatekeeper-system gatekeeper-controller-manager
 
 # Create istio-system namespace and certs
 kubectl create namespace istio-system --dry-run -o yaml > istio-system.yaml
@@ -93,8 +93,8 @@ envsubst < eks2-cluster-asm.yaml_tmpl > eks2-cluster-asm.yaml
 istioctl --context=${EKS1} manifest apply -f eks1-cluster-asm.yaml
 istioctl --context=${EKS2} manifest apply -f eks2-cluster-asm.yaml
 
-get_svc_ingress_ip() ${EKS1} istio-ingressgateway
-get_svc_ingress_ip() ${EKS2} istio-ingressgateway
+get_svc_ingress_ip ${EKS1} istio-ingressgateway
+get_svc_ingress_ip ${EKS2} istio-ingressgateway
 
 # Get the Istio ingress gateway IP addresses from both EKS clusters
 export EKS1_ISTIOINGRESS_HOSTNAME=$(kubectl --context ${EKS1} -n istio-system get svc istio-ingressgateway -ojson | jq -r '.status.loadBalancer.ingress[].hostname')
