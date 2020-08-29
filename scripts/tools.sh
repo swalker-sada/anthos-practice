@@ -111,4 +111,16 @@ else
   aws-iam-authenticator help
 fi
 
+title_no_wait "Installing kubectl_aliases..."
+export KUBE_ALIAS=$(cat $HOME/.gcp-workshop.bash | grep kubectl_alias)
+if [[ -z $KUBE_ALIAS ]]; then
+  wget -O $HOME/.kubectl_aliases https://raw.githubusercontent.com/ahmetb/kubectl-alias/master/.kubectl_aliases
+  echo -e "[ -f ~/.kubectl_aliases ] && source ~/.kubectl_aliases" >> ~/.gcp-workshop.bash
+else
+  title_no_wait "kubectl_aliases already installed!"
+fi
+
+title_no_wait "Enabling kubectl autocompletion..."
+grep -q "kubectl completion bash" ${HOME}/.gcp-workshop.bash || echo 'source <(kubectl completion bash)' >> ${HOME}/.gcp-workshop.bash 
+
 grep -q ".gcp-workshop.bash" ${HOME}/.bashrc || (echo "source ${HOME}/.gcp-workshop.bash" >> ${HOME}/.bashrc)

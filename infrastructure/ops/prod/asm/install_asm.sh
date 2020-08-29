@@ -95,14 +95,16 @@ istioctl --context=${EKS1} manifest apply -f eks1-cluster-asm.yaml
 istioctl --context=${EKS2} manifest apply -f eks2-cluster-asm.yaml
 
 get_svc_ingress_ip ${EKS1} istio-ingressgateway
+export EKS1_ISTIOINGRESS_IP=$ingress_ip
 get_svc_ingress_ip ${EKS2} istio-ingressgateway
+export EKS2_ISTIOINGRESS_IP=$ingress_ip
 
 # Get the Istio ingress gateway IP addresses from both EKS clusters
-export EKS1_ISTIOINGRESS_HOSTNAME=$(kubectl --context ${EKS1} -n istio-system get svc istio-ingressgateway -ojson | jq -r '.status.loadBalancer.ingress[].hostname')
-export EKS1_ISTIOINGRESS_IP=$(nslookup ${EKS1_ISTIOINGRESS_HOSTNAME} | grep Address | awk 'END {print $2}')
+#export EKS1_ISTIOINGRESS_HOSTNAME=$(kubectl --context ${EKS1} -n istio-system get svc istio-ingressgateway -ojson | jq -r '.status.loadBalancer.ingress[].hostname')
+#export EKS1_ISTIOINGRESS_IP=$(nslookup ${EKS1_ISTIOINGRESS_HOSTNAME} | grep Address | awk 'END {print $2}')
 echo -e "EKS1_ISTIOINGRESS_IP is ${EKS1_ISTIOINGRESS_IP}"
-export EKS2_ISTIOINGRESS_HOSTNAME=$(kubectl --context ${EKS2} -n istio-system get svc istio-ingressgateway -ojson | jq -r '.status.loadBalancer.ingress[].hostname')
-export EKS2_ISTIOINGRESS_IP=$(nslookup ${EKS2_ISTIOINGRESS_HOSTNAME} | grep Address | awk 'END {print $2}')
+#export EKS2_ISTIOINGRESS_HOSTNAME=$(kubectl --context ${EKS2} -n istio-system get svc istio-ingressgateway -ojson | jq -r '.status.loadBalancer.ingress[].hostname')
+#export EKS2_ISTIOINGRESS_IP=$(nslookup ${EKS2_ISTIOINGRESS_HOSTNAME} | grep Address | awk 'END {print $2}')
 echo -e "EKS2_ISTIOINGRESS_IP is ${EKS2_ISTIOINGRESS_IP}"
 
 # Create the istiooperator resource for the GKE clusters 
