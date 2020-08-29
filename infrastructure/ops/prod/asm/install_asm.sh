@@ -27,15 +27,16 @@ kubectl --context $1 -n $2 get deploy $3 &> /dev/null
 }
 
 get_svc_ingress_ip() {
-export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer')
-        while [[ " ${ingress} " == " {} " ]]
+export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer.ingress[].hostname')
+export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
+        while [[ ${ingress_ip} == *"127."*  ]]
             do 
                 sleep 5
-                echo -e "Waiting for service $2 in cluster $1 to get an ILB IP..."
-                export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer')
+                echo -e "Waiting for service $2 in cluster $1 to get a hostname..."
+                export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer.ingress[].hostname')
+                export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
             done
-        export ingress_ip=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer.ingress[].hostname')
-        echo -e "$2 in cluster $1 has an ILB IP of ${ingress_ip}."
+        echo -e "$2 in cluster $1 has an ip address of ${ingress_ip}."
 }
 
 # Define vars
@@ -61,10 +62,10 @@ kubectl config rename-context gke_${PROJECT_ID}_${GKE1_LOCATION}_${GKE1} ${GKE1}
 kubectl config rename-context gke_${PROJECT_ID}_${GKE2_LOCATION}_${GKE2} ${GKE2}
 
 # Wait until gatekeeper Pods are up
-is_deployment_ready.sh ${GKE1} gatekeeper-system gatekeeper-controller-manager
-is_deployment_ready.sh ${GKE2} gatekeeper-system gatekeeper-controller-manager
-is_deployment_ready.sh ${EKS1} gatekeeper-system gatekeeper-controller-manager
-is_deployment_ready.sh ${EKS2} gatekeeper-system gatekeeper-controller-manager
+is_deployment_ready ${GKE1} gatekeeper-system gatekeeper-controller-manager
+is_deployment_ready ${GKE2} gatekeeper-system gatekeeper-controller-manager
+is_deployment_ready ${EKS1} gatekeeper-system gatekeeper-controller-manager
+is_deployment_ready ${EKS2} gatekeeper-system gatekeeper-controller-manager
 
 # Create istio-system namespace and certs
 kubectl create namespace istio-system --dry-run -o yaml > istio-system.yaml
