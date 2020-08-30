@@ -5,3 +5,14 @@ gcloud container clusters get-credentials gitlab --zone us-central1 --project ${
 echo ${GITLAB_HOSTNAME} > gitlab_creds.txt
 kubectl get secret gitlab-gitlab-initial-root-password -o go-template='{{ .data.password }}' | base64 -d >> gitlab_creds.txt
 gsutil cp -r gitlab_creds.txt gs://${PROJECT_ID}/gitlab/gitlab_creds.txt
+
+# Create a personal access token with the root password
+GITLAB_CREDS=$(kubectl get secret gitlab-gitlab-initial-root-password -o go-template='{{ .data.password }}' | base64 -d)
+kubectl exec -it $WEBSERVICE_POD -c webservice -- /bin/bash -c "
+    cd /srv/gitlab;
+    bin/rails r \"
+    token_digest = Gitlab::CryptoHelper.sha256 \\\"${GITLAB_CREDS}\\\";
+    token=PersonalAccessToken.create!(name: \\\"Anthos Platform Installer\\\", scopes: [:api], user: User.where(id: 1).first, token_digest: token_digest);
+    token.save!
+    \";
+    " > /dev/null 2>&1 || true

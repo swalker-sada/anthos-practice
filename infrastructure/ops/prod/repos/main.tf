@@ -13,13 +13,13 @@ resource "gitlab_project" "anthos-config-management" {
   default_branch   = "master"
 }
 
-resource "gitlab_deploy_key" "anthos-config-management" {
-  project    = gitlab_project.anthos-config-management
-  title      = "acm deploy key"
-  key        = file("${path.module}/acm_gitlab_key.pub")
-  can_push   = "true"
+#resource "gitlab_deploy_key" "anthos-config-management" {
+#  project    = gitlab_project.anthos-config-management
+#  title      = "acm deploy key"
+#  key        = file("${path.module}/acm_gitlab_key.pub")
+#  can_push   = "true"
   # depends_on = [gitlab_project.anthos-config-management]
-}
+#}
 
 resource "gitlab_group" "online-boutique" {
   name             = var.online_boutique_group

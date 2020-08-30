@@ -23,7 +23,7 @@ steps:
       - --cache=true
       - --cache-ttl=12h
   - name: gcr.io/${PROJECT_ID}/asm-installer
-    id: "vpc"
+    id: "tf-vpc"
     dir: network/prod/vpc
     entrypoint: "bash"
     secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
@@ -35,7 +35,7 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/asm-installer
-    id: "gitlab"
+    id: "tf-gitlab"
     dir: ops/prod/gitlab
     waitFor: ['build-installer-image']
     entrypoint: "bash"
@@ -47,23 +47,10 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/asm-installer
-    id: "repos"
-    dir: ops/prod/repos
-    waitFor:
-    - "gitlab"
-    entrypoint: "bash"
-    args:
-      - "-xe"
-      - "-c"
-      - |
-        terraform init
-        terraform plan -out terraform.tfplan
-        terraform apply -input=false terraform.tfplan
-  - name: gcr.io/${PROJECT_ID}/asm-installer
-    id: "gke"
+    id: "tf-gke"
     dir: ops/prod/gke
     waitFor:
-    - "vpc"
+    - "tf-vpc"
     entrypoint: "bash"
     args:
       - "-xe"
@@ -73,10 +60,10 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/asm-installer
-    id: "eks"
+    id: "tf-eks"
     dir: ops/prod/eks
     waitFor:
-    - "vpc"
+    - "tf-vpc"
     entrypoint: "bash"
     secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
@@ -87,12 +74,12 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/asm-installer
-    id: "acm"
+    id: "tf-acm"
     dir: ops/prod/acm
     waitFor:
-    - "gke"
-    - "eks"
-    - "gitlab"
+    - "tf-gke"
+    - "tf-eks"
+    - "tf-gitlab"
     entrypoint: "bash"
     secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
@@ -103,10 +90,10 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/asm-installer
-    id: "asm"
+    id: "tf-asm"
     dir: ops/prod/asm
     waitFor:
-    - "acm"
+    - "tf-acm"
     entrypoint: "bash"
     secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
