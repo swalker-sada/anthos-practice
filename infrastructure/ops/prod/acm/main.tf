@@ -5,24 +5,24 @@ resource "google_sourcerepo_repository" "acm_repo" {
 }
 
 module "gke1_acm" {
-  source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
+  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm?ref=crd-operator-fix"
   project_id       = data.terraform_remote_state.vpc.outputs.project_id
   cluster_name     = data.terraform_remote_state.gke.outputs.gke1_name
   location         = data.terraform_remote_state.gke.outputs.gke1_location
   cluster_endpoint = data.terraform_remote_state.gke.outputs.gke1_endpoint
-  operator_path    = "config-management-operator.yaml"
+#  operator_path    = "config-management-operator.yaml"
   ssh_auth_key     = file("csr-key")
   create_ssh_key   = false
   sync_repo        = "ssh://${var.user}@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
 }
 
 module "gke2_acm" {
-  source           = "terraform-google-modules/kubernetes-engine/google//modules/acm"
+  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm?ref=crd-operator-fix"
   project_id       = data.terraform_remote_state.vpc.outputs.project_id
   cluster_name     = data.terraform_remote_state.gke.outputs.gke2_name
   location         = data.terraform_remote_state.gke.outputs.gke2_location
   cluster_endpoint = data.terraform_remote_state.gke.outputs.gke2_endpoint
-  operator_path    = "config-management-operator.yaml"
+#  operator_path    = "config-management-operator.yaml"
   ssh_auth_key     = file("csr-key")
   create_ssh_key   = false
   sync_repo        = "ssh://${var.user}@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"

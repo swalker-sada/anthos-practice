@@ -39,3 +39,10 @@ spec:
             port: 443
     kiali:
       createDemoSecret: true
+  components:
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        service_annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
