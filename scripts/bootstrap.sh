@@ -164,7 +164,8 @@ else
   gsutil cp -r gs://$GOOGLE_PROJECT/ssh-key/csr-key csr-key
   gsutil cp -r gs://$GOOGLE_PROJECT/ssh-key/csr-key.pub csr-key.pub
   # Move to acm folder
-  mv csr-key* ${SCRIPT_DIR}/../infrastructure/ops/prod/acm
+  cp csr-key* ${SCRIPT_DIR}/../infrastructure/ops/prod/acm
+  cp csr-key.pub ${SCRIPT_DIR}/../infrastructure/ops/prod/repos/acm-key.pub
 fi
 
 title_no_wait "Preparing terraform backends and shared states files..."

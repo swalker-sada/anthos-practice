@@ -49,7 +49,7 @@ resource "null_resource" "exec_gitlab_creds" {
     }
   }
   triggers = {
-    script_sha1          = sha1(file("gitlab_creds.sh"))
+    always_run = "${timestamp()}"
   }
   depends_on = [module.gke-gitlab]
 }
