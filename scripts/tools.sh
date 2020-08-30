@@ -123,6 +123,20 @@ fi
 title_no_wait "Enabling kubectl autocompletion..."
 grep -q "kubectl completion bash" ${HOME}/.gcp-workshop.bash || echo 'source <(kubectl completion bash)' >> ${HOME}/.gcp-workshop.bash 
 
+title_no_wait "Installing istioctl..."
+if [[ ! ${ASM_VERSION} ]]; then
+  read -p "Enter ASM version: " ASM_VERSION
+fi
+export ISTIOCTL_INSTALLED=`which istioctl
+if [[ ${ISTIOCTL_INSTALLED} ]]; then
+  title_no_wait "istioctl is already installed."
+else
+  wget -O $HOME/istio-${ASM_VERSION}-linux-amd64.tar.gz https://storage.googleapis.com/gke-release/asm/istio-${ASM_VERSION}-linux-amd64.tar.gz
+  tar -C $HOME -xzf $HOME/istio-${ASM_VERSION}-linux-amd64.tar.gz
+  rm -rf $HOME/istio-${ASM_VERSION}-linux-amd64.tar.gz
+  mv $HOME/istio-${ASM_VERSION}/bin/istioctl $HOME/.local/bin/istioctl
+fi
+
 title_no_wait "Creating custom shell prompt file..."
 print_and_execute "cp ${SCRIPT_DIR}/../scripts/krompt.bash ${HOME}/.krompt.bash"
 grep -q ".krompt.bash" ${HOME}/.gcp-workshop.bash || (echo "source ${HOME}/.krompt.bash" >> ${HOME}/.gcp-workshop.bash)
