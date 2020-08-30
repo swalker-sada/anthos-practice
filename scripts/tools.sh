@@ -127,7 +127,8 @@ title_no_wait "Installing istioctl..."
 if [[ ! ${ASM_VERSION} ]]; then
   read -p "Enter ASM version: " ASM_VERSION
 fi
-export ISTIOCTL_INSTALLED=`which istioctl
+
+export ISTIOCTL_INSTALLED=`which istioctl`
 if [[ ${ISTIOCTL_INSTALLED} ]]; then
   title_no_wait "istioctl is already installed."
 else
