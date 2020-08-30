@@ -20,14 +20,14 @@ module "cloud-endpoints-dns-gitlab" {
   external_ip = google_compute_address.gitlab.address
 }
 
-module "cloud-endpoints-dns-registry" {
-  source  = "terraform-google-modules/endpoints-dns/google"
-  version = "~> 2.0.1"
+#module "cloud-endpoints-dns-registry" {
+#  source  = "terraform-google-modules/endpoints-dns/google"
+#  version = "~> 2.0.1"
 
-  project     = var.project_id
-  name        = "registry"
-  external_ip = google_compute_address.gitlab.address
-}
+#  project     = var.project_id
+#  name        = "registry"
+#  external_ip = google_compute_address.gitlab.address
+#}
 
 resource "google_compute_address" "gitlab" {
   project = var.project_id
