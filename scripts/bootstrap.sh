@@ -157,7 +157,8 @@ if [[ $(gsutil ls gs://$GOOGLE_PROJECT/ssh-key &> /dev/null || echo $?) ]]; then
   gsutil cp -r csr-key gs://$GOOGLE_PROJECT/ssh-key/csr-key
   gsutil cp -r csr-key.pub gs://$GOOGLE_PROJECT/ssh-key/csr-key.pub
   # Move key pair to the acm folder
-  mv csr-key* ${SCRIPT_DIR}/../infrastructure/ops/prod/acm
+  cp csr-key* ${SCRIPT_DIR}/../infrastructure/ops/prod/acm
+  cp csr-key.pub ${SCRIPT_DIR}/../infrastructure/ops/prod/repos/acm-key.pub
 else
   title_no_wait "SSH Key pairs already exist."
   # Copy from GCS bucket
