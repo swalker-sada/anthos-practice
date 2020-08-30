@@ -49,8 +49,23 @@ source ${SCRIPT_DIR}/../scripts/tools.sh
 
 if [[ ! ${GOOGLE_PROJECT} ]]; then
     title_no_wait "You have not defined your project ID in the GOOGLE_PROJECT variable."
-    exit 1
+    read -p "Please enter your GCP project ID: " GOOGLE_PROJECT
 fi
+if [[ ! ${AWS_ACCESS_KEY_ID} ]]; then
+    title_no_wait "You have not defined your AWS Access Key ID in the AWS_ACCESS_KEY_ID variable."
+    read -p "Please enter your AWS Access Key ID: " AWS_ACCESS_KEY_ID
+fi
+if [[ ! ${AWS_SECRET_ACCESS_KEY} ]]; then
+    title_no_wait "You have not defined your AWS Secret Access Key in the AWS_SECRET_ACCESS_KEY variable."
+    read -p "Please enter your AWS Secret Access Key: " AWS_SECRET_ACCESS_KEY
+fi
+if [[ ! ${GCLOUD_USER} ]]; then
+    title_no_wait "You have not defined your Google user email in the GCLOUD_USER variable."
+    read -p "Please enter your Google user email: " GCLOUD_USER
+fi
+
+title_no_wait "Setting GCP project..."
+print_and_execute "gcloud config set project ${GOOGLE_PROJECT}"
 
 title_no_wait "Enabling APIs..."
 print_and_execute "gcloud services enable cloudresourcemanager.googleapis.com \
