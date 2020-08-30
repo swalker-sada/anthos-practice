@@ -7,7 +7,8 @@ kubectl get secret gitlab-gitlab-initial-root-password -o go-template='{{ .data.
 gsutil cp -r gitlab_creds.txt gs://${PROJECT_ID}/gitlab/gitlab_creds.txt
 
 # Create a personal access token with the root password
-GITLAB_CREDS=$(kubectl get secret gitlab-gitlab-initial-root-password -o go-template='{{ .data.password }}' | base64 -d)
+export GITLAB_CREDS=$(kubectl get secret gitlab-gitlab-initial-root-password -o go-template='{{ .data.password }}' | base64 -d)
+export WEBSERVICE_POD=$(kubectl get pods -l=app=webservice -o jsonpath='{.items[0].metadata.name}')
 kubectl exec -it $WEBSERVICE_POD -c webservice -- /bin/bash -c "
     cd /srv/gitlab;
     bin/rails r \"
