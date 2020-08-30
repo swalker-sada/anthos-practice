@@ -62,10 +62,26 @@ kubectl config rename-context gke_${PROJECT_ID}_${GKE1_LOCATION}_${GKE1} ${GKE1}
 kubectl config rename-context gke_${PROJECT_ID}_${GKE2_LOCATION}_${GKE2} ${GKE2}
 
 # Wait until gatekeeper Pods are up
-is_deployment_ready ${GKE1} gatekeeper-system gatekeeper-controller-manager
-is_deployment_ready ${GKE2} gatekeeper-system gatekeeper-controller-manager
-is_deployment_ready ${EKS1} gatekeeper-system gatekeeper-controller-manager
-is_deployment_ready ${EKS2} gatekeeper-system gatekeeper-controller-manager
+export IS_ACM_INSTALLED_GKE1=$(kubectl --context=${GKE1} get ns | grep gatekeeper-system)
+export IS_ACM_INSTALLED_GKE2=$(kubectl --context=${GKE2} get ns | grep gatekeeper-system)
+export IS_ACM_INSTALLED_EKS1=$(kubectl --context=${EKS1} get ns | grep gatekeeper-system)
+export IS_ACM_INSTALLED_EKS2=$(kubectl --context=${EKS2} get ns | grep gatekeeper-system)
+
+if [[ ${IS_ACM_INSTALLED_GKE1} ]]; then
+  is_deployment_ready ${GKE1} gatekeeper-system gatekeeper-controller-manager
+fi
+
+if [[ ${IS_ACM_INSTALLED_GKE2} ]]; then
+  is_deployment_ready ${GKE2} gatekeeper-system gatekeeper-controller-manager
+fi
+
+if [[ ${IS_ACM_INSTALLED_EKS1} ]]; then
+  is_deployment_ready ${EKS1} gatekeeper-system gatekeeper-controller-manager
+fi
+
+if [[ ${IS_ACM_INSTALLED_EKS2} ]]; then
+  is_deployment_ready ${EKS2} gatekeeper-system gatekeeper-controller-manager
+fi
 
 # Create istio-system namespace and certs
 kubectl create namespace istio-system --dry-run -o yaml > istio-system.yaml
