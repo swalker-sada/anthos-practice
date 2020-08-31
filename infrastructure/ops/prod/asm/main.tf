@@ -15,8 +15,10 @@ resource "null_resource" "exec_install_asm" {
   }
   triggers = {
     script_sha1          = sha1(file("install_asm.sh"))
-    script_sha1          = sha1(file("eks1-cluster-asm.yaml_tmpl"))
-    script_sha1          = sha1(file("eks2-cluster-asm.yaml_tmpl"))
+    script_sha1          = sha1(file("eks1-cluster-asm-first.yaml_tmpl"))
+    script_sha1          = sha1(file("eks1-cluster-asm-second.yaml_tmpl"))
+    script_sha1          = sha1(file("eks2-cluster-asm-first.yaml_tmpl"))
+    script_sha1          = sha1(file("eks2-cluster-asm-second.yaml_tmpl"))
     script_sha1          = sha1(file("gke1-cluster-asm.yaml_tmpl"))
     script_sha1          = sha1(file("gke2-cluster-asm.yaml_tmpl"))
   }

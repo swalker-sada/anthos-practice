@@ -16,12 +16,12 @@ spec:
         enabled: true
       multiCluster:
         clusterName: ${GKE2}
-      network: ${GCP_NETWORK}
+      network: ${GCP_NET}
 
       # Mesh network configuration. This is optional and may be omitted if
       # all clusters are on the same network.
       meshNetworks:
-        ${GCP_NETWORK}:
+        ${GCP_NET}:
           endpoints:
           # Always use Kubernetes as the registry name for the main cluster in the mesh network configuration
           - fromRegistry: ${GKE1}
@@ -29,16 +29,17 @@ spec:
           gateways:
           - registry_service_name: istio-ingressgateway.istio-system.svc.cluster.local
             port: 443
-
-        ${AWS_NETWORK}:
+        ${EKS1_NET}:
           endpoints:
           - fromRegistry: ${EKS1}
-          - fromRegistry: ${EKS2}
           gateways:
           - address: ${EKS1_ISTIOINGRESS_IP}
             port: 443
+        ${EKS2_NET}:
+          endpoints:
+          - fromRegistry: ${EKS2}
+          gateways:
           - address: ${EKS2_ISTIOINGRESS_IP}
             port: 443
-
     kiali:
       createDemoSecret: true

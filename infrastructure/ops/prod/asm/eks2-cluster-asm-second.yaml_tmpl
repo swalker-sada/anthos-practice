@@ -15,8 +15,8 @@ spec:
       mtls:
         enabled: true
       multiCluster:
-        clusterName: ${GKE1}
-      network: ${GCP_NET}
+        clusterName: ${EKS2}
+      network: ${EKS2_NET}
 
       # Mesh network configuration. This is optional and may be omitted if
       # all clusters are on the same network.
@@ -29,17 +29,24 @@ spec:
           gateways:
           - registry_service_name: istio-ingressgateway.istio-system.svc.cluster.local
             port: 443
+        ${EKS2_NET}:
+          endpoints:
+          - fromRegistry: ${EKS2}
+          gateways:
+          - registry_service_name: istio-ingressgateway.istio-system.svc.cluster.local
+            port: 443
         ${EKS1_NET}:
           endpoints:
           - fromRegistry: ${EKS1}
           gateways:
           - address: ${EKS1_ISTIOINGRESS_IP}
             port: 443
-        ${EKS2_NET}:
-          endpoints:
-          - fromRegistry: ${EKS2}
-          gateways:
-          - address: ${EKS2_ISTIOINGRESS_IP}
-            port: 443
     kiali:
       createDemoSecret: true
+  components:
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        service_annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb

@@ -5,7 +5,7 @@ resource "google_sourcerepo_repository" "acm_repo" {
 }
 
 module "gke1_acm" {
-  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm?ref=crd-operator-fix"
+  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
   project_id       = data.terraform_remote_state.vpc.outputs.project_id
   cluster_name     = data.terraform_remote_state.gke.outputs.gke1_name
   location         = data.terraform_remote_state.gke.outputs.gke1_location
@@ -17,7 +17,7 @@ module "gke1_acm" {
 }
 
 module "gke2_acm" {
-  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm?ref=crd-operator-fix"
+  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
   project_id       = data.terraform_remote_state.vpc.outputs.project_id
   cluster_name     = data.terraform_remote_state.gke.outputs.gke2_name
   location         = data.terraform_remote_state.gke.outputs.gke2_location

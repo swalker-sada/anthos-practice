@@ -41,8 +41,9 @@ export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
 
 # Define vars
 export ASM_DIR=istio-${ASM_VERSION}
-export GCP_NETWORK=gcp-vpc
-export AWS_NETWORK=aws-vpc
+export GCP_NET=gcp-vpc
+export EKS1_NET=aws-vpc-eks1
+export EKS2_NET=aws-vpc-eks2
 
 # Get ASM distro
 wget https://storage.googleapis.com/gke-release/asm/istio-${ASM_VERSION}-linux-amd64.tar.gz
@@ -103,12 +104,17 @@ kubectl --context ${EKS1} apply -f cacerts.yaml
 kubectl --context ${EKS2} apply -f cacerts.yaml
 
 # Create istiooperator resources for the EKS clusters
-envsubst < eks1-cluster-asm.yaml_tmpl > eks1-cluster-asm.yaml
-envsubst < eks2-cluster-asm.yaml_tmpl > eks2-cluster-asm.yaml
+envsubst < eks1-cluster-asm-first.yaml_tmpl > eks1-cluster-asm-first.yaml
+envsubst < eks2-cluster-asm-first.yaml_tmpl > eks2-cluster-asm-first.yaml
 
-# Deploy the istiooperator resource on the EKS clusters
-istioctl --context=${EKS1} manifest apply -f eks1-cluster-asm.yaml
-istioctl --context=${EKS2} manifest apply -f eks2-cluster-asm.yaml
+# Deploy the istiooperator resource on the EKS clusters first time
+echo -e "EKS1 first ASM install manifest: "
+cat eks1-cluster-asm-first.yaml
+echo -e "EKS2 first ASM install manifest: "
+cat eks2-cluster-asm-first.yaml
+
+istioctl --context=${EKS1} manifest apply -f eks1-cluster-asm-first.yaml
+istioctl --context=${EKS2} manifest apply -f eks2-cluster-asm-first.yaml
 
 get_svc_ingress_ip ${EKS1} istio-ingressgateway
 export EKS1_ISTIOINGRESS_IP=$ingress_ip
@@ -123,11 +129,26 @@ echo -e "EKS1_ISTIOINGRESS_IP is ${EKS1_ISTIOINGRESS_IP}"
 #export EKS2_ISTIOINGRESS_IP=$(nslookup ${EKS2_ISTIOINGRESS_HOSTNAME} | grep Address | awk 'END {print $2}')
 echo -e "EKS2_ISTIOINGRESS_IP is ${EKS2_ISTIOINGRESS_IP}"
 
+# Create the second EKS ASM install manifests
+envsubst < eks1-cluster-asm-second.yaml_tmpl > eks1-cluster-asm-second.yaml
+envsubst < eks2-cluster-asm-second.yaml_tmpl > eks2-cluster-asm-second.yaml
+
+# Deploy the istiooperator resource on the EKS clusters second time
+echo -e "EKS1 second ASM install manifest: "
+cat eks1-cluster-asm-second.yaml
+echo -e "EKS2 second ASM install manifest: "
+cat eks2-cluster-asm-second.yaml
+
+istioctl --context=${EKS1} manifest apply -f eks1-cluster-asm-second.yaml
+istioctl --context=${EKS2} manifest apply -f eks2-cluster-asm-second.yaml
+
 # Create the istiooperator resource for the GKE clusters 
 envsubst < gke1-cluster-asm.yaml_tmpl > gke1-cluster-asm.yaml
 envsubst < gke2-cluster-asm.yaml_tmpl > gke2-cluster-asm.yaml
 
+echo -e "GKE1 ASM install manifest: "
 cat gke1-cluster-asm.yaml
+echo -e "GKE2 ASM install manifest: "
 cat gke2-cluster-asm.yaml
 
 # Deploy the istiooperator resource on the GKE clusters
