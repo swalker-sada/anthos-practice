@@ -32,7 +32,7 @@ export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
         while [[ ${ingress_ip} == *"127."*  ]]
             do 
                 sleep 5
-                echo -e "Waiting for service $2 in cluster $1 to get a hostname..."
+                echo -e "Waiting for service $2 in cluster $1 to get an IP address..."
                 export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer.ingress[].hostname')
                 export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
             done
