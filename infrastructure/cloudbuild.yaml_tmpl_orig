@@ -35,6 +35,31 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "gitlab"
+    dir: ops/prod/gitlab
+    waitFor: ['build-installer-image']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "repos"
+    dir: ops/prod/repos
+    waitFor:
+    - "gitlab"
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/asm-installer
     id: "gke"
     dir: ops/prod/gke
     waitFor:
@@ -52,6 +77,50 @@ steps:
     dir: ops/prod/eks
     waitFor:
     - "vpc"
+    entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "acm"
+    dir: ops/prod/acm
+    waitFor:
+    - "gke"
+    - "eks"
+    - "gitlab"
+    entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "asm"
+    dir: ops/prod/asm
+    waitFor:
+    - "acm"
+    entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/asm-installer
+    id: "asm-tests"
+    dir: ops/prod/asm_connectivity
+    waitFor:
+    - "asm"
     entrypoint: "bash"
     secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
