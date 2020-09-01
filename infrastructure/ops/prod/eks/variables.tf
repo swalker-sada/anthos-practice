@@ -1,5 +1,5 @@
-variable "eks1_cluster_name" { default = "eks1-r1ab-prod" }
-variable "eks2_cluster_name" { default = "eks2-r1ab-prod" }
+variable "eks1_cluster_name" { default = "eks1" }
+variable "eks2_cluster_name" { default = "eks2" }
 variable "gke_hub_sa" { default = "gke-hub-sa" }
 
 variable "map_accounts" {

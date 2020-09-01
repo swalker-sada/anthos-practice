@@ -32,45 +32,32 @@ export EKS1=eks1
 export GKE2=gke2
 export EKS2=eks2
 
-# Clone repo with OB manifests
-mkdir -p ~/asm-test && cd ~/asm-test
-if [ -d "$HOME/asm-test/istio-multicluster-gke" ]; then
-  echo "Repo already present."
-else
-  git clone https://github.com/GoogleCloudPlatform/istio-multicluster-gke.git ~/asm-test/istio-multicluster-gke
-fi
+# Export a SCRIPT_DIR var and make all links relative to SCRIPT_DIR
+export SCRIPT_DIR=$(dirname $(readlink -f $0 2>/dev/null) 2>/dev/null || echo "${PWD}/$(dirname $0)")
 
-# Create namespace
-cat > namespace-ob.yaml <<EOF
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: ob
-  labels:
-    istio-injection: enabled
-EOF
+kubectl --context=${GKE1} apply -f ${SCRIPT_DIR}/ob/gke1/ob-namespace.yaml
+kubectl --context=${GKE2} apply -f ${SCRIPT_DIR}/ob/gke2/ob-namespace.yaml
+kubectl --context=${EKS1} apply -f ${SCRIPT_DIR}/ob/eks1/ob-namespace.yaml
+kubectl --context=${EKS2} apply -f ${SCRIPT_DIR}/ob/eks2/ob-namespace.yaml
 
-kubectl --context=${GKE1} apply -f namespace-ob.yaml
-kubectl --context=${EKS1} apply -f namespace-ob.yaml
+kubectl --context=${GKE1} -n ob apply -f ${SCRIPT_DIR}/ob/gke1
+kubectl --context=${GKE2} -n ob apply -f ${SCRIPT_DIR}/ob/gke2
+kubectl --context=${EKS1} -n ob apply -f ${SCRIPT_DIR}/ob/eks1
+kubectl --context=${EKS2} -n ob apply -f ${SCRIPT_DIR}/ob/eks2
 
-# Deploy ob
-kubectl --context ${GKE1} --namespace ob apply -f ${HOME}/asm-test/istio-multicluster-gke/anthos-multicloud/online-boutique/control
-kubectl --context ${EKS1} --namespace ob apply -f ${HOME}/asm-test/istio-multicluster-gke/anthos-multicloud/online-boutique/onprem
-
-# Wait until all Pods are ready
-is_deployment_ready ${GKE1} ob frontend
-is_deployment_ready ${GKE1} ob checkoutservice
-is_deployment_ready ${GKE1} ob adservice
-is_deployment_ready ${GKE1} ob currencyservice
 is_deployment_ready ${GKE1} ob emailservice
-is_deployment_ready ${GKE1} ob paymentservice
-is_deployment_ready ${GKE1} ob productcatalogservice
-is_deployment_ready ${GKE1} ob shippingservice
-is_deployment_ready ${EKS1} ob cartservice
-is_deployment_ready ${EKS1} ob recommendationservice
+is_deployment_ready ${GKE1} ob checkoutservice
+is_deployment_ready ${GKE1} ob frontend
+
+is_deployment_ready ${GKE2} ob paymentservice
+is_deployment_ready ${GKE2} ob productcatalogservice
+is_deployment_ready ${GKE2} ob currencyservice
+
+is_deployment_ready ${EKS1} ob shippingservice
+is_deployment_ready ${EKS1} ob adservice
 is_deployment_ready ${EKS1} ob loadgenerator
 
-# Get GKE1 istio ingress IP
-export INGRESS_IP=$(kubectl --context ${GKE1} --namespace istio-system get svc istio-ingressgateway -o jsonpath={.status.loadBalancer.ingress..ip})
-echo -e "\n"
-echo -e "Navigate to the following IP address: \n${INGRESS_IP}\n"
+is_deployment_ready ${EKS2} ob cartservice
+is_deployment_ready ${EKS2} ob recommendationservice
+
+kubectl --context=${GKE1} -n istio-system get svc

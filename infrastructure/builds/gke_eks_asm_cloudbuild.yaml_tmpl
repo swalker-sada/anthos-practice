@@ -65,7 +65,8 @@ steps:
     id: "asm"
     dir: ops/prod/asm
     waitFor:
-    - "acm"
+    - "gke"
+    - "eks"
     entrypoint: "bash"
     secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
