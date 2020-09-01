@@ -127,7 +127,19 @@ kubectl --context=${GKE2} apply -f 05_app-httpbin-svc-in-app2.yaml
 kubectl --context=${EKS1} apply -f 05_app-httpbin-svc-in-app2.yaml
 kubectl --context=${EKS2} apply -f 05_app-httpbin-svc-in-app2.yaml
 
-# Verify Pods are ready
+# Deploy httpbin deployments
+kubectl --context=${GKE1} apply -f 04_app-httpbin-in-app1.yaml
+kubectl --context=${GKE2} apply -f 04_app-httpbin-in-app2.yaml
+kubectl --context=${EKS1} apply -f 04_app-httpbin-in-app3.yaml
+kubectl --context=${EKS2} apply -f 04_app-httpbin-in-app4.yaml
+
+# Deploy sleep
+kubectl --context=${GKE1} apply -f 04_app-sleep-in-app1.yaml
+kubectl --context=${GKE2} apply -f 04_app-sleep-in-app2.yaml
+kubectl --context=${EKS1} apply -f 04_app-sleep-in-app3.yaml
+kubectl --context=${EKS2} apply -f 04_app-sleep-in-app4.yaml
+
+# Wait until deployments are ready
 is_deployment_ready ${GKE1} app1 httpbin
 is_deployment_ready ${GKE1} app1 sleep
 is_deployment_ready ${GKE2} app2 httpbin
