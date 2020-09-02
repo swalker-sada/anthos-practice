@@ -138,6 +138,14 @@ else
   mv $HOME/istio-${ASM_VERSION}/bin/istioctl $HOME/.local/bin/istioctl
 fi
 
+export NOMOS_INSTALLED=`which nomos`
+if [[ ${NOMOS_INSTALLED} ]]; then
+  title_no_wait "nomos is already installed."
+else
+  gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos $HOME/.local/bin/nomos
+  chmod +x $HOME/.local/bin/nomos
+fi
+
 title_no_wait "Creating custom shell prompt file..."
 print_and_execute "cp ${SCRIPT_DIR}/../scripts/krompt.bash ${HOME}/.krompt.bash"
 grep -q ".krompt.bash" ${HOME}/.gcp-workshop.bash || (echo "source ${HOME}/.krompt.bash" >> ${HOME}/.gcp-workshop.bash)
