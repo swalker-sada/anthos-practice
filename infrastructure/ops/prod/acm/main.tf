@@ -1,8 +1,3 @@
-# Create an ACM repo
-resource "google_sourcerepo_repository" "acm_repo" {
-  name    = var.acm_repo
-  project = data.terraform_remote_state.vpc.outputs.project_id
-}
 
 module "gke1_acm" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
@@ -13,7 +8,6 @@ module "gke1_acm" {
   ssh_auth_key     = file("csr-key")
   create_ssh_key   = false
   sync_repo        = data.terraform_remote_state.repos.outputs.acm_repo_ssh_url
-  #sync_repo        = "ssh://${var.user}@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
 }
 
 module "gke2_acm" {
@@ -25,7 +19,6 @@ module "gke2_acm" {
   ssh_auth_key     = file("csr-key")
   create_ssh_key   = false
   sync_repo        = data.terraform_remote_state.repos.outputs.acm_repo_ssh_url
-  #sync_repo        = "ssh://${var.user}@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
 }
 
 resource "null_resource" "exec_eks1_acm" {
