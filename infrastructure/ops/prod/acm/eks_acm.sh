@@ -12,7 +12,6 @@ gsutil cp gs://$PROJECT_ID/ssh-key/csr-key csr-key
 cat csr-key
 
 # Prep ACM yaml
-export REPO_URL=ssh://$GCLOUD_USER@source.developers.google.com:2022/p/$PROJECT_ID/r/$REPO_NAME
 sed -e s/CLUSTER_NAME/${EKS_CLUSTER}/g -e s~REPO_URL~${REPO_URL}~g ./configmanagement.yaml_tmpl > configmanagement.yaml 
 cat configmanagement.yaml
 

@@ -1,8 +1,3 @@
-# Create an ACM repo
-resource "google_sourcerepo_repository" "acm_repo" {
-  name    = var.acm_repo
-  project = data.terraform_remote_state.vpc.outputs.project_id
-}
 
 module "gke1_acm" {
   source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
@@ -10,10 +5,9 @@ module "gke1_acm" {
   cluster_name     = data.terraform_remote_state.gke.outputs.gke1_name
   location         = data.terraform_remote_state.gke.outputs.gke1_location
   cluster_endpoint = data.terraform_remote_state.gke.outputs.gke1_endpoint
-#  operator_path    = "config-management-operator.yaml"
   ssh_auth_key     = file("csr-key")
   create_ssh_key   = false
-  sync_repo        = "ssh://${var.user}@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
+  sync_repo        = data.terraform_remote_state.repos.outputs.acm_repo_ssh_url
 }
 
 module "gke2_acm" {
@@ -22,10 +16,9 @@ module "gke2_acm" {
   cluster_name     = data.terraform_remote_state.gke.outputs.gke2_name
   location         = data.terraform_remote_state.gke.outputs.gke2_location
   cluster_endpoint = data.terraform_remote_state.gke.outputs.gke2_endpoint
-#  operator_path    = "config-management-operator.yaml"
   ssh_auth_key     = file("csr-key")
   create_ssh_key   = false
-  sync_repo        = "ssh://${var.user}@source.developers.google.com:2022/p/${data.terraform_remote_state.vpc.outputs.project_id}/r/${google_sourcerepo_repository.acm_repo.name}"
+  sync_repo        = data.terraform_remote_state.repos.outputs.acm_repo_ssh_url
 }
 
 resource "null_resource" "exec_eks1_acm" {
@@ -35,7 +28,7 @@ resource "null_resource" "exec_eks1_acm" {
     environment = {
       PROJECT_ID = data.terraform_remote_state.vpc.outputs.project_id
       GCLOUD_USER = var.user
-      REPO_NAME = var.acm_repo
+      REPO_URL = data.terraform_remote_state.repos.outputs.acm_repo_ssh_url
     }
   }
   triggers = {
@@ -49,7 +42,7 @@ resource "null_resource" "exec_eks2_acm" {
     environment = {
       PROJECT_ID = data.terraform_remote_state.vpc.outputs.project_id
       GCLOUD_USER = var.user
-      REPO_NAME = var.acm_repo
+      REPO_URL = data.terraform_remote_state.repos.outputs.acm_repo_ssh_url
     }
   }
   triggers = {
