@@ -7,7 +7,8 @@ module "aws_vpc" {
 
   name                 = var.aws_vpc_name
   cidr                 = var.aws_vpc_cidr
-  azs                  = data.aws_availability_zones.available.names
+  azs                  = var.azs
+  # azs                  = data.aws_availability_zones.available.names
   private_subnets      = var.aws_private_subnets
   public_subnets       = var.aws_public_subnets
   enable_nat_gateway   = true
@@ -26,3 +27,9 @@ public_subnet_tags = {
     "kubernetes.io/role/internal-elb"             = "1"
   }
 }
+
+resource "aws_eip" "asm-ingress" {
+  count = 4
+  vpc = true
+}
+

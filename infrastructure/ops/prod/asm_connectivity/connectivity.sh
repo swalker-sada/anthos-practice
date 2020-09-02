@@ -127,6 +127,16 @@ kubectl --context=${GKE2} apply -f 05_app-httpbin-svc-in-app2.yaml
 kubectl --context=${EKS1} apply -f 05_app-httpbin-svc-in-app2.yaml
 kubectl --context=${EKS2} apply -f 05_app-httpbin-svc-in-app2.yaml
 
+kubectl --context=${GKE1} apply -f 05_app-httpbin-svc-in-app3.yaml
+kubectl --context=${GKE2} apply -f 05_app-httpbin-svc-in-app3.yaml
+kubectl --context=${EKS1} apply -f 05_app-httpbin-svc-in-app3.yaml
+kubectl --context=${EKS2} apply -f 05_app-httpbin-svc-in-app3.yaml
+
+kubectl --context=${GKE1} apply -f 05_app-httpbin-svc-in-app4.yaml
+kubectl --context=${GKE2} apply -f 05_app-httpbin-svc-in-app4.yaml
+kubectl --context=${EKS1} apply -f 05_app-httpbin-svc-in-app4.yaml
+kubectl --context=${EKS2} apply -f 05_app-httpbin-svc-in-app4.yaml
+
 # Deploy httpbin deployments
 kubectl --context=${GKE1} apply -f 04_app-httpbin-in-app1.yaml
 kubectl --context=${GKE2} apply -f 04_app-httpbin-in-app2.yaml
