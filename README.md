@@ -110,7 +110,7 @@ mkdir -p $HOME/anthos-multicloud && cd $HOME/anthos-multicloud && export WORKDIR
 ```
 - Clone the workshop repo.
 ```
-git clone https://gitlab.com/ameer00/attached-clusters.git ${WORKDIR}/attached-clusters
+git clone https://gitlab.com/ameer00/anthos-multicloud-workshop.git ${WORKDIR}/attached-clusters
 ```
 
 ## Deploy the environment
