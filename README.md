@@ -117,7 +117,7 @@ git clone https://gitlab.com/ameer00/anthos-multicloud-workshop.git ${WORKDIR}/a
 
 - Run the bootstrap script to set up the environment in GCP and AWS.
 ```
-cd ${WORKDIR}/attached-clusters
+cd ${WORKDIR}/anthos-multicloud-workshop
 ./build.sh
 ```
 - Once the `build.sh` script finishes, it triggers an infrastructure deployment pipeline in **Cloudbuild**. This pipeline deploys the Anthos platform in both GCP and AWS.
@@ -168,15 +168,15 @@ installer --> stageawsvpc
 installer --> devgcpvpc
 
 installer --> gitlab -->|Create ACM and Online Boutique repos| repos 
-repos --> prodgke
-repos --> stagegke
-repos --> devgke
+%%repos --> prodgke
+%%repos --> stagegke
+%%repos --> devgke
 
-repos --> prodeks
-repos --> stageeks
+%%repos --> prodeks
+%%repos --> stageeks
 
 prodgcpvpc -->|Store creds in GCS| hub_gsa
-installer -->|Create SSH key pair and store in GCS| ssh_key
+prodgcpvpc -->|Create SSH key pair and store in GCS| ssh_key
 
 ssh_key -->|Public key as deploy token| repos
 
