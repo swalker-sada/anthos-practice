@@ -122,7 +122,7 @@ cd ${WORKDIR}/attached-clusters
 ```
 - Once the `build.sh` script finishes, it triggers an infrastructure deployment pipeline in **Cloudbuild**. This pipeline deploys the Anthos platform in both GCP and AWS.
 
-> Note that the infrastructure pipeline can take 35 - 45 minutes to complete.
+> Note that the infrastructure pipeline can take 40 - 50 minutes to complete.
 
 - Go to the **Cloudbuild** details page in Cloud Console from the left hand navbar.
 - You see one build running. Click on the build ID to inspect the stages of the pipeline.
