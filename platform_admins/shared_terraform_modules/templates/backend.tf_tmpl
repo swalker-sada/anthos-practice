@@ -1,0 +1,6 @@
+terraform {
+ backend "gcs" {
+   bucket  = "GOOGLE_PROJECT"
+   prefix  = "tfstate/ENV/CLOUD/RESOURCE"
+ }
+}

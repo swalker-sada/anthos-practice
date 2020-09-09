@@ -1,0 +1,13 @@
+  values:
+    kiali:
+      createDemoSecret: true
+    global:
+      mtls:
+        enabled: true
+      multiCluster:
+        clusterName: ${EKS}
+      network: ${EKS}-net
+      meshNetworks:
+        ${GCP_NET}:
+          endpoints:
+          # Always use Kubernetes as the registry name for the main cluster in the mesh network configuration

@@ -1,2 +1,0 @@
-gitlab_hostname="gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog"
-project_id="${GOOGLE_PROJECT}"

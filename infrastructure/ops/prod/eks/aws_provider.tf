@@ -1,1 +1,0 @@
-../../../aws/prod/provider/aws_provider.tf

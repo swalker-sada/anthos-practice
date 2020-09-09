@@ -1,0 +1,1 @@
+../../variables/asm_variables.tf

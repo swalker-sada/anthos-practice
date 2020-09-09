@@ -1,1 +1,0 @@
-# GCP Shared States Stage
