@@ -1,1 +1,0 @@
-../../../gcp/prod/provider/gcp_provider.tf

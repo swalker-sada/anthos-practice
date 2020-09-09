@@ -1,0 +1,70 @@
+variable "subnets" {
+    default = [
+        {
+            subnet_name = "prod-gcp-vpc-01-us-west2-subnet-01"
+            subnet_ip = "10.4.0.0/22"
+            subnet_region = "us-west2"
+            secondary_ranges = [
+                {
+                    range_name = "prod-gcp-vpc-01-us-west2-subnet-01-secondary-range-01-pod"
+                    ip_cidr_range = "10.0.0.0/14"
+                },
+                {
+                    range_name = "prod-gcp-vpc-01-us-west2-subnet-01-secondary-range-02-svc"
+                    ip_cidr_range = "10.5.0.0/20"
+                },
+                {
+                    range_name = "prod-gcp-vpc-01-us-west2-subnet-01-secondary-range-03-svc"
+                    ip_cidr_range = "10.5.16.0/20"
+                },
+                {
+                    range_name = "prod-gcp-vpc-01-us-west2-subnet-01-secondary-range-04-svc"
+                    ip_cidr_range = "10.5.32.0/20"
+                },
+                {
+                    range_name = "prod-gcp-vpc-01-us-west2-subnet-01-secondary-range-05-svc"
+                    ip_cidr_range = "10.5.48.0/20"
+                },
+            ]
+        },
+        {
+            subnet_name = "prod-gcp-vpc-01-us-east4-subnet-02"
+            subnet_ip = "10.12.0.0/22"
+            subnet_region = "us-east4"
+            secondary_ranges = [
+                {
+                    range_name = "prod-gcp-vpc-01-us-east4-subnet-02-secondary-range-01-pod"
+                    ip_cidr_range = "10.8.0.0/14"
+                },
+                {
+                    range_name = "prod-gcp-vpc-01-us-east4-subnet-02-secondary-range-02-svc"
+                    ip_cidr_range = "10.13.0.0/20"
+                },
+                {
+                    range_name = "prod-gcp-vpc-01-us-east4-subnet-02-secondary-range-03-svc"
+                    ip_cidr_range = "10.13.16.0/20"
+                },
+                {
+                    range_name = "prod-gcp-vpc-01-us-east4-subnet-02-secondary-range-04-svc"
+                    ip_cidr_range = "10.13.32.0/20"
+                },
+                {
+                    range_name = "prod-gcp-vpc-01-us-east4-subnet-02-secondary-range-05-svc"
+                    ip_cidr_range = "10.13.48.0/20"
+                },
+            ]
+        }
+    ]
+}
+
+# VPC
+variable "network_name" {
+    type = string
+    default = "prod-gcp-vpc-01"
+}
+
+# Project
+variable "project_id" {
+    type = string
+    default = "GOOGLE_PROJECT"
+}

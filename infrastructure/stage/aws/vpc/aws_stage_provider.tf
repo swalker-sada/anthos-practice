@@ -1,0 +1,1 @@
+../../../../platform_admins/shared_terraform_modules/providers/aws_stage_provider.tf

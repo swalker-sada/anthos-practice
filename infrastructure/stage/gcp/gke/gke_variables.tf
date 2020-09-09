@@ -1,0 +1,1 @@
+../../variables/gke_variables.tf

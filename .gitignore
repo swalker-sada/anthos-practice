@@ -1,48 +1,15 @@
 .idea/*
-vars/*
-logs/*
-tmp/*
-gke/*
-certs/*
-k8s-repo/*
-scripts/test.sh
+platform_admins/scripts/test.sh
 
-infrastructure/cloudbuild.yaml
-infrastructure/*/*/*/backend.tf
-infrastructure/*/*/*/tfplan
-infrastructure/*/*/*/terraform.tfvars
-infrastructure/*/*/*/.terraform
+cloudbuild.yaml
+infrastructure/*/backends/*_backend.tf
+infrastructure/*/states/*_remote_state.tf
+infrastructure/*/variables/gcp_vpc_variables.tf
 
-infrastructure/*/*/*/*/backend.tf
-infrastructure/*/*/*/*/tfplan
-infrastructure/*/*/*/*/terraform.tfvars
-infrastructure/*/*/*/*/.terraform
+infrastructure/*/*/*/.terraform*
+infrastructure/*/*/*/terraform*
 
-infrastructure/*/*/backend.tf
-infrastructure/*/*/tfplan
-# infrastructure/*/*/*.tfvars
-infrastructure/*/*/.terraform
+platform_admins/*/*/*/*.yaml
 
-# infrastructure/*/*/*/shared_state*
-# infrastructure/*/*/*/*/shared_state*
-
-infrastructure/gcp/*/*/*.tfvars
-infrastructure/gcp/*/*/shared_state*
-
-infrastructure/ops/prod/istio_prep/istio-operator-*.yaml
-infrastructure/ops/prod/istio_prep/operator-*/
-infrastructure/ops/prod/k8s_repo/k8s-repo/
-infrastructure/ops/prod/k8s_repo/tmp/
-infrastructure/ops/prod/k8s_repo/istio-operator-*.yaml
-infrastructure/ops/prod/k8s_repo/data.zip
-infrastructure/ops/prod/k8s_repo/tmp/
-
-infrastructure/ops/prod/acm/csr-key*
-infrastructure/ops/prod/repos/acm-key*
-
-infrastructure/vm-migration/vm/
-infrastructure/vm-migration/istio-*
-infrastructure/*/*.env
-infrastructure/*/*.pem
 .DS_Store
 

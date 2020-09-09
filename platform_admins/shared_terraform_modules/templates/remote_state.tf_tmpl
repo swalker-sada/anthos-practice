@@ -1,0 +1,8 @@
+data "terraform_remote_state" "ENV_CLOUD_RESOURCE" {
+  backend = "gcs"
+
+  config = {
+    bucket  = "GOOGLE_PROJECT"
+    prefix  = "tfstate/ENV/CLOUD/RESOURCE"
+  }
+}

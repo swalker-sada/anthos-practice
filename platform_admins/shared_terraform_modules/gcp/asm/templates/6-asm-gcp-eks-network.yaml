@@ -1,0 +1,6 @@
+        ${EKS}-net:
+          endpoints:
+          - fromRegistry: ${EKS}
+          gateways:
+          - address: ${EKS_ISTIOINGRESS_IP}
+            port: 443
