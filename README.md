@@ -291,6 +291,9 @@ a04832fd-df8a-4533-9307-ff5ee39e813d  2020-09-11T21:23:48+00:00  17M50S    gs://
 1aeab461-7b31-4ae3-bfac-9700c18f9819  2020-09-11T21:21:37+00:00  2M3S      gs://qwiklabs-gcp-02-3d346cf87fd8_cloudbuild/source/1599859295.678195-ef981107e3e3465daa3d54a54a9c7f05.tgz  -       SUCCESS
 ed662a31-cc37-4411-9eb3-87425757557a  2020-09-11T21:17:48+00:00  6M2S      infrastructure@bba1e6558c8da62e211870a09c9fb05594687081                                                     -       SUCCESS
 ```
+- You can also view this through the **Cloudbuild** page in Cloud Console.
+
+<img src="/platform_admins/docs/img/cloudbuild_success.png" width=70% height=70%>
 
 - Run the `user_setup.sh` script from the repository root folder.
 ```bash
@@ -328,3 +331,17 @@ gitlab.endpoints.PROJECT_ID.cloud.goog
 
 ```
 
+### Log in to EKS clusters
+There are three EKS clusters in the architecture. Two clusters in the `prod` environment and one in the `stage` environment. The tokens from the `user_setup.sh` script can be used to log in to the EKS clusters in Cloud Console.
+- Navigate to the **Kubernetes Engine > Clusters** page in Cloud Console. You can see the three EKS clusters registered. They have not been logged in.
+
+<img src="/platform_admins/docs/img/eks_loggedout.png">
+
+- Click **Login** next to each EKS cluster and select **Token**. Copy and paste the tokens (outputted from the `user_setup.sh` script) to the EKS clusters.
+
+<img src="/platform_admins/docs/img/eks_login.png" width=50% height=50%>
+
+- You are logged in to the three EKS clusters.
+- Navigate to the **Workloads** and **Services** pages and verify you can see metadata information from the EKS clusters. This confirms you have successfully logged in.
+
+<img src="/platform_admins/docs/img/eks_workloads.png" width=80% height=80%>
