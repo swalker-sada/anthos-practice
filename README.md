@@ -1,4 +1,6 @@
-# Anthos Multicloud with attached clusters - GKE and EKS Edition
+# Anthos Multicloud Workshop
+
+[[_TOC_]]
 
 ## Architecture
 
@@ -126,7 +128,7 @@ mkdir -p $HOME/anthos-multicloud && cd $HOME/anthos-multicloud && export WORKDIR
 git clone https://gitlab.com/ameer00/anthos-multicloud-workshop.git ${WORKDIR}/anthos-multicloud-workshop
 ```
 
-## Deploy the environment
+## Deploying the environment
 
 - Run the `build.sh` script from the root folder to set up the environment in GCP and AWS. The `build.sh` script installs the required tools in Cloud Shell and triggers a _cloudbuild_ job which creates a number of resources in both GCP and AWS.
 
