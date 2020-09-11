@@ -176,9 +176,9 @@ installer([Build Installer Image])
 prodgcpvpc([Prod GCP VPC])
 stagegcpvpc([Stage GCP VPC])
 devgcpvpc([Dev GCP VPC])
-prodgke([Prod GKE w/ ACM])
-stagegke([Stage GKE w/ ACM])
-devgke([Dev GKE w/ ACM])
+prodgke([2 x Prod GKE w/ ACM])
+stagegke([1 x Stage GKE w/ ACM])
+devgke([2 x Dev GKE w/ ACM])
 
 
 gitlab([Gitlab])
@@ -188,8 +188,8 @@ ssh_key([SSH Key Pair for ACM])
 
 prodawsvpc([Prod AWS VPC])
 stageawsvpc([Stage AWS VPC])
-prodeks([Prod EKS w/ ACM])
-stageeks([Stage EKS w/ ACM])
+prodeks([2 x Prod EKS w/ ACM])
+stageeks([1 x Stage EKS w/ ACM])
 
 prodasm[Prod ASM]
 stageasm[Stage ASM]
