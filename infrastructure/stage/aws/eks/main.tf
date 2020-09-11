@@ -5,5 +5,5 @@ module "eks-stage-1" {
     private_subnets = data.terraform_remote_state.stage_aws_vpc.outputs.private_subnets
     project_id = data.terraform_remote_state.stage_gcp_vpc.outputs.project_id
     env = var.env
-    repo_url = data.terraform_remote_state.prod_gcp_repos.outputs.acm_repo_ssh_url
+    repo_url = "git@gitlab.endpoints.${data.terraform_remote_state.stage_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/anthos-config-management.git"
 }

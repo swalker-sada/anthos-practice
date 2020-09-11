@@ -10,6 +10,7 @@ resource "gitlab_project" "anthos-config-management" {
   description      = "Anthos Config Management repo"
   namespace_id     = gitlab_group.platform-admins.id
   visibility_level = "internal"
+  shared_runners_enabled = true
   default_branch   = "master"
 }
 
@@ -18,7 +19,6 @@ resource "gitlab_deploy_key" "anthos-config-management" {
   title      = "acm deploy key"
   key        = data.terraform_remote_state.prod_gcp_ssh_key.outputs.public_key_openssh
   can_push   = "true"
-   depends_on = [gitlab_project.anthos-config-management]
 }
 
 resource "gitlab_group" "online-boutique" {
@@ -33,5 +33,13 @@ resource "gitlab_project" "online-boutique" {
   description      = "Online boutique project"
   namespace_id     = gitlab_group.online-boutique.id
   visibility_level = "internal"
+  shared_runners_enabled = true
   default_branch   = "master"
+}
+
+resource "gitlab_deploy_key" "online-boutique" {
+  project    = gitlab_project.online-boutique.id
+  title      = "ssh deploy key"
+  key        = data.terraform_remote_state.prod_gcp_ssh_key.outputs.public_key_openssh
+  can_push   = "true"
 }

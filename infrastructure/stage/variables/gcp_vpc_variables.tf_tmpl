@@ -35,9 +35,3 @@ variable "network_name" {
     type = string
     default = "stage-gcp-vpc-01"
 }
-
-# Project
-variable "project_id" {
-    type = string
-    default = "GOOGLE_PROJECT"
-}

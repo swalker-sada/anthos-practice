@@ -1,0 +1,1 @@
+platform_admins/scripts/user_setup.sh

@@ -1,10 +1,14 @@
 .idea/*
 platform_admins/scripts/test.sh
 
-cloudbuild.yaml
+platform_admins/builds/cloudbuild-prod.yaml
+platform_admins/builds/cloudbuild-stage.yaml
+platform_admins/builds/cloudbuild.yaml_tmpl_orig
+
 infrastructure/*/backends/*_backend.tf
 infrastructure/*/states/*_remote_state.tf
 infrastructure/*/variables/gcp_vpc_variables.tf
+infrastructure/*/variables/project_variables.tf
 
 infrastructure/*/*/*/.terraform*
 infrastructure/*/*/*/terraform*
