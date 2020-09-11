@@ -275,3 +275,56 @@ class GCP_Prod,GCP_Stage,GCP_Dev gcp;
 class ASM_Prod,ASM_Stage,ASM_Dev mesh;
 class Prod_Pipeline,Stage_Pipeline,Dev_Pipeline,Gitlab_Pipeline,Project_Pipeline,Main_Pipeline anthos;
 ```
+
+## User setup
+- Verify that all pipelines finish successfully. 
+```bash
+gcloud builds list
+```
+_OUTPUT (Do not copy)_
+```bash
+ID                                    CREATE_TIME                DURATION  SOURCE                                                                                                      IMAGES  STATUS
+ca7c4cd3-cd26-46ab-b1ba-49d93e80d567  2020-09-11T21:23:49+00:00  24M23S    gs://qwiklabs-gcp-02-3d346cf87fd8_cloudbuild/source/1599859427.742461-84b48dc9b6c94fe1b1d9f4f3c490f635.tgz  -       SUCCESS
+a04832fd-df8a-4533-9307-ff5ee39e813d  2020-09-11T21:23:48+00:00  17M50S    gs://qwiklabs-gcp-02-3d346cf87fd8_cloudbuild/source/1599859427.061173-61bcedfeae134da7b4783afde66a3ead.tgz  -       SUCCESS
+52712167-d29f-47f9-b6bc-f530efac3bee  2020-09-11T21:23:47+00:00  22M9S     gs://qwiklabs-gcp-02-3d346cf87fd8_cloudbuild/source/1599859425.499421-2e5ee25907124f02b0822ee12f3d03e2.tgz  -       SUCCESS
+4a7d7686-46a3-440a-af46-1be607205b16  2020-09-11T21:23:46+00:00  6M53S     gs://qwiklabs-gcp-02-3d346cf87fd8_cloudbuild/source/1599859425.402949-c875d1b65f7a49dcacde5d766fe7ac62.tgz  -       SUCCESS
+1aeab461-7b31-4ae3-bfac-9700c18f9819  2020-09-11T21:21:37+00:00  2M3S      gs://qwiklabs-gcp-02-3d346cf87fd8_cloudbuild/source/1599859295.678195-ef981107e3e3465daa3d54a54a9c7f05.tgz  -       SUCCESS
+ed662a31-cc37-4411-9eb3-87425757557a  2020-09-11T21:17:48+00:00  6M2S      infrastructure@bba1e6558c8da62e211870a09c9fb05594687081                                                     -       SUCCESS
+```
+
+- Run the `user_setup.sh` script from the repository root folder.
+```bash
+source ${HOME}/.bashrc # If you're using ZSH, source ${HOME}/.zshrc
+cd ${WORKDIR}/anthos-multicloud-workshop
+source ./user_setup.sh
+```
+
+- This `user_setup.sh` script performs the following steps:
+  - Downloads EKS cluster _kubeconfig_ files. The location of these files is in the `${WORKDIR}/kubeconfig` folder.
+  - Downloads SSH-Key pair. SSH Keys are used to interact with Gitlab repos. The location of these files is in the `${WORKDIR}/ssh-keys` folder.
+  - Downloads the Gitlab hostname and root password txt file. The location of the file is in the `${WORKDIR}/gitlab` folder.
+  - Creates a combined _kubeconfig_ file with all cluster contexts. Renames the clusters for easy context switching. The location of the merged _kubeconfig_ file is `${WORKDIR}/kubeconfig/workshop-config`. The script also sets this as your `KUBECONFIG` variable.
+  - Get the EKS cluster's Kubernetes Service Account tokens to login to through the Cloud Console. Learn about logging in to Anthos registered clusters [here](https://cloud.google.com/anthos/multicluster-management/console/logging-in).
+> The script is idempotent and can be run multiple times.
+
+_OUTPUT from the `user_setup.sh` script (Do not copy)_
+```bash
+*** eks-prod-us-west2ab-1 Token ***
+
+[EKS Cluster Token]
+
+*** eks-prod-us-west2ab-2 Token ***
+
+[EKS Cluster Token]
+
+*** eks-stage-us-east1ab-1 Token ***
+
+[EKS Cluster Token]
+
+*** Gitlab Hostname and root password ***
+
+gitlab.endpoints.PROJECT_ID.cloud.goog
+[`root` PASSWORD]
+
+```
+
