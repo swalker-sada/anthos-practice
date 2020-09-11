@@ -63,8 +63,3 @@ variable "network_name" {
     default = "prod-gcp-vpc-01"
 }
 
-# Project
-variable "project_id" {
-    type = string
-    default = "GOOGLE_PROJECT"
-}

@@ -13,7 +13,7 @@ title_and_wait () {
 
 print_and_execute () {
 
-    SPEED=210
+    SPEED=290
     GREEN='\e[1;32m' # green
     NC='\e[0m'
 
@@ -24,7 +24,7 @@ print_and_execute () {
 
 nopv_and_execute () {
 
-    SPEED=210
+    SPEED=290
     GREEN='\e[1;32m' # green
     NC='\e[0m'
 

@@ -6,5 +6,5 @@ module "gke_stage_1" {
     zone = var.gke1_zone
     env = var.env
     acm_ssh_auth_key = data.terraform_remote_state.prod_gcp_ssh_key.outputs.private_key
-    acm_sync_repo = data.terraform_remote_state.prod_gcp_repos.outputs.acm_repo_ssh_url
+    acm_sync_repo = "git@gitlab.endpoints.${data.terraform_remote_state.stage_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/anthos-config-management.git"
 }

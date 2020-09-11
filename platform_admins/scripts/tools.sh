@@ -33,6 +33,7 @@ exec 2>&1
 exec &> >(tee -i ${LOG_FILE})
 
 source ${SCRIPT_DIR}/../scripts/functions.sh
+source ${SCRIPT_DIR}/../../../vars.sh
 
 # Tools
 
@@ -55,7 +56,7 @@ else
     nopv_and_execute "curl -s \"https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh\"  | bash"
 fi
 export PATH=$PATH:${HOME}/bin:${HOME}/.local/bin
-grep -q "export PATH=.*\${HOME}/bin.*" ${HOME}/.gcp-workshop.bash || echo "export PATH=$PATH:${HOME}/bin:${HOME}/.local/bin" >> ${HOME}/.gcp-workshop.bash
+grep -q "export PATH=.*${HOME}/bin.*" ${HOME}/.gcp-workshop.bash || echo "export PATH=$PATH:${HOME}/bin:${HOME}/.local/bin" >> ${HOME}/.gcp-workshop.bash
 echo -e "\n"
 
 export PV_INSTALLED=`which pv`

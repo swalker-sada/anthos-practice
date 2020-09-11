@@ -45,6 +45,9 @@ echo -e "\n"
 title_no_wait "*** BOOTSTRAP ***"
 echo -e "\n"
 
+# Pin ASM Version
+grep -q "export ASM_VERSION.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export ASM_VERSION=1.6.8-asm.9" >> ${SCRIPT_DIR}/../../../vars.sh
+
 source ${SCRIPT_DIR}/../scripts/tools.sh
 
 if [[ ! ${GOOGLE_PROJECT} ]]; then
@@ -68,35 +71,49 @@ grep -q "export AWS_SECRET_ACCESS_KEY.*" ${SCRIPT_DIR}/../../../vars.sh || echo 
 export GCLOUD_USER=$(gcloud config get-value account)
 grep -q "export GCLOUD_USER.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export GCLOUD_USER=${GCLOUD_USER}" >> ${SCRIPT_DIR}/../../../vars.sh
 
+# Pin ASM Version
+grep -q "export ASM_VERSION.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export ASM_VERSION=1.6.8-asm.9" >> ${SCRIPT_DIR}/../../../vars.sh
+
+# Add WORKDIR to vars
+grep -q "export WORKDIR=.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export WORKDIR=${WORKDIR}" >> ${SCRIPT_DIR}/../../../vars.sh
+
 source ${SCRIPT_DIR}/../../../vars.sh
 
 title_no_wait "Setting GCP project..."
 print_and_execute "gcloud config set project ${GOOGLE_PROJECT}"
 
-title_no_wait "Enabling APIs..."
-print_and_execute "gcloud services enable cloudresourcemanager.googleapis.com \
-cloudbilling.googleapis.com \
-iam.googleapis.com \
-compute.googleapis.com \
-container.googleapis.com \
-serviceusage.googleapis.com \
-sourcerepo.googleapis.com \
-cloudbuild.googleapis.com \
-servicemanagement.googleapis.com \
-anthos.googleapis.com"
+if [[ ! $API_ENABLED ]]; then
+  title_no_wait "Enabling APIs..."
+  print_and_execute "gcloud services enable cloudresourcemanager.googleapis.com \
+  cloudbilling.googleapis.com \
+  iam.googleapis.com \
+  compute.googleapis.com \
+  container.googleapis.com \
+  serviceusage.googleapis.com \
+  sourcerepo.googleapis.com \
+  cloudbuild.googleapis.com \
+  servicemanagement.googleapis.com \
+  secretmanager.googleapis.com \
+  anthos.googleapis.com"
+  echo -e "export API_ENABLED=true" >> ${SCRIPT_DIR}/../../../vars.sh
+fi
 
-title_no_wait "Getting Cloudbuild Service Account..."
-print_and_execute "export TF_CLOUDBUILD_SA=$(gcloud projects describe $GOOGLE_PROJECT --format='value(projectNumber)')@cloudbuild.gserviceaccount.com"
+if [[ ! $TF_CLOUDBUILD_SA ]]; then
+  title_no_wait "Getting Cloudbuild Service Account..."
+  print_and_execute "export TF_CLOUDBUILD_SA=$(gcloud projects describe $GOOGLE_PROJECT --format='value(projectNumber)')@cloudbuild.gserviceaccount.com"
 
-title_no_wait "Giving Cloudbuild SA project owner role"
-print_and_execute "gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT} \
---member serviceAccount:${TF_CLOUDBUILD_SA} \
---role roles/owner"
+  title_no_wait "Giving Cloudbuild SA project owner role"
+  print_and_execute "gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT} \
+  --member serviceAccount:${TF_CLOUDBUILD_SA} \
+  --role roles/owner"
 
-title_no_wait "Giving Cloudbuild SA cluster admin role"
-print_and_execute "gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT} \
---member serviceAccount:${TF_CLOUDBUILD_SA} \
---role roles/container.admin"
+  title_no_wait "Giving Cloudbuild SA cluster admin role"
+  print_and_execute "gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT} \
+  --member serviceAccount:${TF_CLOUDBUILD_SA} \
+  --role roles/container.admin"
+
+  echo -e "export TF_CLOUDBUILD_SA=true" >> ${SCRIPT_DIR}/../../../vars.sh
+fi
 
 if [[ $(gsutil ls | grep "gs://${GOOGLE_PROJECT}/") ]]; then
     title_no_wait "Bucket gs://${GOOGLE_PROJECT} already exists."
@@ -125,7 +142,7 @@ else
     title_no_wait "Creating cloudbuild trigger for infrastructure deployment..."
     print_and_execute "gcloud alpha builds triggers create cloud-source-repositories \
     --repo='infrastructure' --description='push to master' --branch-pattern='master' \
-    --build-config='cloudbuild.yaml'"
+    --build-config='platform_admins/builds/cloudbuild.yaml'"
 fi
 
 title_no_wait "Setting default project and credentials..."
@@ -161,29 +178,22 @@ export AWS_ACCESS_KEY_ID_ENCRYPTED_PASS=$(echo -n "${AWS_ACCESS_KEY_ID}" | gclou
 export AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS=$(echo -n "${AWS_SECRET_ACCESS_KEY}" | gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=aws-creds --key=aws-secret-access-key | base64)
 export AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES="$(echo -e "${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS}" | tr -d '[:space:]')"
 export AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES="$(echo -e "${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS}" | tr -d '[:space:]')"
-sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../../cloudbuild.yaml_tmpl > ${SCRIPT_DIR}/../../cloudbuild.yaml
-sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild.yaml
-sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild.yaml
 
-#title_no_wait "Create SSH key pair for Repos..."
-#mkdir -p ${SCRIPT_DIR}/../../../ssh-key
-# Check if there is already a csr key present
-#if [[ $(gsutil ls gs://${GOOGLE_PROJECT}/ssh-key &> /dev/null || echo $?) ]]; then
-#  title_no_wait "Creating SSH key pair..."
-#  # Create an SSH key pair
-#  ssh-keygen -t rsa -b 4096 \
-#  -C "${USER}@qwiklabs.net" \
-#  -N '' \
-#  -f ${SCRIPT_DIR}/../../../ssh-key/ssh-key
-#  # Copy to GCS bucket
-#  gsutil cp -r ${SCRIPT_DIR}/../../../ssh-key/ssh-key gs://${GOOGLE_PROJECT}/ssh-key/ssh-key
-#  gsutil cp -r ${SCRIPT_DIR}/../../../ssh-key/ssh-key.pub gs://${GOOGLE_PROJECT}/ssh-key/ssh-key.pub
-#else
-#  title_no_wait "SSH Key pairs already exist."
-#  # Copy from GCS bucket
-#  gsutil cp -r gs://${GOOGLE_PROJECT}/ssh-key/ssh-key ${SCRIPT_DIR}/../../../ssh-key/ssh-key
-#  gsutil cp -r gs://${GOOGLE_PROJECT}/ssh-key/ssh-key.pub ${SCRIPT_DIR}/../../../ssh-key/ssh-key.pub
-#fi
+# sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../../cloudbuild-prod.yaml_tmpl > ${SCRIPT_DIR}/../../cloudbuild-prod.yaml
+# sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild-prod.yaml
+# sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild-prod.yaml
+
+# sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../../cloudbuild-stage.yaml_tmpl > ${SCRIPT_DIR}/../../cloudbuild-stage.yaml
+# sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild-stage.yaml
+# sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild-stage.yaml
+
+sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../builds/cloudbuild-prod.yaml_tmpl > ${SCRIPT_DIR}/../builds/cloudbuild-prod.yaml
+sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../builds/cloudbuild-prod.yaml
+sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../builds/cloudbuild-prod.yaml
+
+sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../builds/cloudbuild-stage.yaml_tmpl > ${SCRIPT_DIR}/../builds/cloudbuild-stage.yaml
+sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../builds/cloudbuild-stage.yaml
+sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../builds/cloudbuild-stage.yaml
 
 title_no_wait "Preparing terraform backends and remote state files..."
 
@@ -197,6 +207,9 @@ do
 	if [[ ${CLOUD} == "gcp"  ]]; then
 	  sed -e s/GOOGLE_PROJECT/${GOOGLE_PROJECT}/ ${SCRIPT_DIR}/../../infrastructure/${ENV}/variables/gcp_vpc_variables.tf_tmpl > \
 	  ${SCRIPT_DIR}/../../infrastructure/${ENV}/variables/gcp_vpc_variables.tf  
+	  sed -e s/GOOGLE_PROJECT/${GOOGLE_PROJECT}/ \
+      ${SCRIPT_DIR}/../../infrastructure/${ENV}/variables/project_variables.tf_tmpl > \
+	  ${SCRIPT_DIR}/../../infrastructure/${ENV}/variables/project_variables.tf  
 	fi
         declare -a FOLDERS
         unset FOLDERS
@@ -227,7 +240,7 @@ if [ -d ${SCRIPT_DIR}/../../../infra-repo ]; then
     rm -rf ${SCRIPT_DIR}/../../../infra-repo/platform_admins
     cp -r ${SCRIPT_DIR}/../../infrastructure ${SCRIPT_DIR}/../../../infra-repo
     cp -r ${SCRIPT_DIR}/../../platform_admins ${SCRIPT_DIR}/../../../infra-repo
-    cp -r ${SCRIPT_DIR}/../../cloudbuild.yaml ${SCRIPT_DIR}/../../../infra-repo
+    # cp -rf ${SCRIPT_DIR}/../../cloudbuil*.yaml ${SCRIPT_DIR}/../../../infra-repo
     cp -r ${SCRIPT_DIR}/../../Dockerfile ${SCRIPT_DIR}/../../../infra-repo
     cd ${SCRIPT_DIR}/../../../infra-repo
     git add . && git commit -am 'commit'
@@ -238,7 +251,7 @@ else
     mkdir -p ${SCRIPT_DIR}/../../../infra-repo
     cp -r ${SCRIPT_DIR}/../../infrastructure ${SCRIPT_DIR}/../../../infra-repo
     cp -r ${SCRIPT_DIR}/../../platform_admins ${SCRIPT_DIR}/../../../infra-repo
-    cp -r ${SCRIPT_DIR}/../../cloudbuild.yaml ${SCRIPT_DIR}/../../../infra-repo
+    # cp -rf ${SCRIPT_DIR}/../../cloudbuil*.yaml ${SCRIPT_DIR}/../../../infra-repo
     cp -r ${SCRIPT_DIR}/../../Dockerfile ${SCRIPT_DIR}/../../../infra-repo
     cd ${SCRIPT_DIR}/../../../infra-repo
     git init

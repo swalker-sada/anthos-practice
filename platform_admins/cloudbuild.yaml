@@ -1,0 +1,77 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+timeout: 3600s
+logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
+substitutions:
+  _PROD: "true"
+  _STAGE: "true"
+  _DEV: "true"
+  _GITLAB: "true"
+  _PROJECT: "true"
+tags:
+  - main
+steps:
+  - name: "gcr.io/kaniko-project/executor:v0.15.0"
+    id: "build-installer-image"
+    args:
+      - --destination=gcr.io/${PROJECT_ID}/platform-installer
+      - --cache=true
+      - --cache-ttl=12h
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "project-pipeline"
+    entrypoint: bash
+    waitFor: ['build-installer-image']
+    args:
+      - -c
+      - |
+        [[ "${_PROJECT}" == "false" ]] && exit 0
+        exec gcloud  builds submit --config cloudbuild-project.yaml
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "gitlab-pipeline"
+    entrypoint: bash
+    waitFor: ['project-pipeline']
+    args:
+      - -c
+      - |
+        [[ "${_GITLAB}" == "false" ]] && exit 0
+        exec gcloud  builds submit --config cloudbuild-gitlab.yaml --async
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "dev-pipeline"
+    entrypoint: bash
+    waitFor: ['project-pipeline']
+    args:
+      - -c
+      - |
+        [[ "${_DEV}" == "false" ]] && exit 0
+        exec gcloud  builds submit --config cloudbuild-dev.yaml --async
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "stage-pipeline"
+    entrypoint: bash
+    waitFor: ['project-pipeline']
+    args:
+      - -c
+      - |
+        [[ "${_STAGE}" == "false" ]] && exit 0
+        exec gcloud  builds submit --config cloudbuild-stage.yaml --async
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "prod-pipeline"
+    entrypoint: bash
+    waitFor: ['project-pipeline']
+    args:
+      - -c
+      - |
+        [[ "${_PROD}" == "false" ]] && exit 0
+        exec gcloud  builds submit --config cloudbuild-prod.yaml --async

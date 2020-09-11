@@ -12,6 +12,10 @@ locals {
     zone = var.zone
 }
 
+data "google_project" "project" {
+    project_id = var.subnet.project
+}
+
 module "gke" {
   source                  = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/beta-public-cluster"
   project_id              = local.project
@@ -25,7 +29,7 @@ module "gke" {
   ip_range_pods           = local.pod_subnet
   ip_range_services       = local.svc_subnet
   network_policy          = false
-  cluster_resource_labels = { "environ" : "${local.env}", "infra" : "gcp" }
+  cluster_resource_labels = { "mesh_id": "proj-${local.env}-${data.google_project.project.number}", "environ" : "${local.env}", "infra" : "gcp" }
   node_pools = [
     {
       name         = "node-pool-01"

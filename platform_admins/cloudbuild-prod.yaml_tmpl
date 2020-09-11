@@ -1,0 +1,86 @@
+---
+timeout: 3600s
+logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
+substitutions:
+  _GCP_VPC: "true"
+  _AWS_VPC: "true"
+  _GKE: "true"
+  _EKS: "true"
+  _ASM: "true"
+tags:
+  - prod
+steps:
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-gcp-vpc"
+    dir: infrastructure/prod/gcp/vpc
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_GCP_VPC}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-aws-vpc"
+    dir: infrastructure/prod/aws/vpc
+    waitFor: ['-']
+    entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_AWS_VPC}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-gcp-gke"
+    dir: infrastructure/prod/gcp/gke
+    waitFor: ['prod-gcp-vpc']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_GKE}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-aws-eks"
+    dir: infrastructure/prod/aws/eks
+    waitFor: ['prod-aws-vpc']
+    entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_EKS}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-asm"
+    dir: infrastructure/prod/gcp/asm
+    waitFor: ['prod-gcp-gke', 'prod-aws-eks']
+    entrypoint: "bash"
+    secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_ASM}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+secrets:
+- kmsKeyName: projects/GOOGLE_PROJECT/locations/global/keyRings/aws-creds/cryptoKeys/aws-access-id
+  secretEnv:
+    AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID_ENCRYPTED_PASS'
+- kmsKeyName: projects/GOOGLE_PROJECT/locations/global/keyRings/aws-creds/cryptoKeys/aws-secret-access-key
+  secretEnv:
+    AWS_SECRET_ACCESS_KEY: 'AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS'

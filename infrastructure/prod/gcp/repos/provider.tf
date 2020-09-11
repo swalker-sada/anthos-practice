@@ -1,7 +1,7 @@
 data "external" "gitlab-creds" {
   program = ["bash", "${path.module}/get_gitlab_creds.sh"]
   query = {
-    PROJECT_ID = data.terraform_remote_state.prod_gcp_vpc.outputs.project_id
+    PROJECT_ID = var.project_id
   }
 }
 
