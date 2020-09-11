@@ -328,10 +328,12 @@ _OUTPUT from the `user_setup.sh` script (Do not copy)_
 
 gitlab.endpoints.PROJECT_ID.cloud.goog
 [`root` PASSWORD]
-
 ```
 
-### Log in to EKS clusters
+### Variables
+The initial `build.sh` script creates a `vars.sh` file in the `${WORKDIR}` folder. The `user_setup.sh` script adds additional variables for the workshop to the `vars.sh` file. The `vars.sh` file is automatically sourced when you log in to Cloud Shell. You can also manually source the file.
+
+### Logging in to EKS clusters
 There are three EKS clusters in the architecture. Two clusters in the `prod` environment and one in the `stage` environment. The tokens from the `user_setup.sh` script can be used to log in to the EKS clusters in Cloud Console.
 - Navigate to the **Kubernetes Engine > Clusters** page in Cloud Console. You can see the three EKS clusters registered. They have not been logged in.
 
@@ -344,3 +346,19 @@ There are three EKS clusters in the architecture. Two clusters in the `prod` env
 - Navigate to the **Workloads** and **Services** pages and verify you can see metadata information from the EKS clusters. This confirms you have successfully logged in.
 
 <img src="/platform_admins/docs/img/eks_workloads.png" width=80% height=80%>
+
+### Logging in to Gitlab
+Log in to Gitlab.
+
+- Navigate to the output link of the following command.
+```bash
+echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog"
+```
+- Log in with the username `root` and the gitlab password from the `user_setup.sh` script.
+- You see two projects (or repos).
+  - `anthos-config-management` - ACM repo
+  - `online-boutique` - Online Boutique application repo
+
+<img src="/platform_admins/docs/img/gitlab_repos.png" width=50% height=50%>
+
+
