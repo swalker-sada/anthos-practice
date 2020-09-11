@@ -341,7 +341,7 @@ There are three EKS clusters in the architecture. Two clusters in the `prod` env
 
 - Click **Login** next to each EKS cluster and select **Token**. Copy and paste the tokens (outputted from the `user_setup.sh` script) to the EKS clusters.
 
-<img src="/platform_admins/docs/img/eks_login.png" width=50% height=50%>
+<img src="/platform_admins/docs/img/eks_login.png" width=40% height=40%>
 
 - Navigate to the **Workloads** and **Services** pages and verify you can see metadata information from the EKS clusters. This confirms you have successfully logged in.
 
