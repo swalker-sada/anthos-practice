@@ -128,7 +128,7 @@ git clone https://gitlab.com/ameer00/anthos-multicloud-workshop.git ${WORKDIR}/a
 
 ## Deploy the environment
 
-- Run the `build.sh` script from the root folder to set up the environment in GCP and AWS. The `build.sh` script installs the required tools in Cloud Shell as well as trigger a _cloudbuild_ job which in turn creates a number of resources in both GCP and AWS.
+- Run the `build.sh` script from the root folder to set up the environment in GCP and AWS. The `build.sh` script installs the required tools in Cloud Shell and triggers a _cloudbuild_ job which creates a number of resources in both GCP and AWS.
 
 ```
 cd ${WORKDIR}/anthos-multicloud-workshop
