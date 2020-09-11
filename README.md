@@ -341,7 +341,6 @@ There are three EKS clusters in the architecture. Two clusters in the `prod` env
 
 <img src="/platform_admins/docs/img/eks_login.png" width=50% height=50%>
 
-- You are logged in to the three EKS clusters.
 - Navigate to the **Workloads** and **Services** pages and verify you can see metadata information from the EKS clusters. This confirms you have successfully logged in.
 
 <img src="/platform_admins/docs/img/eks_workloads.png" width=80% height=80%>
