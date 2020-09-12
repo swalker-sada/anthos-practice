@@ -5,7 +5,7 @@ This module builds a GCP VPC. This module is built on top of the official GCP VP
 This module is meant for use with Terraform 0.12.
 
 ## Usage
-Following example is taken from the [/infrastructure/prod/gcp/vpc](https://gitlab.com/ameer00/anthos-multicloud-workshop/-/tree/master/infrastructure/prod/gcp/vpc) folder.
+Following example is taken from the [/infrastructure/prod/gcp/vpc](/infrastructure/prod/gcp/vpc) folder.
 ```bash
 module "prod_gcp_vpc_01" {
     source = "../../../../platform_admins/shared_terraform_modules/gcp/vpc/"
