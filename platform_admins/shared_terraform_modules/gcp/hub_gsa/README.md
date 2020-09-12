@@ -3,13 +3,7 @@
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
+| account\_id |  | string | n/a | yes |
 | project\_id |  | string | n/a | yes |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| gitlab\_hostname | GitLab endpoint hostname. |
-| gitlab\_root\_password\_instructions | GitLab root password instructions. |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
