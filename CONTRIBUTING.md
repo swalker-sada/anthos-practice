@@ -16,8 +16,8 @@ This will get triaged by one of the maintainers.
 ## Tracking build errors and troubleshooting
 Initial build pipelines take about 30 -35 minutes to complete. Once in a while, one or more pipelines may fail. Pipelines for various stages (dev, stage and prod) run in parallel and independent of one another so failure of one pipeline does not cause the entire build process to fail.
 
-If you encounter a failure, check existing issues with the label ~build_error. If the issue already exists, you can add any additional notes there.
-If the issue does not exist, create a new issue with as much detail as possible and label is with the ~build_error label.
+If you encounter a failure, check existing issues with the label ~build_errors. If the issue already exists, you can add any additional notes there.
+If the issue does not exist, create a new issue with as much detail as possible and label is with the ~build_errors label.
 
 This is useful for the troubleshooting section.
 
@@ -32,7 +32,7 @@ The use of labels in issues is encouraged but not required. The following useful
 | `build`	| something that hasn’t been built yet |
 | `fix`		| something built that needs fixing |
 | `polish`	| something working that could be better |
-| `build_error` | for tracking errors during initial builds |
+| `build_errors` | for tracking errors during initial builds |
 | `docs`		| documentation |
 | `customer`	| customer reference |
 | `idea`.       | To track new and awesome ideas |
