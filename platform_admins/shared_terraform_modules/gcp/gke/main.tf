@@ -29,7 +29,8 @@ module "gke" {
   ip_range_pods           = local.pod_subnet
   ip_range_services       = local.svc_subnet
   network_policy          = false
-  cluster_resource_labels = { "mesh_id": "proj-${local.env}-${data.google_project.project.number}", "environ" : "${local.env}", "infra" : "gcp" }
+  cluster_resource_labels = { "mesh_id": "proj-${data.google_project.project.number}", "environ" : "${local.env}", "infra" : "gcp" }
+  # cluster_resource_labels = { "mesh_id": "proj-${data.google_project.project.number}" }
   node_pools = [
     {
       name         = "node-pool-01"

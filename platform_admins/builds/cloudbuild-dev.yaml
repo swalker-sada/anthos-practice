@@ -4,6 +4,7 @@ logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
 substitutions:
   _GCP_VPC: "true"
   _GKE: "true"
+  _ASM: "true"
 tags:
   - dev
 steps:
@@ -29,6 +30,19 @@ steps:
       - "-c"
       - |
         [[ "${_GKE}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "dev-gcp-asm"
+    dir: infrastructure/dev/gcp/asm
+    waitFor: ['dev-gcp-gke']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_ASM}" == "false" ]] && exit 0
         terraform init
         terraform plan -out terraform.tfplan
         terraform apply -input=false -lock=false terraform.tfplan
