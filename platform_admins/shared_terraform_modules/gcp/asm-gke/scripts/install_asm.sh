@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
+# set -e
 
 # Functions
 is_deployment_ready() {
@@ -88,7 +88,7 @@ do
   GKE_CTX=gke_${PROJECT_ID}_${CLUSTER_LOCS[$i]}_${CLUSTER_NAMES[$i]}
 
   # Download ASM package for istio-operator and other resource configuration files
-  kpt pkg get https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages.git/asm-patch@"${ASM_VERSION}" "${CLUSTER_NAMES[$i]}"
+  kpt pkg get https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages.git/asm@"${ASM_VERSION}" "${CLUSTER_NAMES[$i]}"
 
   # Prepare config files
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ gcloud.core.project "${PROJECT_ID}"

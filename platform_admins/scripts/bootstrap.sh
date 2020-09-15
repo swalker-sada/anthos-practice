@@ -55,6 +55,7 @@ if [[ ! ${GOOGLE_PROJECT} ]]; then
     read -p "Please enter your GCP project ID: " GOOGLE_PROJECT
 fi
 grep -q "export GOOGLE_PROJECT.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export GOOGLE_PROJECT=${GOOGLE_PROJECT}" >> ${SCRIPT_DIR}/../../../vars.sh
+grep -q "gcloud config set project.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "gcloud config set project ${GOOGLE_PROJECT}" >> ${SCRIPT_DIR}/../../../vars.sh
 
 if [[ ! ${AWS_ACCESS_KEY_ID} ]]; then
     title_no_wait "You have not defined your AWS Access Key ID in the AWS_ACCESS_KEY_ID variable."
@@ -91,6 +92,14 @@ if [[ ! $API_ENABLED ]]; then
   container.googleapis.com \
   serviceusage.googleapis.com \
   sourcerepo.googleapis.com \
+  monitoring.googleapis.com \
+  logging.googleapis.com \
+  cloudtrace.googleapis.com \
+  meshca.googleapis.com \
+  meshtelemetry.googleapis.com \
+  meshconfig.googleapis.com \
+  gkeconnect.googleapis.com \
+  gkehub.googleapis.com \
   cloudbuild.googleapis.com \
   servicemanagement.googleapis.com \
   secretmanager.googleapis.com \
