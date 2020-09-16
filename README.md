@@ -86,9 +86,9 @@ In this workshop you will accomplish the following:
 
 ## Setting up the environment in Qwiklabs
 
-This workshop is intended to be run in Qwiklabs.
+This workshop is intended to be run in Qwiklabs. You should have been invited to a Qwiklabs "Classroom". In the "Classrooms" icon on the left of the home screen, navigate to the 'Anthos Multicloud Workshop GCP' classroom.
 
-You should see two labs in Qwiklabs as part of this workshop. One of the labs sets up an environment in GCP (a clean GCP project) and the other sets up an environment in AWS (a federated qwiklabs managed account). Starting both of these labs provide you with credentials to both environments.
+You will now see two labs in Qwiklabs as part of this workshop. One of the labs sets up an environment in GCP (a clean GCP project) and the other sets up an environment in AWS (a federated qwiklabs managed account). Starting both of these labs provide you with credentials to both environments.
 
 For GCP, you get a Google account username, password and a GCP project. You use these credentials to access and administer resources in your provided GCP project via GCP Console and Cloud Shell.
 
@@ -125,7 +125,7 @@ mkdir -p $HOME/anthos-multicloud && cd $HOME/anthos-multicloud && export WORKDIR
 - Clone the workshop repo.
 
 ```
-git clone https://gitlab.com/ameer00/anthos-multicloud-workshop.git ${WORKDIR}/anthos-multicloud-workshop
+git clone https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop.git ${WORKDIR}/anthos-multicloud-workshop
 ```
 
 ## Deploying the environment
