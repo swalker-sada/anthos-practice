@@ -1,1 +1,0 @@
-../../variables/project_variables.tf
