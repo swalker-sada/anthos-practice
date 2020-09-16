@@ -26,6 +26,12 @@ kubectl --context $1 -n $2 get deploy $3 &> /dev/null
     return ${availableReplicas}
 }
 
+export CYAN='\033[1;36m'
+export GREEN='\033[1;32m'
+export NC='\033[0m' # No Color
+function echo_cyan() { echo -e "${CYAN}$@${NC}"; }
+function echo_green() { echo -e "${GREEN}$@${NC}"; }
+
 # Define vars
 export GKE1=${GKE_DEV_1}
 export GKE2=${GKE_DEV_2}
@@ -55,4 +61,7 @@ is_deployment_ready ${GKE2} ${DEV_NS} loadgenerator
 is_deployment_ready ${GKE2} ${DEV_NS} cartservice
 is_deployment_ready ${GKE2} ${DEV_NS} recommendationservice
 
-kubectl --context=${GKE1} -n istio-system get svc
+echo -e "\n"
+echo_cyan "*** Access Online Boutique app in namespace ${DEV_NS} by navigating to the following address: ***\n"
+kubectl --context=${GKE1} -n istio-system get svc istio-ingressgateway -o jsonpath={.status.loadBalancer.ingress[].ip}
+echo -e "\n"
