@@ -32,3 +32,4 @@ variable "zone" {
 
 variable "acm_ssh_auth_key" {}
 variable "acm_sync_repo" {}
+variable "hub_sa_private_key" {}
