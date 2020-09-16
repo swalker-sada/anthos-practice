@@ -148,7 +148,7 @@ cd ${WORKDIR}/anthos-multicloud-workshop
 graph LR
 classDef pipeline fill:#FAFAC6,stroke:#333;
 
-commit -->|6mins|Main[Main - Create custom builder] -->|2mins| Project_Setup[Project Setup - SSH Keys and Anthos Hub GSA]
+commit[commit to master] -->|6mins|Main[Main - Create custom builder] -->|2mins| Project_Setup[Project Setup - SSH Keys and Anthos Hub GSA]
 Project_Setup -->|7mins| Dev[Dev Pipeline - Sets up the dev environment]
 Project_Setup --> |23mins|Stage[Stage Pipeline - Sets up the stage environment]
 Project_Setup -->|26mins| Prod[Prod Pipeline - Sets up the prod environment]
@@ -360,5 +360,3 @@ echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog"
   - `online-boutique` - Online Boutique application repo
 
 <img src="/platform_admins/docs/img/gitlab_repos.png" width=50% height=50%>
-
-
