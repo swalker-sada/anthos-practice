@@ -90,9 +90,18 @@ This workshop is intended to be run in [Qwiklabs](https://explore.qwiklabs.com).
 
 You will now see two labs in Qwiklabs as part of this workshop. One of the labs sets up an environment in GCP (a clean GCP project) and the other sets up an environment in AWS (a federated qwiklabs managed account). Starting both of these labs provide you with credentials to both environments.
 
-For GCP, you get a Google account username, password and a GCP project. You use these credentials to access and administer resources in your provided GCP project via GCP Console and Cloud Shell.
+For GCP, you get a Google account username, password and a GCP project. You use these credentials to access and administer resources in your provided GCP project via GCP Console and Cloud Shell. 
+
+  * Tip: You can open an incognito window in Chrome to log in as this temporary user, without having to deal with switching Google accounts. 
+  * Once you log in using the user/pass in the qwiklab window, you should see the GCP console, logged into project: `qwiklabs-gcp-1234abcd`
+  * You should also see at the top right that you're logged in as a User, like: `student-00-1234abcd@qwiklabs.net`
 
 For AWS, you get an Access Key ID and a Secret Access Key. These credentials allow you full control over both environments.
+
+  * Tip: Don't try to open this in the incognito window. Instead, just click the "Open Console" button.
+  * On the first try, this will fail :( -- it is creating your credentials and you'll see a banner: `Creating login credentials. Please try again in 30 seconds.`
+  * Try again, and you should be logged into https://console.aws.amazon.com/console/home?region=us-east-1# 
+  * You should see that you're logged in at the top right: `awsstudent @ [1234-1234-1234]`
 
 These two environments are temporary and expire at the end of this workshop (or when time expires). If you would like a persistent setup of this workshop, you can follow the same instructions using your own GCP and AWS accounts.
 
