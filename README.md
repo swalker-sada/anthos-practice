@@ -86,7 +86,7 @@ In this workshop you will accomplish the following:
 
 ## Setting up the environment in Qwiklabs
 
-This workshop is intended to be run in [Qwiklabs](explore.qwiklabs.com). You should have been invited to a Qwiklabs "Classroom". In the "Classrooms" icon on the left of the home screen, navigate to the 'Anthos Multicloud Workshop GCP' classroom.
+This workshop is intended to be run in [Qwiklabs](https://explore.qwiklabs.com). You should have been invited to a Qwiklabs "Classroom". In the "Classrooms" icon on the left of the home screen, navigate to the 'Anthos Multicloud Workshop GCP' classroom.
 
 You will now see two labs in Qwiklabs as part of this workshop. One of the labs sets up an environment in GCP (a clean GCP project) and the other sets up an environment in AWS (a federated qwiklabs managed account). Starting both of these labs provide you with credentials to both environments.
 
