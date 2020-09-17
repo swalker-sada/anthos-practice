@@ -139,7 +139,7 @@ git clone https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop.git ${
 
 ## Deploying the environment
 
-- Run the `build.sh` script from the root folder to set up the environment in GCP and AWS. The `build.sh` script installs the required tools in Cloud Shell and triggers a _cloudbuild_ job which creates a number of resources in both GCP and AWS.
+- Run the `build.sh` script from the root folder to set up the environment in GCP and AWS. The `build.sh` script runs the [`bootstrap.sh`](platform_admins/scripts/bootstrap.sh) script, for more information about the script see the [bootstrap.sh documentations](platform_admins/docs/scripts.md#bootstrapsh)
 
 ```
 cd ${WORKDIR}/anthos-multicloud-workshop
@@ -147,8 +147,8 @@ gcloud auth login
 ./build.sh
 ```
 
-- The `build.sh` script creates an `infrastructure` repo in Cloud Source Repository (CSR). The `infrastructure` repo contains the code to deploy the Anthos resources in GCP and AWS. Committing to the _main_ branch of the `infrastructure` repository triggers a series of build pipelines in **Cloudbuild**. These pipelines deploys the Anthos platform resources in both GCP and AWS.
-  > Note that the infrastructure build process can take approximately 30 - 35 minutes to complete.
+> Note that the infrastructure build process can take approximately 30 - 35 minutes to complete.
+
 - After the `build.sh` script finishes, navigate to the **Cloudbuild** details page in Cloud Console from the left hand navbar.
 - Initially, you see the `main` build running. Click on the build ID to inspect the stages of the pipeline. The `main` build pipeline trigger additional builds.
 - The following diagram illustrates the builds and the approximate times each stage takes to complete. Note that all the `env` and the `gitlab` stages run concurrently as shown.
