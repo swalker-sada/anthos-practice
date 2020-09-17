@@ -137,7 +137,7 @@ cd ${WORKDIR}/anthos-multicloud-workshop
 ./build.sh
 ```
 
-- The `build.sh` script creates an `infrastructure` repo in Cloud Source Repository (CSR). The `infrastructiure` repo contains the code to deploy the Anthos resources in GCP and AWS. Commiting to the _master_ branch of the `infrastructure` repository triggers a series of build pipelines in **Cloudbuild**. These pipelines deploys the Anthos platform resources in both GCP and AWS.
+- The `build.sh` script creates an `infrastructure` repo in Cloud Source Repository (CSR). The `infrastructure` repo contains the code to deploy the Anthos resources in GCP and AWS. Commiting to the _master_ branch of the `infrastructure` repository triggers a series of build pipelines in **Cloudbuild**. These pipelines deploys the Anthos platform resources in both GCP and AWS.
   > Note that the infrastructure build process can take approximately 30 - 35 minutes to complete.
 - After the `build.sh` script finishes, navigate to the **Cloudbuild** details page in Cloud Console from the left hand navbar.
 - Initially, you see the `main` build running. Click on the build ID to inspect the stages of the pipeline. The `main` build pipeline trigger additional builds.
