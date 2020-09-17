@@ -143,6 +143,7 @@ git clone https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop.git ${
 
 ```
 cd ${WORKDIR}/anthos-multicloud-workshop
+gcloud auth login
 ./build.sh
 ```
 
