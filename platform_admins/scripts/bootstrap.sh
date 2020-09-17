@@ -100,7 +100,8 @@ if [[ ! $API_ENABLED ]]; then
   cloudbuild.googleapis.com \
   servicemanagement.googleapis.com \
   secretmanager.googleapis.com \
-  anthos.googleapis.com"
+  anthos.googleapis.com \
+  multiclusteringress.googleapis.com"
   echo -e "export API_ENABLED=true" >> ${SCRIPT_DIR}/../../../vars.sh
 fi
 
