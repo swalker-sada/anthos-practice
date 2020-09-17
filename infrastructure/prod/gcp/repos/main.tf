@@ -11,7 +11,7 @@ resource "gitlab_project" "anthos-config-management" {
   namespace_id     = gitlab_group.platform-admins.id
   visibility_level = "internal"
   shared_runners_enabled = true
-  default_branch   = "master"
+  default_branch   = "main"
   depends_on       = [gitlab_group.platform-admins]
 }
 
@@ -37,7 +37,7 @@ resource "gitlab_project" "online-boutique" {
   namespace_id     = gitlab_group.online-boutique.id
   visibility_level = "internal"
   shared_runners_enabled = true
-  default_branch   = "master"
+  default_branch   = "main"
   depends_on       = [gitlab_group.online-boutique]
 }
 

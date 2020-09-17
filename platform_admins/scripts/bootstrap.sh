@@ -45,7 +45,7 @@ echo -e "\n"
 title_no_wait "*** BOOTSTRAP ***"
 echo -e "\n"
 
-# Pin ASM Version
+# Pin ASM version, needed for tools.sh script
 grep -q "export ASM_VERSION.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export ASM_VERSION=1.6.8-asm.9" >> ${SCRIPT_DIR}/../../../vars.sh
 
 source ${SCRIPT_DIR}/../scripts/tools.sh
@@ -71,9 +71,6 @@ grep -q "export AWS_SECRET_ACCESS_KEY.*" ${SCRIPT_DIR}/../../../vars.sh || echo 
 
 export GCLOUD_USER=$(gcloud config get-value account)
 grep -q "export GCLOUD_USER.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export GCLOUD_USER=${GCLOUD_USER}" >> ${SCRIPT_DIR}/../../../vars.sh
-
-# Pin ASM Version
-grep -q "export ASM_VERSION.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export ASM_VERSION=1.6.8-asm.9" >> ${SCRIPT_DIR}/../../../vars.sh
 
 # Add WORKDIR to vars
 grep -q "export WORKDIR=.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export WORKDIR=${WORKDIR}" >> ${SCRIPT_DIR}/../../../vars.sh
@@ -145,12 +142,12 @@ else
     print_and_execute "gcloud source repos create infrastructure"
 fi
 
-if [[ $(gcloud alpha builds triggers list | grep push-to-master) ]]; then
-    title_no_wait "Build trigger 'push-to-master' already exists."
+if [[ $(gcloud alpha builds triggers list | grep push-to-main) ]]; then
+    title_no_wait "Build trigger 'push-to-main' already exists."
 else
     title_no_wait "Creating cloudbuild trigger for infrastructure deployment..."
     print_and_execute "gcloud alpha builds triggers create cloud-source-repositories \
-    --repo='infrastructure' --description='push to master' --branch-pattern='master' \
+    --repo='infrastructure' --description='push to main' --branch-pattern='main' \
     --build-config='platform_admins/builds/cloudbuild.yaml'"
 fi
 
@@ -187,14 +184,6 @@ export AWS_ACCESS_KEY_ID_ENCRYPTED_PASS=$(echo -n "${AWS_ACCESS_KEY_ID}" | gclou
 export AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS=$(echo -n "${AWS_SECRET_ACCESS_KEY}" | gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=aws-creds --key=aws-secret-access-key | base64)
 export AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES="$(echo -e "${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS}" | tr -d '[:space:]')"
 export AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES="$(echo -e "${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS}" | tr -d '[:space:]')"
-
-# sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../../cloudbuild-prod.yaml_tmpl > ${SCRIPT_DIR}/../../cloudbuild-prod.yaml
-# sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild-prod.yaml
-# sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild-prod.yaml
-
-# sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../../cloudbuild-stage.yaml_tmpl > ${SCRIPT_DIR}/../../cloudbuild-stage.yaml
-# sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild-stage.yaml
-# sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../../cloudbuild-stage.yaml
 
 sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../builds/cloudbuild-prod.yaml_tmpl > ${SCRIPT_DIR}/../builds/cloudbuild-prod.yaml
 sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../builds/cloudbuild-prod.yaml
@@ -253,7 +242,7 @@ if [ -d ${SCRIPT_DIR}/../../../infra-repo ]; then
     cp -r ${SCRIPT_DIR}/../../Dockerfile ${SCRIPT_DIR}/../../../infra-repo
     cd ${SCRIPT_DIR}/../../../infra-repo
     git add . && git commit -am 'commit'
-    git push infra master
+    git push infra main
     "
 else
     print_and_execute "
@@ -264,11 +253,12 @@ else
     cp -r ${SCRIPT_DIR}/../../Dockerfile ${SCRIPT_DIR}/../../../infra-repo
     cd ${SCRIPT_DIR}/../../../infra-repo
     git init
+    git checkout -b main
     git config --local user.email ${TF_CLOUDBUILD_SA}
     git config --local user.name 'terraform'
     git config --local credential.'https://source.developers.google.com'.helper gcloud.sh
     git remote add infra https://source.developers.google.com/p/$GOOGLE_PROJECT/r/infrastructure
     git add . && git commit -am 'first commit'
-    git push infra master
+    git push infra main
     "
 fi

@@ -67,8 +67,6 @@ else
     title_no_wait "pv is already installed and in the ${PV_INSTALLED} folder."
 fi
 
-[[ ! -e ${HOME}/.gcp-workshop.bash ]] && touch ${HOME}/.gcp-workshop.bash
-
 export KREW_FILEPATH="${HOME}/.krew"
 if [ -d ${KREW_FILEPATH} ]; then
     title_no_wait "kubectl krew is already installed and in the ${KREW_FILEPATH} folder."
