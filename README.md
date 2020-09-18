@@ -147,7 +147,7 @@ gcloud auth login
 ./build.sh
 ```
 
-- The `build.sh` script creates an `infrastructure` repo in Cloud Source Repository (CSR). The `infrastructure` repo contains the code to deploy the Anthos resources in GCP and AWS. Commiting to the _master_ branch of the `infrastructure` repository triggers a series of build pipelines in **Cloudbuild**. These pipelines deploys the Anthos platform resources in both GCP and AWS.
+- The `build.sh` script creates an `infrastructure` repo in Cloud Source Repository (CSR). The `infrastructure` repo contains the code to deploy the Anthos resources in GCP and AWS. Committing to the _main_ branch of the `infrastructure` repository triggers a series of build pipelines in **Cloudbuild**. These pipelines deploys the Anthos platform resources in both GCP and AWS.
   > Note that the infrastructure build process can take approximately 30 - 35 minutes to complete.
 - After the `build.sh` script finishes, navigate to the **Cloudbuild** details page in Cloud Console from the left hand navbar.
 - Initially, you see the `main` build running. Click on the build ID to inspect the stages of the pipeline. The `main` build pipeline trigger additional builds.
@@ -158,7 +158,7 @@ gcloud auth login
 graph LR
 classDef pipeline fill:#FAFAC6,stroke:#333;
 
-commit[commit to master] -->|6mins|Main[Main - Create custom builder] -->|2mins| Project_Setup[Project Setup - SSH Keys and Anthos Hub GSA]
+commit[commit to main] -->|6mins|Main[Main - Create custom builder] -->|2mins| Project_Setup[Project Setup - SSH Keys and Anthos Hub GSA]
 Project_Setup -->|7mins| Dev[Dev Pipeline - Sets up the dev environment]
 Project_Setup --> |23mins|Stage[Stage Pipeline - Sets up the stage environment]
 Project_Setup -->|26mins| Prod[Prod Pipeline - Sets up the prod environment]
@@ -167,7 +167,7 @@ Project_Setup -->|20mins| Gitlab[Gitlab and Repos - Sets up Gitlab and repos]
 class Main,Project_Setup,Dev,Stage,Prod,Gitlab pipeline;
 ```
 
-- You can trigger this pipeline by running the `build.sh` script which commits the changes to the `infrastructure` CSR repo's _master_ branch.
+- You can trigger this pipeline by running the `build.sh` script which commits the changes to the `infrastructure` CSR repo's _main_ branch.
 - Alternatively, you can directly commit changes to the `infrastructure` repo which is cloned in the `${WORKDIR}/infra-repo` folder in Cloud Shell.
   > Running the `build.sh` script overrides any changes you make locally through the `infra-repo` folder.
 
