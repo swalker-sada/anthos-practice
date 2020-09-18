@@ -412,4 +412,8 @@ With the setup complete, you can proceed with the following labs.
 #### [Lab 4: Cloud Monitoring Setup](/platform_admins/docs/cloud-mon-setup.md)
 > "I want to use Cloud Monitoring to monitor metrics from all services running in all clusters in multiple cloud environments"
 
+#### [Lab 5: Add a New Cluster](/platform_admins/docs/add-cluster.md)
+> "I want to add a new cluster to my multi-cloud environment"
+
+
 

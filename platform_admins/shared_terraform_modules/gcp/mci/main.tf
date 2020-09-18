@@ -17,9 +17,9 @@
 module "mci" {
   source  = "terraform-google-modules/gcloud/google"
   version = "~> 2.0"
-  
-  platform           = "linux"
-  upgrade            = true
+
+  platform = "linux"
+  upgrade  = true
 
   create_cmd_entrypoint  = "${path.module}/scripts/enable_mci.sh"
   create_cmd_body        = "${var.project_id} ${var.cluster_name}"

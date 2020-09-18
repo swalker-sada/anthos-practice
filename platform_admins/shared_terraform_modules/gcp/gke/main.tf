@@ -19,7 +19,7 @@ data "google_project" "project" {
 module "gke" {
   source                  = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/beta-public-cluster"
   project_id              = local.project
-  name                    = "gke-${local.env}-${local.region}${local.zone}-${local.suffix}"
+  name                    = "${local.name}" #"gke-${local.env}-${local.region}${local.zone}-${local.suffix}"
   regional                = false
   region                  = local.region
   zones                   = ["${local.region}-${local.zone}"]
@@ -56,14 +56,14 @@ module "acm" {
 
 module "hub" {
   # Replace when new release including fix is merged
-  source           = "github.com/CloudPharaoh/terraform-google-kubernetes-engine//modules/hub?ref=hub_depends_on"
+  source = "github.com/CloudPharaoh/terraform-google-kubernetes-engine//modules/hub?ref=hub_depends_on"
 
-  module_depends_on = [module.acm.wait]
-  project_id       = local.project
-  cluster_name     = module.gke.name
-  location         = module.gke.location
-  cluster_endpoint = module.gke.endpoint
-  use_existing_sa  = true
-  sa_private_key   = var.hub_sa_private_key
+  module_depends_on       = [module.acm.wait]
+  project_id              = local.project
+  cluster_name            = module.gke.name
+  location                = module.gke.location
+  cluster_endpoint        = module.gke.endpoint
+  use_existing_sa         = true
+  sa_private_key          = var.hub_sa_private_key
   gke_hub_membership_name = module.gke.name
 }
