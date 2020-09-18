@@ -1,0 +1,1 @@
+../../../../platform_admins/shared_terraform_modules/providers/gcp_prod_provider.tf

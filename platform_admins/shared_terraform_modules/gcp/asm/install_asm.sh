@@ -77,7 +77,7 @@ do
     fi
     kubectl --context=eks_${EKS} apply -f istio-system.yaml
     kubectl --context=eks_${EKS} apply -f cacerts.yaml
-    istioctl --context=eks_${EKS} manifest apply -f asm_${EKS}.yaml
+    istioctl --context=eks_${EKS} install -f asm_${EKS}.yaml
     kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml
     istioctl x create-remote-secret --context=eks_${EKS} --name ${EKS} > kubeconfig_secret_${EKS}.yaml
 done
@@ -95,7 +95,7 @@ do
     fi
     kubectl --context=${GKE_CTX} apply -f istio-system.yaml
     kubectl --context=${GKE_CTX} apply -f cacerts.yaml
-    istioctl --context=${GKE_CTX} manifest apply -f asm_${GKE_LIST[IDX]}.yaml
+    istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml
     kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml
     istioctl x create-remote-secret --context=${GKE_CTX} --name ${GKE_LIST[IDX]} > kubeconfig_secret_${GKE_LIST[IDX]}.yaml
 done

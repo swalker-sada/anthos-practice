@@ -32,3 +32,16 @@ steps:
         terraform init
         terraform plan -out terraform.tfplan
         terraform apply -input=false -lock=false terraform.tfplan 
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-gcp-cloud-ops-gsa"
+    dir: infrastructure/prod/gcp/cloud_ops_gsa
+    waitFor: ['-']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_HUB}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan 

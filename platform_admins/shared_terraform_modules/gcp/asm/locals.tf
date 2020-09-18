@@ -19,6 +19,13 @@ EOT
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
           service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "EIP1,EIP2"
 EOT
+  eks_meshconfig = <<EOT
+  meshConfig:
+    defaultConfig:
+      proxyMetadata:
+        ISTIO_METAJSON_PLATFORM_METADATA: |-
+          {\"PLATFORM_METADATA\":{\"gcp_gke_cluster_name\":\"EKS\",\"gcp_project\":\"PROJECT_ID\",\"gcp_location\":\"CLUSTER_LOCATION\"}}
+EOT
     gcp_values = <<EOT
   values:
     kiali:
@@ -36,6 +43,12 @@ EOT
 EOT
     eks_values = <<EOT
   values:
+    telemetry:
+      enabled: true
+      v2:
+        enabled: true
+        stackdriver:
+          enabled: true  # This enables Stackdriver metrics       
     kiali:
       createDemoSecret: true
     global:
