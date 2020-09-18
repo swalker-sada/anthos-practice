@@ -4,20 +4,20 @@ variable "gke_hub_sa_key_file" { default = "gke_hub_sa_key.json" }
 variable "repo_url" {}
 
 variable "vpc_id" {
-    type = string
-    description = "AWS VPC ID"
+  type        = string
+  description = "AWS VPC ID"
 }
 
 variable "eks_cluster_name" {
-    type = string
-    description = "EKS cluster name"
+  type        = string
+  description = "EKS cluster name"
 }
 
 variable "private_subnets" {}
 
 variable "env" {
-    type = string
-    description = "environment"
+  type        = string
+  description = "environment"
 }
 
 variable "map_accounts" {

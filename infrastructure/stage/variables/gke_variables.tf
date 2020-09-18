@@ -1,24 +1,24 @@
 variable "gke1_subnet_name" {
-    type = string
-    default = "us-east4/stage-gcp-vpc-01-us-east4-subnet-01"
+  type    = string
+  default = "us-east4/stage-gcp-vpc-01-us-east4-subnet-01"
 }
 
 variable "gke1_region" {
-    type = string
-    default = "us-east4"
+  type    = string
+  default = "us-east4"
 }
 
 variable "gke1_suffix" {
-    type = number
-    default = 1
+  type    = number
+  default = 1
 }
 
 variable "gke1_zone" {
-    type = string
-    default = "b"
+  type    = string
+  default = "b"
 }
 
 variable "env" {
-    type = string
-    default = "stage"
+  type    = string
+  default = "stage"
 }

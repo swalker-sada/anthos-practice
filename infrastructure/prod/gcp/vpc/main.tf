@@ -1,8 +1,8 @@
 module "prod_gcp_vpc_01" {
-    source = "../../../../platform_admins/shared_terraform_modules/gcp/vpc/"
-    project_id   = var.project_id
-    network_name = var.network_name
-    subnets = var.subnets
+  source       = "../../../../platform_admins/shared_terraform_modules/gcp/vpc/"
+  project_id   = var.project_id
+  network_name = var.network_name
+  subnets      = var.subnets
 }
 
 # create firewall rules to allow-all inernally and SSH from external

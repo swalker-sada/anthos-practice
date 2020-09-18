@@ -1,5 +1,5 @@
 module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
+  source = "terraform-aws-modules/vpc/aws"
 
   name                 = var.name
   cidr                 = var.cidr
@@ -25,6 +25,6 @@ module "vpc" {
 
 resource "aws_eip" "asm-ingress" {
   count = var.eip_count
-  vpc = true
+  vpc   = true
 }
 

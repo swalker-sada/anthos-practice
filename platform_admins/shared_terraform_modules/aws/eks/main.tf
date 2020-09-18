@@ -93,14 +93,14 @@ resource "null_resource" "exec_eks_kubeconfig" {
     interpreter = ["bash", "-exc"]
     command     = "${path.module}/eks_kubeconfig.sh"
     environment = {
-      PROJECT_ID        = var.project_id
-      EKS               = module.eks.cluster_id
-      ENV               = var.env
+      PROJECT_ID = var.project_id
+      EKS        = module.eks.cluster_id
+      ENV        = var.env
     }
   }
 
   triggers = {
-    script_sha1          = sha1(file("${path.module}/eks_kubeconfig.sh"))
+    script_sha1 = sha1(file("${path.module}/eks_kubeconfig.sh"))
   }
   depends_on = [
     module.eks,
@@ -113,12 +113,12 @@ resource "null_resource" "exec_eks_acm" {
     command     = "${path.module}/eks_acm.sh"
     environment = {
       EKS_CLUSTER = module.eks.cluster_id
-      PROJECT_ID = var.project_id
-      REPO_URL = var.repo_url
+      PROJECT_ID  = var.project_id
+      REPO_URL    = var.repo_url
     }
   }
   triggers = {
-    script_sha1          = sha1(file("${path.module}/eks_acm.sh"))
+    script_sha1 = sha1(file("${path.module}/eks_acm.sh"))
   }
   depends_on = [
     null_resource.exec_eks_kubeconfig,

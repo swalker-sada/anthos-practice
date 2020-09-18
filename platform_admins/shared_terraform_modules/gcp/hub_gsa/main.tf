@@ -7,7 +7,7 @@ resource "google_service_account" "gke_hub_sa" {
 
 # IAM binding to grant GKE Hub service account access to the project.
 resource "google_project_iam_member" "gke_hub_sa_connect" {
-  project      = var.project_id
+  project = var.project_id
   role    = "roles/gkehub.connect"
   member  = "serviceAccount:${google_service_account.gke_hub_sa.email}"
 }
@@ -18,8 +18,8 @@ resource "google_service_account_key" "gke_hub_sa_key" {
 }
 
 resource "local_file" "gke_hub_sa_key_file" {
-    content     = base64decode(google_service_account_key.gke_hub_sa_key.private_key)
-    filename = "gke_hub_sa_key.json"
+  content  = base64decode(google_service_account_key.gke_hub_sa_key.private_key)
+  filename = "gke_hub_sa_key.json"
 }
 
 resource "google_storage_bucket_object" "gke_hub_sa_key_file_object" {

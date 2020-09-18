@@ -6,7 +6,7 @@ data "external" "gitlab-creds" {
 }
 
 provider "gitlab" {
-  token = data.external.gitlab-creds.result.gitlab_creds
+  token    = data.external.gitlab-creds.result.gitlab_creds
   base_url = "https://${data.terraform_remote_state.prod_gcp_gitlab.outputs.gitlab_hostname}/api/v4/"
   insecure = true
 }
