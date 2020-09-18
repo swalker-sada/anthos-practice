@@ -1,0 +1,1 @@
+../../variables/cloud_ops_gsa_variables.tf

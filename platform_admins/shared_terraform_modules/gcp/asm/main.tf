@@ -14,6 +14,7 @@ resource "null_resource" "exec_create_asm_yamls" {
       # ASM yaml patches below
       HEADER = local.header
       EKS_COMPONENT = local.eks_component
+      EKS_MESHCONFIG = local.eks_meshconfig
       GCP_VALUES = local.gcp_values
       EKS_VALUES = local.eks_values
       GCP_REGISTRY = local.gcp_registry

@@ -1,0 +1,5 @@
+  meshConfig:
+    defaultConfig:
+      proxyMetadata:
+        ISTIO_METAJSON_PLATFORM_METADATA: |-
+          {\"PLATFORM_METADATA\":{\"gcp_gke_cluster_name\":\"${EKS}\",\"gcp_project\":\"${PROJECT_ID}\",\"gcp_location\":\"${CLUSTER_LOCATION}\"}}
