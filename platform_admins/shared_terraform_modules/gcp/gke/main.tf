@@ -1,19 +1,19 @@
 # GKE
 locals {
-    # The following locals are derived from the subnet object
-    node_subnet = var.subnet.name
-    pod_subnet = var.subnet.secondary_ip_range[0].range_name
-    svc_subnet = var.subnet.secondary_ip_range[local.suffix].range_name
-    region = var.subnet.region
-    network = split("/", var.subnet.network)[length(split("/", var.subnet.network))-1]
-    project = var.subnet.project
-    suffix = var.suffix
-    env = var.env
-    zone = var.zone
+  # The following locals are derived from the subnet object
+  node_subnet = var.subnet.name
+  pod_subnet  = var.subnet.secondary_ip_range[0].range_name
+  svc_subnet  = var.subnet.secondary_ip_range[local.suffix].range_name
+  region      = var.subnet.region
+  network     = split("/", var.subnet.network)[length(split("/", var.subnet.network)) - 1]
+  project     = var.subnet.project
+  suffix      = var.suffix
+  env         = var.env
+  zone        = var.zone
 }
 
 data "google_project" "project" {
-    project_id = var.subnet.project
+  project_id = var.subnet.project
 }
 
 module "gke" {
@@ -29,7 +29,7 @@ module "gke" {
   ip_range_pods           = local.pod_subnet
   ip_range_services       = local.svc_subnet
   network_policy          = false
-  cluster_resource_labels = { "mesh_id": "proj-${data.google_project.project.number}", "environ" : "${local.env}", "infra" : "gcp" }
+  cluster_resource_labels = { "mesh_id" : "proj-${data.google_project.project.number}", "environ" : "${local.env}", "infra" : "gcp" }
   # cluster_resource_labels = { "mesh_id": "proj-${data.google_project.project.number}" }
   node_pools = [
     {

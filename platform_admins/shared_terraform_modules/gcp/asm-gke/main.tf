@@ -15,10 +15,10 @@
  */
 
 locals {
-    project_id               = var.project_id
-    regional_string  = join(",", [for cluster in var.clusters : cluster.regional])
-    clusters_string = join(",", [for cluster in var.clusters : cluster.name])
-    locations_string = join(",", [for cluster in var.clusters : cluster.location])
+  project_id       = var.project_id
+  regional_string  = join(",", [for cluster in var.clusters : cluster.regional])
+  clusters_string  = join(",", [for cluster in var.clusters : cluster.name])
+  locations_string = join(",", [for cluster in var.clusters : cluster.location])
 }
 
 resource "null_resource" "asm-gke" {
@@ -45,11 +45,11 @@ resource "null_resource" "asm-gke" {
   }
 
   triggers = {
-    script_sha1 = sha1(file("${path.module}/scripts/install_asm.sh")),
-    script_sha2 = sha1(file("${path.module}/scripts/remove_asm.sh")),
-    project_id = local.project_id,
+    script_sha1      = sha1(file("${path.module}/scripts/install_asm.sh")),
+    script_sha2      = sha1(file("${path.module}/scripts/remove_asm.sh")),
+    project_id       = local.project_id,
     regional_string  = local.regional_string
-    clusters_string = local.clusters_string
+    clusters_string  = local.clusters_string
     locations_string = local.locations_string
   }
 }
@@ -65,7 +65,7 @@ resource "null_resource" "create_secrets_cross_discovery" {
     environment = {
       PROJECT_ID       = local.project_id
       REGIONAL_STRING  = local.regional_string
-      CLUSTERS_STRING = local.clusters_string
+      CLUSTERS_STRING  = local.clusters_string
       LOCATIONS_STRING = local.locations_string
     }
   }

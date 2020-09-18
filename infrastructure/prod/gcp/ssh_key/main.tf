@@ -4,13 +4,13 @@ resource "tls_private_key" "ssh-key" {
 }
 
 resource "local_file" "ssh_key_private_file" {
-    content     = tls_private_key.ssh-key.private_key_pem
-    filename = "${path.module}/ssh-key-private"
+  content  = tls_private_key.ssh-key.private_key_pem
+  filename = "${path.module}/ssh-key-private"
 }
 
 resource "local_file" "ssh_key_public_file" {
-    content     = tls_private_key.ssh-key.public_key_openssh
-    filename = "${path.module}/ssh-key-public.pub"
+  content  = tls_private_key.ssh-key.public_key_openssh
+  filename = "${path.module}/ssh-key-public.pub"
 }
 
 resource "google_storage_bucket_object" "ssh_key_private_file_gcs" {

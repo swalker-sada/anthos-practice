@@ -1,5 +1,5 @@
 module "gke-gitlab" {
-  source  = "terraform-google-modules/gke-gitlab/google"
+  source = "terraform-google-modules/gke-gitlab/google"
 
   project_id            = var.project_id
   domain                = "${trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")}"
@@ -35,7 +35,7 @@ resource "null_resource" "exec_gitlab_creds" {
     interpreter = ["bash", "-exc"]
     command     = "${path.module}/gitlab_creds.sh"
     environment = {
-      PROJECT_ID = var.project_id
+      PROJECT_ID      = var.project_id
       GITLAB_HOSTNAME = module.cloud-endpoints-dns-gitlab.endpoint_computed
     }
   }

@@ -7,21 +7,21 @@ resource "google_service_account" "cloud_ops_sa" {
 
 # IAM binding to grant cloud ops service account log writing.
 resource "google_project_iam_member" "cloud_ops_sa_logwriter" {
-  project      = var.project_id
+  project = var.project_id
   role    = "roles/logging.logWriter"
   member  = "serviceAccount:${google_service_account.cloud_ops_sa.email}"
 }
 
 # IAM binding to grant cloud ops service account metric writing.
 resource "google_project_iam_member" "cloud_ops_sa_metricwriter" {
-  project      = var.project_id
+  project = var.project_id
   role    = "roles/monitoring.metricWriter"
   member  = "serviceAccount:${google_service_account.cloud_ops_sa.email}"
 }
 
 # IAM binding to grant cloud ops service account monitoring viewer.
 resource "google_project_iam_member" "cloud_ops_sa_monitoringviewer" {
-  project      = var.project_id
+  project = var.project_id
   role    = "roles/monitoring.viewer"
   member  = "serviceAccount:${google_service_account.cloud_ops_sa.email}"
 }
@@ -32,8 +32,8 @@ resource "google_service_account_key" "cloud_ops_sa_key" {
 }
 
 resource "local_file" "cloud_ops_sa_key_file" {
-    content     = base64decode(google_service_account_key.cloud_ops_sa_key.private_key)
-    filename = "cloud_ops_sa_key.json"
+  content  = base64decode(google_service_account_key.cloud_ops_sa_key.private_key)
+  filename = "cloud_ops_sa_key.json"
 }
 
 resource "google_storage_bucket_object" "cloud_ops_sa_key_file_object" {

@@ -6,13 +6,13 @@ resource "gitlab_group" "platform-admins" {
 }
 
 resource "gitlab_project" "anthos-config-management" {
-  name             = var.acm
-  description      = "Anthos Config Management repo"
-  namespace_id     = gitlab_group.platform-admins.id
-  visibility_level = "internal"
+  name                   = var.acm
+  description            = "Anthos Config Management repo"
+  namespace_id           = gitlab_group.platform-admins.id
+  visibility_level       = "internal"
   shared_runners_enabled = true
-  default_branch   = "main"
-  depends_on       = [gitlab_group.platform-admins]
+  default_branch         = "main"
+  depends_on             = [gitlab_group.platform-admins]
 }
 
 resource "gitlab_deploy_key" "anthos-config-management" {
@@ -20,7 +20,7 @@ resource "gitlab_deploy_key" "anthos-config-management" {
   title      = "acm deploy key"
   key        = data.terraform_remote_state.prod_gcp_ssh_key.outputs.public_key_openssh
   can_push   = "true"
-  depends_on       = [gitlab_project.anthos-config-management]
+  depends_on = [gitlab_project.anthos-config-management]
 }
 
 resource "gitlab_group" "online-boutique" {
@@ -32,13 +32,13 @@ resource "gitlab_group" "online-boutique" {
 }
 
 resource "gitlab_project" "online-boutique" {
-  name             = var.online_boutique_project
-  description      = "Online boutique project"
-  namespace_id     = gitlab_group.online-boutique.id
-  visibility_level = "internal"
+  name                   = var.online_boutique_project
+  description            = "Online boutique project"
+  namespace_id           = gitlab_group.online-boutique.id
+  visibility_level       = "internal"
   shared_runners_enabled = true
-  default_branch   = "main"
-  depends_on       = [gitlab_group.online-boutique]
+  default_branch         = "main"
+  depends_on             = [gitlab_group.online-boutique]
 }
 
 resource "gitlab_deploy_key" "online-boutique" {
@@ -46,5 +46,5 @@ resource "gitlab_deploy_key" "online-boutique" {
   title      = "ssh deploy key"
   key        = data.terraform_remote_state.prod_gcp_ssh_key.outputs.public_key_openssh
   can_push   = "true"
-  depends_on       = [gitlab_project.online-boutique]
+  depends_on = [gitlab_project.online-boutique]
 }

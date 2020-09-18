@@ -1,7 +1,7 @@
 output "eks_list" {
-    value = [
-        "${module.eks-stage-1.cluster_id}"
-    ]
+  value = [
+    "${module.eks-stage-1.cluster_id}"
+  ]
 }
 
 output "eks1_cluster_id" {

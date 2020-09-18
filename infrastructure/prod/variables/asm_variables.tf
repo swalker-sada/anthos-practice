@@ -1,7 +1,7 @@
 variable "gke_net" {
-    default = "prod-gcp-vpc"
+  default = "prod-gcp-vpc"
 }
 
 variable "asm_version" {
-    default = "1.6.8-asm.9"
+  default = "1.6.8-asm.9"
 }
