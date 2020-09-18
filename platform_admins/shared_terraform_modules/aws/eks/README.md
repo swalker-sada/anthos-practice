@@ -94,7 +94,7 @@ variable "subnet" {
 - [Terraform Provider for GCP][terraform-provider-google] v2.9
 
 ### IAM Permissions and Credentials
-Minimum IAM permissions needed to setup EKS Cluster: (https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/iam-permissions.md)
+[Minimum IAM permissions needed to setup EKS Cluster](https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/iam-permissions.md)
 
 - Set GCP and AWS credentials. Get the value of the GCP Project ID, AWS Access Key ID and AWS Secret Access
   Key from Qwiklabs and replace the values with your values below.
