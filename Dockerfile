@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM gcr.io/google.com/cloudsdktool/cloud-sdk:debian_component_based
-RUN apt install -y jq python3 openssl gettext coreutils wget unzip curl dnsutils
+FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+RUN apk add -u jq python3 openssl gettext coreutils wget unzip curl bind-tools
 
 ENV TERRAFORM_VERSION=0.12.26
 # ENV TF_PLUGIN_CACHE_DIR /workspace/.terraform.d/plugin-cache
