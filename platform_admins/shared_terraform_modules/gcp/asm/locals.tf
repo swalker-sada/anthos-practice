@@ -28,6 +28,12 @@ EOT
 EOT
   gcp_values            = <<EOT
   values:
+    telemetry:
+      enabled: true
+      v2:
+        enabled: true
+        stackdriver:
+          enabled: true  # This enables Stackdriver metrics
     kiali:
       createDemoSecret: true
     global:
