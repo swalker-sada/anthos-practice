@@ -90,18 +90,18 @@ This workshop is intended to be run in [Qwiklabs](https://explore.qwiklabs.com).
 
 You will now see two labs in Qwiklabs as part of this workshop. One of the labs sets up an environment in GCP (a clean GCP project) and the other sets up an environment in AWS (a federated qwiklabs managed account). Starting both of these labs provide you with credentials to both environments.
 
-For GCP, you get a Google account username, password and a GCP project. You use these credentials to access and administer resources in your provided GCP project via GCP Console and Cloud Shell. 
+For GCP, you get a Google account username, password and a GCP project. You use these credentials to access and administer resources in your provided GCP project via GCP Console and Cloud Shell.
 
-  * Tip: You can open an incognito window in Chrome to log in as this temporary user, without having to deal with switching Google accounts. 
-  * Once you log in using the user/pass in the qwiklab window, you should see the GCP console, logged into project: `qwiklabs-gcp-1234abcd`
-  * You should also see at the top right that you're logged in as a User, like: `student-00-1234abcd@qwiklabs.net`
+- Tip: You can open an incognito window in Chrome to log in as this temporary user, without having to deal with switching Google accounts.
+- Once you log in using the user/pass in the qwiklab window, you should see the GCP console, logged into project: `qwiklabs-gcp-1234abcd`
+- You should also see at the top right that you're logged in as a User, like: `student-00-1234abcd@qwiklabs.net`
 
 For AWS, you get an Access Key ID and a Secret Access Key. These credentials allow you full control over both environments.
 
-  * Tip: Don't try to open this in the incognito window. Instead, just click the "Open Console" button.
-  * On the first try, this will fail :( -- it is creating your credentials and you'll see a banner: `Creating login credentials. Please try again in 30 seconds.`
-  * Try again, and you should be logged into https://console.aws.amazon.com/console/home?region=us-east-1# 
-  * You should see that you're logged in at the top right: `awsstudent @ [1234-1234-1234]`
+- Tip: Don't try to open this in the incognito window. Instead, just click the "Open Console" button.
+- On the first try, this will fail :( -- it is creating your credentials and you'll see a banner: `Creating login credentials. Please try again in 30 seconds.`
+- Try again, and you should be logged into https://console.aws.amazon.com/console/home?region=us-east-1#
+- You should see that you're logged in at the top right: `awsstudent @ [1234-1234-1234]`
 
 These two environments are temporary and expire at the end of this workshop (or when time expires). If you would like a persistent setup of this workshop, you can follow the same instructions using your own GCP and AWS accounts.
 
@@ -146,9 +146,9 @@ cd ${WORKDIR}/anthos-multicloud-workshop
 gcloud config set project ${GOOGLE_PROJECT}
 
 gcloud auth login
-<Enter Verification Code>
+<Enter verification code>
 
-gcloud auth login
+gcloud auth list
 <Authorize gcloud>
 
 ./build.sh
@@ -294,11 +294,15 @@ class Prod_Pipeline,Stage_Pipeline,Dev_Pipeline,Gitlab_Pipeline,Project_Pipeline
 ```
 
 ## User setup
-- Verify that all pipelines finish successfully. 
+
+- Verify that all pipelines finish successfully.
+
 ```bash
 gcloud builds list
 ```
+
 _OUTPUT (Do not copy)_
+
 ```bash
 ID                                    CREATE_TIME                DURATION  SOURCE                                                                                                      IMAGES  STATUS
 ca7c4cd3-cd26-46ab-b1ba-49d93e80d567  2020-09-11T21:23:49+00:00  24M23S    gs://qwiklabs-gcp-02-3d346cf87fd8_cloudbuild/source/1599859427.742461-84b48dc9b6c94fe1b1d9f4f3c490f635.tgz  -       SUCCESS
@@ -308,11 +312,13 @@ a04832fd-df8a-4533-9307-ff5ee39e813d  2020-09-11T21:23:48+00:00  17M50S    gs://
 1aeab461-7b31-4ae3-bfac-9700c18f9819  2020-09-11T21:21:37+00:00  2M3S      gs://qwiklabs-gcp-02-3d346cf87fd8_cloudbuild/source/1599859295.678195-ef981107e3e3465daa3d54a54a9c7f05.tgz  -       SUCCESS
 ed662a31-cc37-4411-9eb3-87425757557a  2020-09-11T21:17:48+00:00  6M2S      infrastructure@bba1e6558c8da62e211870a09c9fb05594687081                                                     -       SUCCESS
 ```
+
 - You can also view this through the **Cloudbuild** page in Cloud Console.
 
 <img src="/platform_admins/docs/img/cloudbuild_success.png" width=70% height=70%>
 
 - Run the `user_setup.sh` script from the repository root folder.
+
 ```bash
 source ${HOME}/.bashrc # If you're using ZSH, source ${HOME}/.zshrc
 cd ${WORKDIR}/anthos-multicloud-workshop
@@ -325,9 +331,10 @@ source ./user_setup.sh
   - Downloads the Gitlab hostname and root password txt file. The location of the file is in the `${WORKDIR}/gitlab` folder.
   - Creates a combined _kubeconfig_ file with all cluster contexts. Renames the clusters for easy context switching. The location of the merged _kubeconfig_ file is `${WORKDIR}/kubeconfig/workshop-config`. The script also sets this as your `KUBECONFIG` variable.
   - Get the EKS cluster's Kubernetes Service Account tokens to login to through the Cloud Console. Learn about logging in to Anthos registered clusters [here](https://cloud.google.com/anthos/multicluster-management/console/logging-in).
-> The script is idempotent and can be run multiple times.
+    > The script is idempotent and can be run multiple times.
 
 _OUTPUT from the `user_setup.sh` script (Do not copy)_
+
 ```bash
 *** eks-prod-us-west2ab-1 Token ***
 
@@ -348,10 +355,13 @@ gitlab.endpoints.PROJECT_ID.cloud.goog
 ```
 
 ### Variables
+
 The initial `build.sh` script creates a `vars.sh` file in the `${WORKDIR}` folder. The `user_setup.sh` script adds additional variables for the workshop to the `vars.sh` file. The `vars.sh` file is automatically sourced when you log in to Cloud Shell. You can also manually source the file.
 
 ### Logging in to EKS clusters
+
 There are three EKS clusters in the architecture. Two clusters in the `prod` environment and one in the `stage` environment. The tokens from the `user_setup.sh` script can be used to log in to the EKS clusters in Cloud Console.
+
 - Navigate to the **Kubernetes Engine > Clusters** page in Cloud Console. You can see the three EKS clusters registered. They have not been logged in.
 
 <img src="/platform_admins/docs/img/eks_loggedout.png">
@@ -365,12 +375,15 @@ There are three EKS clusters in the architecture. Two clusters in the `prod` env
 <img src="/platform_admins/docs/img/eks_workloads.png" width=80% height=80%>
 
 ### Logging in to Gitlab
+
 Log in to Gitlab.
 
 - Navigate to the output link of the following command.
+
 ```bash
 echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog"
 ```
+
 - Log in with the username `root` and the gitlab password from the `user_setup.sh` script.
 - You see two projects (or repos).
   - `anthos-config-management` - ACM repo
