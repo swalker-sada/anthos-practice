@@ -120,9 +120,9 @@ ssh.cloud.google.com
   Key from Qwiklabs and replace the values with your values below.
 
 ```
-export GOOGLE_PROJECT=[GCP PROJECT ID]
-export AWS_ACCESS_KEY_ID=[AWS_ACCESS_KEY_ID]
-export AWS_SECRET_ACCESS_KEY=[AWS_SECRET_ACCESS_KEY]
+export GOOGLE_PROJECT=[GCP PROJECT ID] # example export GOOGLE_PROJECT=qwiklabs-gcp-1234abcd
+export AWS_ACCESS_KEY_ID=[AWS_ACCESS_KEY_ID] # example export AWS_ACCESS_KEY_ID=ABCDEF123456
+export AWS_SECRET_ACCESS_KEY=[AWS_SECRET_ACCESS_KEY] # example export AWS_SECRET_ACCESS_KEY=123abc456def789def
 ```
 
 - Create a `WORKDIR` for this tutorial. All files related to this tutorial end up in `WORKDIR`.
