@@ -46,6 +46,11 @@ module "eks-prod-1" {
 ## Inputs
 | **Name** | **Description** | **Type** | **Default** | **Required** |
 | ---      | ---             | ---      | ---         | ---          |
+| `eks_cluster_name` | EKS Cluster Name | string | "" | yes |
+| `vpc_id` | AWS VPC ID | string | "" | yes |
+| `private_subnets` | Private Subnet | string | "" | yes |
+| `project_id` | Project ID | string | "" | yes |
+| `env` | Environment (dev, stage or prod) | string | "" | yes |
 | `repo_url` | SSH link of the `anthos-config-management` repo | string | "" | yes |
 
 ## Outputs
