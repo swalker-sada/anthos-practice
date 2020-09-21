@@ -13,26 +13,38 @@
 # limitations under the License.
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
-RUN apk add -u jq python3 openssl gettext coreutils wget unzip curl bind-tools
+
+RUN apk --update add --no-cache \
+coreutils \
+curl \
+gettext \
+jq \
+openssl \
+python3 \
+unzip \
+wget
 
 ENV TERRAFORM_VERSION=0.12.26
-# ENV TF_PLUGIN_CACHE_DIR /workspace/.terraform.d/plugin-cache
 
 # Install terraform
-RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
-    unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
-    chmod +x terraform && \
-    mv terraform /usr/local/bin && \
-    rm -rf terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+RUN echo "INSTALL TERRAFORM v${TERRAFORM_VERSION}" \
+&& wget -q -O terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+&& unzip terraform.zip \
+&& chmod +x terraform \
+&& mv terraform /usr/local/bin \
+&& rm -rf terraform.zip
+
+ENV AWS_IAM_AUTHENTICATOR_VERSION=1.17.9/2020-08-04
 
 # Install aws-iam-authenticator
-RUN curl -o /usr/local/bin/aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/aws-iam-authenticator && \
-    chmod +x /usr/local/bin/aws-iam-authenticator
+RUN echo "INSTALL TERRAFORM v${TERRAFORM_VERSION}" \
+&& wget -q -O /usr/local/bin/aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/${AWS_IAM_AUTHENTICATOR_VERSION}/bin/linux/amd64/aws-iam-authenticator \
+&& chmod +x /usr/local/bin/aws-iam-authenticator
 
-# Install kubectl kpt kustomize
-RUN gcloud components install kubectl kpt kustomize
-
-# Install nomos
-# RUN gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos /usr/bin/local/nomos && \
-    # chmod +x /usr/bin/local/nomos && \
-    # nomos version
+# Install additional tools
+RUN gcloud components install \
+kpt \
+kubectl \
+kustomize \
+&& rm -rf $(find google-cloud-sdk/ -regex ".*/__pycache__") \
+&& rm -rf google-cloud-sdk/.install/.backup

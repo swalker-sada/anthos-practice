@@ -24,7 +24,7 @@ substitutions:
 tags:
   - main
 steps:
-  - name: "gcr.io/kaniko-project/executor:v0.15.0"
+  - name: "gcr.io/kaniko-project/executor:v1.0.0"
     id: "build-installer-image"
     args:
       - --destination=gcr.io/${PROJECT_ID}/platform-installer
