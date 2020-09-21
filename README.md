@@ -143,7 +143,14 @@ git clone https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop.git ${
 
 ```
 cd ${WORKDIR}/anthos-multicloud-workshop
+gcloud config set project ${GOOGLE_PROJECT}
+
 gcloud auth login
+<Enter Verification Code>
+
+gcloud auth login
+<Authorize gcloud>
+
 ./build.sh
 ```
 
