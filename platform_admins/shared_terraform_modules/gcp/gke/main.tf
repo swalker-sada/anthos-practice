@@ -44,7 +44,7 @@ module "gke" {
 }
 
 module "acm" {
-  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm"
+  source           = "github.com/CloudPharaoh/terraform-google-kubernetes-engine//modules/acm?ref=hub_depends_on"
   project_id       = local.project
   cluster_name     = module.gke.name
   location         = module.gke.location
@@ -52,4 +52,18 @@ module "acm" {
   ssh_auth_key     = var.acm_ssh_auth_key
   create_ssh_key   = false
   sync_repo        = var.acm_sync_repo
+}
+
+module "hub" {
+  # Replace when new release including fix is merged
+  source           = "github.com/CloudPharaoh/terraform-google-kubernetes-engine//modules/hub?ref=hub_depends_on"
+
+  module_depends_on = [module.acm.wait]
+  project_id       = local.project
+  cluster_name     = module.gke.name
+  location         = module.gke.location
+  cluster_endpoint = module.gke.endpoint
+  use_existing_sa  = true
+  sa_private_key   = var.hub_sa_private_key
+  gke_hub_membership_name = module.gke.name
 }
