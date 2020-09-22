@@ -46,5 +46,6 @@ RUN gcloud components install \
 kpt \
 kubectl \
 kustomize \
+alpha \
 && rm -rf $(find google-cloud-sdk/ -regex ".*/__pycache__") \
 && rm -rf google-cloud-sdk/.install/.backup

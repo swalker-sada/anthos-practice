@@ -34,6 +34,19 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false -lock=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "dev-gcp-gke-mci"
+    dir: infrastructure/dev/gcp/mci
+    waitFor: ['dev-gcp-gke']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_GKE}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan          
+  - name: gcr.io/${PROJECT_ID}/platform-installer
     id: "dev-gcp-asm"
     dir: infrastructure/dev/gcp/asm
     waitFor: ['dev-gcp-gke']
