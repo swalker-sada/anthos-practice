@@ -17,6 +17,7 @@ if [[ ! $USER_SETUP_RUN ]]; then
   gsutil cp -r gs://$GOOGLE_PROJECT/kubeconfig ${WORKDIR}/.
   gsutil cp -r gs://$GOOGLE_PROJECT/gitlab ${WORKDIR}/.
   gsutil cp -r gs://$GOOGLE_PROJECT/ssh-keys ${WORKDIR}/.
+  gsutil cp -r gs://$GOOGLE_PROJECT/cloudopsgsa ${WORKDIR}/.
 
   echo -e "export EKS_PROD_1=eks-prod-us-west2ab-1" >> ${WORKDIR}/vars.sh
   echo -e "export EKS_PROD_2=eks-prod-us-west2ab-2" >> ${WORKDIR}/vars.sh

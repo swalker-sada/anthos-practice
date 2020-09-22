@@ -41,12 +41,19 @@ export STAGE_NS=ob-stage
 # Export a SCRIPT_DIR var and make all links relative to SCRIPT_DIR
 export SCRIPT_DIR=$(dirname $(readlink -f $0 2>/dev/null) 2>/dev/null || echo "${PWD}/$(dirname $0)")
 
-kubectl --context=${GKE1} apply -f ${SCRIPT_DIR}/ob/stage/gke1/ob-namespace.yaml
-kubectl --context=${EKS1} apply -f ${SCRIPT_DIR}/ob/stage/eks1/ob-namespace.yaml
+# Create Cloud-Ops GSA secret YAML
+kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/stage/eks1/cloud-ops-sa-secret.yaml
+kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/stage/gke1/cloud-ops-sa-secret.yaml
 
-kubectl --context=${GKE1} -n ${STAGE_NS} apply -f ${SCRIPT_DIR}/ob/stage/gke1
-kubectl --context=${EKS1} -n ${STAGE_NS} apply -f ${SCRIPT_DIR}/ob/stage/eks1
+echo -e "\n"
+echo_cyan "*** Deploying Online Boutique app to ${GKE1} cluster... ***\n"
+kubectl --context=${GKE1} apply -k ${SCRIPT_DIR}/ob/stage/gke1
+echo -e "\n"
+echo_cyan "*** Deploying Online Boutique app to ${EKS1} cluster... ***\n"
+kubectl --context=${EKS1} apply -k ${SCRIPT_DIR}/ob/stage/eks1
 
+echo -e "\n"
+echo_cyan "*** Verifying all Deployments are Ready in all clusters... ***\n"
 is_deployment_ready ${GKE1} ${STAGE_NS} emailservice
 is_deployment_ready ${GKE1} ${STAGE_NS} checkoutservice
 is_deployment_ready ${GKE1} ${STAGE_NS} frontend

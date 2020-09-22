@@ -16,6 +16,8 @@ infrastructure/*/*/*/terraform*
 
 platform_admins/*/*/*/*.yaml
 
+platform_admins/tests/ob/*/*/cloud-ops-sa-secret.yaml
+
 .DS_Store
 
 wget-log
