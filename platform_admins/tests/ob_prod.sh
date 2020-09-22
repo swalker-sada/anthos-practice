@@ -43,16 +43,27 @@ export PROD_NS=ob-prod
 # Export a SCRIPT_DIR var and make all links relative to SCRIPT_DIR
 export SCRIPT_DIR=$(dirname $(readlink -f $0 2>/dev/null) 2>/dev/null || echo "${PWD}/$(dirname $0)")
 
-kubectl --context=${GKE1} apply -f ${SCRIPT_DIR}/ob/prod/gke1/ob-namespace.yaml
-kubectl --context=${GKE2} apply -f ${SCRIPT_DIR}/ob/prod/gke2/ob-namespace.yaml
-kubectl --context=${EKS1} apply -f ${SCRIPT_DIR}/ob/prod/eks1/ob-namespace.yaml
-kubectl --context=${EKS2} apply -f ${SCRIPT_DIR}/ob/prod/eks2/ob-namespace.yaml
+# Create Cloud-Ops GSA secret YAML
+kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/eks1/cloud-ops-sa-secret.yaml
+kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/eks2/cloud-ops-sa-secret.yaml
+kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/gke1/cloud-ops-sa-secret.yaml
+kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/gke2/cloud-ops-sa-secret.yaml
 
-kubectl --context=${GKE1} -n ${PROD_NS} apply -f ${SCRIPT_DIR}/ob/prod/gke1
-kubectl --context=${GKE2} -n ${PROD_NS} apply -f ${SCRIPT_DIR}/ob/prod/gke2
-kubectl --context=${EKS1} -n ${PROD_NS} apply -f ${SCRIPT_DIR}/ob/prod/eks1
-kubectl --context=${EKS2} -n ${PROD_NS} apply -f ${SCRIPT_DIR}/ob/prod/eks2
+echo -e "\n"
+echo_cyan "*** Deploying Online Boutique app to ${GKE1} cluster... ***\n"
+kubectl --context=${GKE1} apply -k ${SCRIPT_DIR}/ob/prod/gke1
+echo -e "\n"
+echo_cyan "*** Deploying Online Boutique app to ${GKE2} cluster... ***\n"
+kubectl --context=${GKE2} apply -k ${SCRIPT_DIR}/ob/prod/gke2
+echo -e "\n"
+echo_cyan "*** Deploying Online Boutique app to ${EKS1} cluster... ***\n"
+kubectl --context=${EKS1} apply -k ${SCRIPT_DIR}/ob/prod/eks1
+echo -e "\n"
+echo_cyan "*** Deploying Online Boutique app to ${EKS2} cluster... ***\n"
+kubectl --context=${EKS2} apply -k ${SCRIPT_DIR}/ob/prod/eks2
 
+echo -e "\n"
+echo_cyan "*** Verifying all Deployments are Ready in all clusters... ***\n"
 is_deployment_ready ${GKE1} ${PROD_NS} emailservice
 is_deployment_ready ${GKE1} ${PROD_NS} checkoutservice
 is_deployment_ready ${GKE1} ${PROD_NS} frontend
@@ -69,6 +80,6 @@ is_deployment_ready ${EKS2} ${PROD_NS} cartservice
 is_deployment_ready ${EKS2} ${PROD_NS} recommendationservice
 
 echo -e "\n"
-echo_cyan "*** Access Online Boutique app in namespace ${STAGE_NS} by navigating to the following address: ***\n"
+echo_cyan "*** Access Online Boutique app in namespace ${PROD_NS} by navigating to the following address: ***\n"
 kubectl --context=${GKE1} -n istio-system get svc istio-ingressgateway -o jsonpath={.status.loadBalancer.ingress[].ip}
 echo -e "\n"
