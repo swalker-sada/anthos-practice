@@ -301,6 +301,11 @@ class Prod_Pipeline,Stage_Pipeline,Dev_Pipeline,Gitlab_Pipeline,Project_Pipeline
 gcloud builds list
 ```
 
+optional: follow progress of builds with
+```bash
+watch -n 10 gcloud builds list
+```
+
 _OUTPUT (Do not copy)_
 
 ```bash
