@@ -1,3 +1,8 @@
+# Terraform Anthos Service Mesh (ASM) Module
+This module creates a service mesh [(ASM)](https://cloud.google.com/anthos/service-mesh) between GKE and EKE Kubernetes clusters deployedf in this workshop. 
+
+This module is intended to be used in lab/workshop environments only. 
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Inputs
 
