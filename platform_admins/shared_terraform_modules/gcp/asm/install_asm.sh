@@ -1,31 +1,9 @@
 #!/usr/bin/env bash
 
+# Exit on any error
+set -e
+
 # Functions
-is_deployment_ready() { 
-    kubectl --context $1 -n $2 get deploy $3 &> /dev/null
-    export exit_code=$?
-    while [ ! " ${exit_code} " -eq 0 ]
-        do 
-            sleep 5
-            echo -e "Waiting for deployment $3 in cluster $1 to be created..."
-            kubectl --context $1 -n $2 get deploy $3 &> /dev/null
-            export exit_code=$?
-        done
-    echo -e "Deployment $3 in cluster $1 created."
-
-    # Once deployment is created, check for deployment status.availableReplicas is greater than 0
-    export availableReplicas=$(kubectl --context $1 -n $2 get deploy $3 -o json | jq -r '.status.availableReplicas')
-    while [[ " ${availableReplicas} " == " null " ]]
-        do 
-            sleep 5
-            echo -e "Waiting for deployment $3 in cluster $1 to become ready..."
-            export availableReplicas=$(kubectl --context $1 -n $2 get deploy $3 -o json | jq -r '.status.availableReplicas')
-        done
-    
-    echo -e "$3 in cluster $1 is ready with replicas ${availableReplicas}."
-    return ${availableReplicas}
-}
-
 get_svc_ingress_ip() { 
     export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer.ingress[].hostname')
 export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
@@ -65,40 +43,63 @@ kubectl create secret generic cacerts -n istio-system \
 echo -e "${CLUSTER_AWARE_GATEWAY}" > cluster_aware_gateway.yaml
 cat cluster_aware_gateway.yaml
 
-# Get Kubeconfigs, check if ACM Policy Controller is deployed and wait for ACM to be Ready and deploy ASM
 # Get all EKS clusters' kubeconfig files
+for IDX in ${!GKE_LIST[@]}
+do
+    gcloud container clusters get-credentials ${GKE_LIST[IDX]} --zone ${GKE_LOC[IDX]} --project ${PROJECT_ID}
+done
+
+DEFAULT_KUBECONFIG=${HOME}/.kube/config
+
 for EKS in ${EKS_LIST[@]}
 do
-    gsutil cp -r gs://$PROJECT_ID/kubeconfig/kubeconfig_$EKS .
-    export KUBECONFIG=kubeconfig_$EKS
-    IS_ACM_INSTALLED=$(kubectl --kubeconfig=kubeconfig_$EKS get ns | grep gatekeeper-system)
-    if [[ ${IS_ACM_INSTALLED} ]]; then
-        is_deployment_ready eks_${EKS} gatekeeper-system gatekeeper-controller-manager
-    fi
+    gsutil cp -r gs://$PROJECT_ID/kubeconfig/kubeconfig_${EKS} .
+    KUBECONFIG=${DEFAULT_KUBECONFIG}:kubeconfig_${EKS} kubectl config view --flatten --merge > /tmp/kubeconfig
+    cp /tmp/kubeconfig ${DEFAULT_KUBECONFIG}
+done
+
+cat ${DEFAULT_KUBECONFIG}
+export KUBECONFIG=${DEFAULT_KUBECONFIG}
+
+# install asm and process secrets
+processEKS() {
+    EKS=${1}
+    exec 1> >(sed "s/^/${EKS} SO: /")
+    exec 2> >(sed "s/^/${EKS} SE: /" >&2)
+    kubectl --context=eks_${EKS} get po --all-namespaces
     kubectl --context=eks_${EKS} apply -f istio-system.yaml
     kubectl --context=eks_${EKS} apply -f cacerts.yaml
     istioctl --context=eks_${EKS} install -f asm_${EKS}.yaml
     kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml
     istioctl x create-remote-secret --context=eks_${EKS} --name ${EKS} > kubeconfig_secret_${EKS}.yaml
-done
+}
 
-touch kubeconfig_gke
-export KUBECONFIG=kubeconfig_gke
-# Get GKE credentials
-for IDX in ${!GKE_LIST[@]}
-do
-    gcloud container clusters get-credentials ${GKE_LIST[IDX]} --zone ${GKE_LOC[IDX]} --project ${PROJECT_ID}
+processGKE() {
+    IDX=${1}
+    exec 1> >(sed "s/^/${IDX} SO: /")
+    exec 2> >(sed "s/^/${IDX} SE: /" >&2)
+    kubectl --context=eks_${EKS} get po --all-namespaces
     GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
-    IS_ACM_INSTALLED=$(kubectl --context=$GKE_CTX get ns | grep gatekeeper-system)
-    if [[ ${IS_ACM_INSTALLED} ]]; then
-        is_deployment_ready ${GKE_CTX} gatekeeper-system gatekeeper-controller-manager
-    fi
     kubectl --context=${GKE_CTX} apply -f istio-system.yaml
     kubectl --context=${GKE_CTX} apply -f cacerts.yaml
     istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml
     kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml
     istioctl x create-remote-secret --context=${GKE_CTX} --name ${GKE_LIST[IDX]} > kubeconfig_secret_${GKE_LIST[IDX]}.yaml
+}
+
+for EKS in ${EKS_LIST[@]}
+do
+    processEKS ${EKS} &
 done
+
+# Get GKE credentials
+for IDX in ${!GKE_LIST[@]}
+do
+    processGKE ${IDX} &
+done
+
+# wait for all background jobs to finish
+wait < <(jobs -p)
 
 # Create cross-cluster service discovery
 for EKS in ${EKS_LIST[@]}
@@ -108,14 +109,14 @@ do
     do
         if [[ ! $EKS == $EKS_SECRET ]]; then
             echo -e "Creating kubeconfig secret in cluster ${EKS_SECRET} for ${EKS}..."
-            kubectl --kubeconfig=kubeconfig_${EKS_SECRET} --context=eks_${EKS_SECRET} apply -f kubeconfig_secret_${EKS}.yaml
+            kubectl --context=eks_${EKS_SECRET} apply -f kubeconfig_secret_${EKS}.yaml
         fi
     done
     for GKE_SECRET_IDX in ${!GKE_LIST[@]}
     do
         echo -e "Creating kubeconfig secret in cluster ${GKE_LIST[GKE_SECRET_IDX]} for ${EKS}..."
         GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[GKE_SECRET_IDX]}_${GKE_LIST[GKE_SECRET_IDX]}
-        kubectl --kubeconfig=kubeconfig_gke --context=${GKE_CTX} apply -f kubeconfig_secret_${EKS}.yaml
+        kubectl --context=${GKE_CTX} apply -f kubeconfig_secret_${EKS}.yaml
     done
 done
 
@@ -125,16 +126,16 @@ do
     for EKS_SECRET in ${EKS_LIST[@]}
     do
         echo -e "Creating kubeconfig secret in cluster ${EKS_SECRET} for ${GKE_LIST[IDX]}..."
-        kubectl --kubeconfig=kubeconfig_${EKS_SECRET} --context=eks_${EKS_SECRET} apply -f \
-        kubeconfig_secret_${GKE_LIST[IDX]}.yaml
+        kubectl --context=eks_${EKS_SECRET} apply -f \
+          kubeconfig_secret_${GKE_LIST[IDX]}.yaml
     done
     for GKE_SECRET_IDX in ${!GKE_LIST[@]}
     do
         if [[ ! ${GKE_LIST[IDX]} == ${GKE_LIST[GKE_SECRET_IDX]} ]]; then
             echo -e "Creating kubeconfig secret in cluster ${GKE_LIST[GKE_SECRET_IDX]} for ${GKE_LIST[IDX]}..."
             GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[GKE_SECRET_IDX]}_${GKE_LIST[GKE_SECRET_IDX]}
-            kubectl --kubeconfig=kubeconfig_gke --context=${GKE_CTX} apply -f \
-            kubeconfig_secret_${GKE_LIST[IDX]}.yaml
+            kubectl --context=${GKE_CTX} apply -f \
+              kubeconfig_secret_${GKE_LIST[IDX]}.yaml
         fi
     done
 done
