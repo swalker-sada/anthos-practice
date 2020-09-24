@@ -1,5 +1,34 @@
 #!/usr/bin/env bash
 
+# Functions
+is_deployment_ready() { 
+    kubectl --kubeconfig $1 -n $2 get deploy $3 &> /dev/null
+    export exit_code=$?
+    while [ ! " ${exit_code} " -eq 0 ]
+        do 
+            sleep 5
+            echo -e "Waiting for deployment $3 in cluster $1 to be created..."
+            kubectl --kubeconfig $1 -n $2 get deploy $3 &> /dev/null
+            export exit_code=$?
+        done
+    echo -e "Deployment $3 in cluster $1 created."
+
+    # Once deployment is created, check for deployment status.availableReplicas is greater than 0
+    export availableReplicas=$(kubectl --kubeconfig $1 -n $2 get deploy $3 -o json | jq -r '.status.availableReplicas')
+    while [[ " ${availableReplicas} " == " null " ]]
+        do 
+            sleep 5
+            echo -e "Waiting for deployment $3 in cluster $1 to become ready..."
+            export availableReplicas=$(kubectl --kubeconfig $1 -n $2 get deploy $3 -o json | jq -r '.status.availableReplicas')
+        done
+    
+    echo -e "$3 in cluster $1 is ready with replicas ${availableReplicas}."
+    # Returned value is a bash return status as opposed to replica count. 
+    #return ${availableReplicas}
+}
+
+
+
 # Get kubeconfig file
 gsutil cp -r gs://$PROJECT_ID/kubeconfig/kubeconfig_$EKS_CLUSTER kubeconfig_$EKS_CLUSTER
 
@@ -37,3 +66,6 @@ kubectl --kubeconfig=kubeconfig_$EKS_CLUSTER create secret generic git-creds \
 
 # Deploy configmanagement
 kubectl --kubeconfig=kubeconfig_$EKS_CLUSTER apply -f configmanagement_$EKS_CLUSTER.yaml
+
+# Gatekeeper takes time to start, check that gatekeeper controller is ready
+is_deployment_ready kubeconfig_${EKS_CLUSTER} gatekeeper-system gatekeeper-controller-manager

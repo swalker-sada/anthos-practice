@@ -15,32 +15,6 @@
 
 # set -e
 
-# Functions
-is_deployment_ready() {
-    kubectl --context $1 -n $2 get deploy $3 &> /dev/null
-    export exit_code=$?
-    while [ ! " ${exit_code} " -eq 0 ]
-        do
-            sleep 5
-            echo -e "Waiting for deployment $3 in cluster $1 to be created..."
-            kubectl --context $1 -n $2 get deploy $3 &> /dev/null
-            export exit_code=$?
-        done
-    echo -e "Deployment $3 in cluster $1 created."
-
-    # Once deployment is created, check for deployment status.availableReplicas is greater than 0
-    export availableReplicas=$(kubectl --context $1 -n $2 get deploy $3 -o json | jq -r '.status.availableReplicas')
-    while [[ " ${availableReplicas} " == " null " ]]
-        do
-            sleep 5
-            echo -e "Waiting for deployment $3 in cluster $1 to become ready..."
-            export availableReplicas=$(kubectl --context $1 -n $2 get deploy $3 -o json | jq -r '.status.availableReplicas')
-        done
-
-    echo -e "$3 in cluster $1 is ready with replicas ${availableReplicas}."
-    return ${availableReplicas}
-}
-
 # Setup variables
 IFS=',' read -r -a CLUSTER_NAMES <<< "${CLUSTERS_STRING}"
 IFS=',' read -r -a CLUSTER_TYPES <<< "${REGIONAL_STRING}"
@@ -97,13 +71,6 @@ do
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ gcloud.project.environProjectNumber ${ENVIRON_PROJECT_NUMBER}
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ anthos.servicemesh.profile asm-gcp
   kpt cfg list-setters "${CLUSTER_NAMES[$i]}"/
-
-  # Gatekeeper causes issues if not ready
-  # Check if ACM is installed and wait for it to be ready
-  IS_ACM_INSTALLED=$(kubectl --context ${GKE_CTX} get ns | grep gatekeeper-system)
-  if [[ ${IS_ACM_INSTALLED} ]]; then
-    is_deployment_ready ${GKE_CTX} gatekeeper-system gatekeeper-controller-manager
-  fi
 
   # Install ASM
   istioctl install -f "${CLUSTER_NAMES[$i]}"/cluster/istio-operator.yaml
