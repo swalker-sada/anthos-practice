@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cartservice
+  annotations:
+    sidecar.istio.io/userVolume: '[{"name": "cloud-ops-sa-volume", "secret": {"secretName": "cloud-ops-sa"}}]'
+    sidecar.istio.io/userVolumeMount: '[{"name": "cloud-ops-sa-volume", "mountPath": "/home/istio-proxy/.config/gcloud"}]'
 spec:
   selector:
     matchLabels:
@@ -13,30 +16,30 @@ spec:
     spec:
       terminationGracePeriodSeconds: 5
       containers:
-      - name: server
-        image: gcr.io/google-samples/microservices-demo/cartservice:v0.2.0
-        ports:
-        - containerPort: 7070
-        env:
-        - name: REDIS_ADDR
-          value: "" # use local redis
-        - name: PORT
-          value: "7070"
-        - name: LISTEN_ADDR
-          value: "0.0.0.0"
-        resources:
-          requests:
-            cpu: 200m
-            memory: 64Mi
-          limits:
-            cpu: 300m
-            memory: 128Mi
-        readinessProbe:
-          initialDelaySeconds: 15
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070"]
-        livenessProbe:
-          initialDelaySeconds: 15
-          periodSeconds: 10
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070"]
+        - name: server
+          image: gcr.io/google-samples/microservices-demo/cartservice:v0.2.0
+          ports:
+            - containerPort: 7070
+          env:
+            - name: REDIS_ADDR
+              value: "" # use local redis
+            - name: PORT
+              value: "7070"
+            - name: LISTEN_ADDR
+              value: "0.0.0.0"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 128Mi
+          readinessProbe:
+            initialDelaySeconds: 15
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:7070"]
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:7070"]

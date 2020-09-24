@@ -395,3 +395,21 @@ echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog"
   - `online-boutique` - Online Boutique application repo
 
 <img src="/platform_admins/docs/img/gitlab_repos.png" width=50% height=50%>
+
+## Labs
+
+With the setup complete, you can proceed with the following labs.
+
+#### [Lab 1: Multicloud Applications](/platform_admins/docs/multicluster-networking.md)
+> "I want to deploy my applications across multicple clusters in multiple cloud environments"
+
+#### [Lab 2: Multicloud Service Portability](/platform_admins/docs/app-migration.md)
+> "I want to move/migrate services between clusters in a multicloud environment."
+
+#### [Lab 3: Introduction to Distributed Services](/platform_admins/docs/distributed-service-intro.md)
+> "I want to run the same service in multiple cluster and in multiple cloud environments."
+
+#### [Lab 4: Cloud Monitoring Setup](/platform_admins/docs/cloud-mon-setup.md)
+> "I want to use Cloud Monitoring to monitor metrics from all services running in all clusters in multiple cloud environments"
+
+
