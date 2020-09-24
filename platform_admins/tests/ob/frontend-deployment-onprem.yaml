@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend
   labels:
-    provider: gcp
+    provider: onprem
   annotations:
     sidecar.istio.io/userVolume: '[{"name": "cloud-ops-sa-volume", "secret": {"secretName": "cloud-ops-sa"}}]'
     sidecar.istio.io/userVolumeMount: '[{"name": "cloud-ops-sa-volume", "mountPath": "/home/istio-proxy/.config/gcloud"}]'
@@ -13,9 +13,6 @@ spec:
       app: frontend
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/userVolume: '[{"name": "cloud-ops-sa-volume", "secret": {"secretName": "cloud-ops-sa"}}]'
-        sidecar.istio.io/userVolumeMount: '[{"name": "cloud-ops-sa-volume", "mountPath": "/home/istio-proxy/.config/gcloud"}]'
       labels:
         app: frontend
     spec:
@@ -40,7 +37,7 @@ spec:
             - name: AD_SERVICE_ADDR
               value: "adservice:9555"
             - name: ENV_PLATFORM
-              value: "aws"
+              value: "onprem"
           # - name: JAEGER_SERVICE_ADDR
           #   value: "jaeger-collector:14268"
           resources:
