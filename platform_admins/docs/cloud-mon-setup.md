@@ -84,18 +84,24 @@ If you did [Lab 3: Introduction to Distributed Services](/platform_admins/docs/d
 
 ## Scripted Dashboard for Production
 1. A pre-created created dashboard for production is available.
-```
-cd ops
-./services-dashboard-production.sh
-```
 
-Output (do not copy)
-```
-... json ...
-https://console.cloud.google.com/monitoring/dashboards/custom/servicesdash?cloudshell=false&project=qwiklabs-gcp-01-01f4f219d79d
-```
+    ```
+    cd ops
+    ./services-dashboard-production.sh
+    ```
 
-1. Select the output link to open the dashboard directly.
+    Output (do not copy)
+    ```
+    ... json ...
+    https://console.cloud.google.com/monitoring/dashboards/custom/servicesdash?cloudshell=false&project=qwiklabs-gcp-01-01f4f219d79d
+    ```
+
+1. Select the link from the script output to open the dashboard directly.
+
+1. A new tab with the dashboard will be opened.  Select the custom dashboard titled: `Services Dashboard - Production`
+
+    <img src="/platform_admins/docs/img/cloud-mon-dash-list.png" width=80% height=80%>
+
 
 #### [Back to Labs](/README.md#labs)
 
