@@ -7,7 +7,4 @@ resources:
   - deployments-email-checkout-frontend.yaml
   - deployments-payment-productcatalog-currency.yaml
   - istio-control.yaml
-  - cloud-ops-sa-secret.yaml
-commonAnnotations:
-  sidecar.istio.io/userVolume: '[{"name": "cloud-ops-sa-volume", "secret": {"secretName": "cloud-ops-sa"}}]'
-  sidecar.istio.io/userVolumeMount: '[{"name": "cloud-ops-sa-volume", "mountPath": "/home/istio-proxy/.config/gcloud"}]'
+  - default-ksa.yaml

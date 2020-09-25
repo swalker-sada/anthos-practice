@@ -37,7 +37,8 @@ export GKE1=${GKE_PROD_1}
 export EKS1=${EKS_PROD_1}
 export GKE2=${GKE_PROD_2}
 export EKS2=${EKS_PROD_2}
-
+export GSA=cloud-ops@${GOOGLE_PROJECT}.iam.gserviceaccount.com
+export KSA=default
 export PROD_NS=ob-prod
 
 # Export a SCRIPT_DIR var and make all links relative to SCRIPT_DIR
@@ -46,8 +47,14 @@ export SCRIPT_DIR=$(dirname $(readlink -f $0 2>/dev/null) 2>/dev/null || echo "$
 # Create Cloud-Ops GSA secret YAML
 kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/eks1/cloud-ops-sa-secret.yaml
 kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/eks2/cloud-ops-sa-secret.yaml
-kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/gke1/cloud-ops-sa-secret.yaml
-kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/gke2/cloud-ops-sa-secret.yaml
+
+# Workload Identity for Cloud-Ops GSA/KSA Mapping
+sed -i "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke1/default-ksa.yaml
+sed -i "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke2/default-ksa.yaml
+
+gcloud iam service-accounts add-iam-policy-binding $GSA \
+  --role roles/iam.workloadIdentityUser \
+  --member "serviceAccount:${GOOGLE_PROJECT}.svc.id.goog[${PROD_NS}/$KSA]"
 
 echo -e "\n"
 echo_cyan "*** Deploying Online Boutique app to ${GKE1} cluster... ***\n"
