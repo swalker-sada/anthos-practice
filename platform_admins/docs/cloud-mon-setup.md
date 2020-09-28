@@ -86,8 +86,8 @@ If you did [Lab 3: Introduction to Distributed Services](/platform_admins/docs/d
 1. A pre-created created dashboard for production is available.
 
     ```
-    cd ops
-    ./services-dashboard-production.sh
+    ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ops/services-dashboard.sh \
+      ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ops/services-dashboard-prod.json
     ```
 
     Output (do not copy)
