@@ -10,4 +10,4 @@ variable "public_subnets" { default = [
   "10.100.3.0/24", "10.100.4.0/24"
 ] }
 
-variable "eip_count" { default = 2 }
+variable "eip_count" { default = 4 }
