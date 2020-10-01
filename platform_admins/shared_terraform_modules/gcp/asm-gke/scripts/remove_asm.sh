@@ -25,9 +25,9 @@ for i in "${!CLUSTER_NAMES[@]}"; do
 
   # Set cmdline org for region/zone
   CMD_ARG=$([ "${CLUSTER_TYPES[$i]}" = true ] && echo "--region" || echo "--zone")
-  gcloud container clusters get-credentials ${CLUSTER_NAME} ${CMD_ARG} ${CLUSTER_LOCATION} --project ${PROJECT_ID}
+  gcloud container clusters get-credentials "${CLUSTER_NAMES[$i]}" $CMD_ARG "${CLUSTER_LOCS[$i]}" --project ${PROJECT_ID}
 
-  kubectl --context=gke_"${PROJECT_ID}"_"${CLUSTER_LOCATION}"_"${CLUSTER_NAME}" delete ns istio-system
-  kubectl --context=gke_"${PROJECT_ID}"_"${CLUSTER_LOCATION}"_"${CLUSTER_NAME}" delete ns asm-system
+  kubectl --context=gke_"${PROJECT_ID}"_"${CLUSTER_LOCS[$i]}"_"${CLUSTER_NAMES[$i]}" delete ns istio-system
+  kubectl --context=gke_"${PROJECT_ID}"_"${CLUSTER_LOCS[$i]}"_"${CLUSTER_NAMES[$i]}" delete ns asm-system
 
 done
