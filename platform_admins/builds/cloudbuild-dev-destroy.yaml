@@ -1,0 +1,53 @@
+---
+timeout: 3600s
+logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
+substitutions:
+  _GCP_VPC: "true"
+  _GKE: "true"
+  _ASM: "true"
+tags:
+  - dev
+steps:
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "dev-gcp-asm"
+    dir: infrastructure/dev/gcp/asm
+    waitFor: ['dev-gcp-gke']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_ASM}" == "false" ]] && exit 0
+        terraform destroy -auto-approve
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "dev-gcp-gke-mci"
+    dir: infrastructure/dev/gcp/mci
+    waitFor: ['dev-gcp-gke']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_GKE}" == "false" ]] && exit 0
+        terraform destroy -auto-approve
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "dev-gcp-gke"
+    dir: infrastructure/dev/gcp/gke
+    waitFor: ['dev-gcp-vpc']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_GKE}" == "false" ]] && exit 0
+        terraform destroy -auto-approve
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "dev-gcp-vpc"
+    dir: infrastructure/dev/gcp/vpc
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_GCP_VPC}" == "false" ]] && exit 0
+        terraform destroy -auto-approve
