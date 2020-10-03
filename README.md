@@ -372,6 +372,7 @@ There are three EKS clusters in the architecture. Two clusters in the `prod` env
 <img src="/platform_admins/docs/img/eks_loggedout.png">
 
 - Click **Login** next to each EKS cluster and select **Token**. Copy and paste the tokens (outputted from the `user_setup.sh` script) to the EKS clusters.
+- Note: Simply select the token in the cloud shell (and nothing else, this automatically copies is), and paste it into the token box in the Cloud Console without intermittently storing it into a file. Any intermittent storage might add extra characters that will invalidate the token and login will fail.
 
 <img src="/platform_admins/docs/img/eks_login.png" width=40% height=40%>
 
