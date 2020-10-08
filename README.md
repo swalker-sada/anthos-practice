@@ -95,7 +95,7 @@ The labs in the workshops are designed with these user personae and their user j
 The workshop is divided into two main sections:
 
 1. **Foundation** - Aimed at the platform admin persona, the foundation focuses on _building_ the Anthos platform. The foundation goes through tooling, build pipelines, automation, best practices and management of components of Anthos in GCP and AWS. The foundation covers a canonical approach of building and managing Anthos platform in a multi-cloud environment.
-1. **User Stories** - After the foundation, you can start _using_ the Anthos platform. This section is a series of labs that go various user stories. These section is designed to be iterative and ever growing. The idea behind splitting the foundation from the user stories is so that anyone can build upon the foundation for a particular story. We will continue to add more and more stories in time and as we hear more use cases. Some examples of user stories that are part of this workshop are as follows:
+1. **User Stories** - After the foundation, different personae can start _using_ the Anthos platform. This section is a series of labs that go various user stories. These section is designed to be iterative and ever growing. The idea behind splitting the foundation from the user stories is so that anyone can build upon the foundation for a particular story. We will continue to add more and more stories in time and as we hear more use cases. Some examples of user stories that are part of this workshop are as follows:
 
 - _I, application owner and operator, want to deploy my applications across multiple clusters in multiple cloud environments_
 - _I, application operator, want to move/migrate services between clusters in a multi-cloud environment._
