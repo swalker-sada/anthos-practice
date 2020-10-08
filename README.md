@@ -103,7 +103,7 @@ The workshop is divided into two main sections:
 - _I, application operator, want to use Cloud Monitoring to monitor metrics from all services running in all clusters in multiple cloud environments_
 - _I, platform administrator, want to add a new cluster to my multi-cloud environment_
 
-## Foundation
+## Foundation - Building Anthos platform
 
 To set up the Anthos platform foundation, you accomplish the following:
 
