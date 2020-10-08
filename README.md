@@ -79,7 +79,7 @@ class Dev dev;
 - Container management (via [Anthos GKE](https://cloud.google.com/anthos/gke) or [Anthos attached clusters](https://cloud.google.com/anthos/docs/setup/attached-clusters))
 - Policy management and enforcement (via [Anthos Configuration Management](https://cloud.google.com/anthos/config-management))
 - Services management (via [Anthos Service Mesh](https://cloud.google.com/anthos/service-mesh))
-- Application and software life cycle management (CI/CD)
+- Application and software life cycle management ([CI/CD](https://cloud.google.com/solutions/modern-ci-cd-with-anthos))
 - Observability and platform management (via [Cloud Operations](https://cloud.google.com/products/operations))
 
 ## About the workshop
