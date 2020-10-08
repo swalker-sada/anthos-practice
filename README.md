@@ -84,7 +84,7 @@ class Dev dev;
 
 ## About the workshop
 
-The purpose of this workshop is to learn, build and manage Anthos platform in a multi-cloud environment. Instead of a technology (or product) focused approach, the workshop takes a persona-focused approach. The labs in the workshop each resolve to address a user journey or story. There are three main personae that interact with Anthos:
+The purpose of this workshop is to learn, build and manage Anthos platform in a multi-cloud environment. Instead of a technology (or product) focused approach, the workshop takes a persona-focused approach. The labs in the workshop each address a user journey or story. There are three main personae that interact with Anthos:
 
 1. **Application Developers or Owners** - Application developers are primarily responsible for writing and debugging application code.
 1. **Application or Service Operators** - Also sometimes affectionately known as [SRE](https://landing.google.com/sre/), are responsible for running applications/services, monitoring the health and status of live deployments, and rolling out updates.
