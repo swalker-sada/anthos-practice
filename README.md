@@ -436,20 +436,20 @@ With the setup complete, you can proceed with the following labs.
 
 #### [Lab 1: Multicloud Applications](/platform_admins/docs/multicluster-networking.md)
 
-> "I want to deploy my applications across multiple clusters in multiple cloud environments"
+> "I, application owner or operator, want to deploy my applications across multiple clusters in multiple cloud environments"
 
 #### [Lab 2: Multicloud Service Portability](/platform_admins/docs/app-migration.md)
 
-> "I want to move/migrate services between clusters in a multicloud environment."
+> "I, application operator, want to move/migrate services between clusters in a multicloud environment."
 
 #### [Lab 3: Introduction to Distributed Services](/platform_admins/docs/distributed-service-intro.md)
 
-> "I want to run the same service in multiple cluster and in multiple cloud environments."
+> "I, application owner or operator, want to run the same service in multiple cluster and in multiple cloud environments."
 
 #### [Lab 4: Cloud Monitoring Setup](/platform_admins/docs/cloud-mon-setup.md)
 
-> "I want to use Cloud Monitoring to monitor metrics from all services running in all clusters in multiple cloud environments"
+> "I, application operator, want to use Cloud Monitoring to monitor metrics from all services running in all clusters in multiple cloud environments"
 
 #### [Lab 5: Add a New Cluster](/platform_admins/docs/add-cluster.md)
 
-> "I want to add a new cluster to my multi-cloud environment"
+> "I, platform administrator, want to add a new cluster to my multi-cloud environment"
