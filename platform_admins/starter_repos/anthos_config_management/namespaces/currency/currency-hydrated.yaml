@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: currency
+---
+apiVersion: v1
+data:
+  application_default_credentials.json: ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInByb2plY3RfaWQiOiAicXdpa2xhYnMtZ2NwLW1sLWI2OTlmYTVlMWJkOCIsCiAgInByaXZhdGVfa2V5X2lkIjogImY5ZjE3NWVhZGI5NzcyMjJjZGQzZDFhYTJmNTQxNmRjYzRkNTVhMDgiLAogICJwcml2YXRlX2tleSI6ICItLS0tLUJFR0lOIFBSSVZBVEUgS0VZLS0tLS1cbk1JSUV2QUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktZd2dnU2lBZ0VBQW9JQkFRQ3lJdDZleHc2eGFzcEFcbnpjQmxoZ2VHazhZaURvNkZlR3E0dEMxVmlrTWhkcldRUU9VL0dDL3hkaExsWlgxV0Ftc3NxcXNSLzZ4TjdrYzRcbmlGb2FwSUlVS0gzWHFta3BWbk9zSjhtcnBVYmFyVmRVUW5aSnZkd25DU1k1Vlh5N3ZHSTBEVVQ5TmtDNXdiV0Fcbnpidll4Slp2akxOV1p4endmb2xuaHJKeW5xbStiQUVNK1RINUFQQkR5OEFOYy9rcmcwdy9nUFM5WWF3MGI5QlhcbkpMdkRlVmRUTlFSUFNnVVZhV2ZKb0FNMHdVZks3NkwvUTFMckJpOHRqZldGYVA1SVBTdmxnNmlUR2hwcnZaaFdcbm9idUd2ZU1LWm5aR3VOUnRkWlZ5bEgvd2F5ZlI5QmVGZ2ZiODdKNGdLMDVFdmJtNzBNc3F4RnJZak1XeVZlbHVcbnM5MUhKdEMxQWdNQkFBRUNnZ0VBVXpCWWtZSzVXRjVjTEk1Sm1yL1FWT2MrNEptMnNoc05qOHRJM29rdWwzcVdcbkNOTmRtNjBDZXJ0ZTBMVW9KcG9EamZ6MzNmUnQ5WWpneHNSYWU5VzJqNDVuVW1lWks3NWRUNWpYSStzUDMwQ1RcbkoxelFXOWluN3F6bHBtSEhXZTc4VjMyWTZiMUQxZHZpRk5BL09OaDV2b2RSR3ZrVmVUUkdtOHU2R3pBQWFsWENcbitQcUtvbnlsNG41T0RsWHNUZnpWZUE0Sk81UzlHVVlBdWFCV21rYXVnN0l5V0F6bGdOc3lXOWFpaXdta09KbTVcbnN6QjFYR29HNzhNT0V2cklzWktXckJCNFpQVkxZaXVaS1pZSlVBaTBrSnNqT2pobWVrMmtBdkNjV1FKMkwyZTVcbm12U1BkNkpyNitXaE5qK3M0bi96T0x6RDBUWWdYQ0JucGdoM3cxUy9Fd0tCZ1FEajZ2R2xWU2hqV3hlb2lURGJcbmhDRWtoOG5GbENldllBYVBGN2VqZnRDaHJ6ZnBnVG1jbXRscCtGOFJzT3RKUTRBanppZUdtUkVYSjZKMlVxOGZcbll5MGZnWVJqM2MrOHdpOGZIVjZwLzVrZVVBWTZYbldMT1diQ1o1UGk4Q044b09FSWk4OVA3eHR2YWZ4bEdoK3lcbjdiUU8wWU83YW5hZFpmL0JweS92NDNBcXp3S0JnUURJRmJNNHZFSnhKNFQxR3BmdldsUVIxa1ozUXh0R205bDRcbkRoelc3NjFxbEJnbnV1L0hHSklRWnkzZ3BHOWZRaVlJZEVNQWphc2JXSGszMXhrbEtvMThGc2g5VkFCVk9oM0hcbnB1YitKN1ZuRGpMN3dLOWlEb20wYTNwRnplTzZXV3Zoa2tHN2VXdEtLMisvVlJmYzUrU2UzY25IaEdNRndUeVpcbmVYY1NvRFNkT3dLQmdCajY5RGRKeVI1eXFub25aenA0RmVYYUdDeFdtNjdtR0hId2lJa2I2aVArZjJOUmJZNFRcbmpzYkZtUzNvTlRHWGUyRHhSSFhGS3hGZG43bldRQ2x4aGsyUXRZRDRtNzgxalZLY3RuWnRkRXZWTzRtRU50L21cbmo3TzVCSVY0Q251cmFsNjBiQ2wzcklzZWs3SkZGYnBYd1VkcWdVUzJXMy9PNFNSSmZjQ09MZ29UQW9HQVNsakZcbjM2OFVnVGRPRUVWeGIxOEJIaCtnejNBQUVweVdraVdzVWJGOW5yeW92UnFaUGtIREJKVlNWc2JERzRKWTM0dFRcbjJrREo4NzlNUzVPQnBHM0xaUENTVHYrSG9DT1lMVGUzWFhranpzZFg2blFPdDBEdnFqckZsR3FNMUJHbUpJdFVcbklYVmNpSkxiVXgwcllNcEtDVDRnWENLMUtNNUUxa0pzSEYrckxVRUNnWUJNeThKUkZndzFRUFBGSVFmYzg2QTJcbjhyYjBGT1RZOElpUEd3WUZhSlNUTE42S3EyZW05Mnc3RVhDMEtmdTRkMjJQcWpzbnFHTGdRZ1QrN2xFbDFEODZcbmNwYzR5Qk1FOGRTMU1lY0t1NmpUZ2tHUmdQSytkYU1OUndaSEw1MUN3S25aanphMTRPWS9reGpML1hiZitEN1VcbnZ6L2x2c1hVelRBZTBvc29weFQybFE9PVxuLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLVxuIiwKICAiY2xpZW50X2VtYWlsIjogImNsb3VkLW9wc0Bxd2lrbGFicy1nY3AtbWwtYjY5OWZhNWUxYmQ4LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwKICAiY2xpZW50X2lkIjogIjEwOTY5OTc0Mzg4MzY4ODUyNzQzOSIsCiAgImF1dGhfdXJpIjogImh0dHBzOi8vYWNjb3VudHMuZ29vZ2xlLmNvbS9vL29hdXRoMi9hdXRoIiwKICAidG9rZW5fdXJpIjogImh0dHBzOi8vb2F1dGgyLmdvb2dsZWFwaXMuY29tL3Rva2VuIiwKICAiYXV0aF9wcm92aWRlcl94NTA5X2NlcnRfdXJsIjogImh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL29hdXRoMi92MS9jZXJ0cyIsCiAgImNsaWVudF94NTA5X2NlcnRfdXJsIjogImh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL3JvYm90L3YxL21ldGFkYXRhL3g1MDkvY2xvdWQtb3BzJTQwcXdpa2xhYnMtZ2NwLW1sLWI2OTlmYTVlMWJkOC5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIKfQo=
+kind: Secret
+metadata:
+  annotations:
+    configmanagement.gke.io/cluster-selector: gke-prod-us-west2b-2
+    sidecar.istio.io/userVolume: '[{"name": "cloud-ops-sa-volume", "secret": {"secretName":
+      "cloud-ops-sa"}}]'
+    sidecar.istio.io/userVolumeMount: '[{"name": "cloud-ops-sa-volume", "mountPath":
+      "/home/istio-proxy/.config/gcloud"}]'
+  creationTimestamp: null
+  name: cloud-ops-sa
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: currencyservice
+spec:
+  ports:
+  - name: grpc
+    port: 7000
+    targetPort: 7000
+  selector:
+    app: currencyservice
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    configmanagement.gke.io/cluster-selector: gke-prod-us-west2b-2
+    sidecar.istio.io/userVolume: '[{"name": "cloud-ops-sa-volume", "secret": {"secretName":
+      "cloud-ops-sa"}}]'
+    sidecar.istio.io/userVolumeMount: '[{"name": "cloud-ops-sa-volume", "mountPath":
+      "/home/istio-proxy/.config/gcloud"}]'
+  name: currencyservice
+spec:
+  selector:
+    matchLabels:
+      app: currencyservice
+  template:
+    metadata:
+      annotations:
+        configmanagement.gke.io/cluster-selector: gke-prod-us-west2b-2
+        sidecar.istio.io/userVolume: '[{"name": "cloud-ops-sa-volume", "secret": {"secretName":
+          "cloud-ops-sa"}}]'
+        sidecar.istio.io/userVolumeMount: '[{"name": "cloud-ops-sa-volume", "mountPath":
+          "/home/istio-proxy/.config/gcloud"}]'
+      labels:
+        app: currencyservice
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "7000"
+        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.0
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:7000
+        name: server
+        ports:
+        - containerPort: 7000
+          name: grpc
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:7000
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+      serviceAccount: currency
+      terminationGracePeriodSeconds: 5
