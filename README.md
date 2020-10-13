@@ -113,7 +113,7 @@ The workshop is divided into two main sections:
 
 To set up the Anthos platform foundation, you accomplish the following:
 
-- Setting up an Anthos multi-environment multicloud environment on GCP and AWS using GKE and EKS anthos attached clusters (registered via GKE Hub).
+- Setting up an Anthos multi-environment multi-cloud environment on GCP and AWS using GKE and EKS (Anthos attached clusters, registered via Hub).
 - Setting up VPCs in each environment in GCP and VPC.
 - Setting up GKE and EKS clusters in GCP and AWS.
 - Deploying Anthos Config Management (ACM) on all clusters.
@@ -132,9 +132,9 @@ For GCP, you get a Google account username, password and a GCP project. You use 
 - Once you log in using the user/pass in the qwiklab window, you should see the GCP console, logged into project: `qwiklabs-gcp-1234abcd`
 - You should also see at the top right that you're logged in as a User, like: `student-00-1234abcd@qwiklabs.net`
 
-For AWS, you get an Access Key ID and a Secret Access Key. These credentials allow you full control over both environments.
+For AWS, you get an Access Key ID and a Secret Access Key.  These credentials allow you full control.
 
-- Tip: Don't try to open this in the incognito window. Instead, just click the "Open Console" button.
+- Tip: No need to open this in an incognito window. Instead, just click the "Open Console" button.
 - On the first try, this will fail :( -- it is creating your credentials and you'll see a banner: `Creating login credentials. Please try again in 30 seconds.`
 - Try again, and you should be logged into https://console.aws.amazon.com/console/home?region=us-east-1#
 - You should see that you're logged in at the top right: `awsstudent @ [1234-1234-1234]`
@@ -192,7 +192,7 @@ gcloud auth list
 
 > Note that the infrastructure build process can take approximately 30 - 35 minutes to complete.
 
-- After the `build.sh` script finishes, navigate to the **Cloudbuild** details page in Cloud Console from the left hand navbar.
+- After the `build.sh` script finishes, navigate to the **Cloud Build** details page in Cloud Console from the left hand navbar.
 - Initially, you see the `main` build running. Click on the build ID to inspect the stages of the pipeline. The `main` build pipeline trigger additional builds.
 - The following diagram illustrates the builds and the approximate times each stage takes to complete. Note that all the `env` and the `gitlab` stages run concurrently as shown.
 
