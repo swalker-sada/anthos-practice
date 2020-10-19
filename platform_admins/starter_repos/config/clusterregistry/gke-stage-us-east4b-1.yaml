@@ -1,0 +1,10 @@
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: gke-stage-us-east4b-1
+  labels:
+    environment: stage
+    clusterName: gke-stage-us-east4b-1
+    infrastructure: gcp
+    region: us-east4
+    zone: b

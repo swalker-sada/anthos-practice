@@ -102,6 +102,12 @@ if [[ ! $API_ENABLED ]]; then
   secretmanager.googleapis.com \
   anthos.googleapis.com \
   multiclusteringress.googleapis.com"
+
+  # Number of services enable may not exceed 20 thus splitting into 2 commands
+  print_and_execute "gcloud services enable \
+  sqladmin.googleapis.com \
+  redis.googleapis.com \
+  cloudkms.googleapis.com" 
   echo -e "export API_ENABLED=true" >> ${SCRIPT_DIR}/../../../vars.sh
 fi
 

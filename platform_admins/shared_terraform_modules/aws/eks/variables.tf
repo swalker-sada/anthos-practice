@@ -2,6 +2,10 @@ variable "project_id" {}
 variable "path" { default = "hubgsa/gke_hub_sa_key.json" }
 variable "gke_hub_sa_key_file" { default = "gke_hub_sa_key.json" }
 variable "repo_url" {}
+variable "sync_branch" {
+  type = string
+  default = "main"
+}
 
 variable "vpc_id" {
   type        = string

@@ -45,6 +45,8 @@ frontend-88f5c79cd-pwpbl           2/2     **Running**   0          49s
 
 <img src="/platform_admins/docs/img/ob-aws-banner.png" width=70% height=70%>
 
+> Note: It may take a few minutes for the AWS banner to show up. 
+
 `frontend` Service is now deployed to both GKE and EKS cluster. The incoming traffic is being load balanced between the two workload instances (Pods running in GKE and EKS cluster).
 
 [Anthos Service Mesh](https://cloud.google.com/anthos/service-mesh) allows you to connect services running on multiple Kubernetes clusters. The [ASM controlplane](https://istio.io/latest/docs/ops/deployment/architecture/#istiod) runs in every cluster and automatically discovers (and updates) Pod IP addresses for all services running inside the [service mesh](https://cloud.google.com/blog/products/networking/welcome-to-the-service-mesh-era-introducing-a-new-istio-blog-post-series). When you add (or remove) a Deployment to any cluster, the ASM controlplanes in every cluster discovers the change and updates all of the [Envoy proxy sidecars](https://istio.io/latest/docs/ops/deployment/architecture/#envoy) running in every Pod in the service mesh.
@@ -54,7 +56,7 @@ You can view the Envoy proxy-configs for any Pod running in the mesh. You can vi
 1. In the `istio-ingressgateway` Pod in ${GKE_PROD_1} running in the `istio-system` namespace, validate the `frontend` service has two endpoint IP addresses.
 ```
 export GKE_1_INGRESSGATEWAY_POD=$(kubectl get pod -n istio-system -l istio=ingressgateway --context=${GKE_PROD_1} -o jsonpath='{.items[0].metadata.name}')
-istioctl proxy-config endpoints ${GKE_1_INGRESSGATEWAY_POD} | grep "outbound|80||frontend.ob-prod.svc.cluster.local"
+istioctl --context ${GKE_PROD_1} proxy-config endpoints ${GKE_1_INGRESSGATEWAY_POD} | grep "outbound|80||frontend.ob-prod.svc.cluster.local"
 ```
 
 Output (Do not copy)
@@ -98,18 +100,20 @@ classDef pod fill:#E7ECEF,stroke:#333,stroke-width:1px;
 
 client[Client]
 l4lb[L4 TCP LB Public IP Address]
-istio[istio-ingressgateway Pod]
+istiogke[istio-ingressgateway Pod]
+istioeks[istio-ingressgateway Pod]
 frontendgke[frontend Pod]
 frontendeks[frontend Pod]
 
 client --> l4lb
-l4lb -->|all client traffic flows through the istio-ingressgateway in the GKE cluster| istio
-istio -->|mTLS| frontendgke
-istio -->|mTLS| frontendeks
+l4lb -->|all client traffic flows through the istio-ingressgateway in the GKE cluster| istiogke
+istiogke -->|mTLS| frontendgke
+istiogke -->|mTLS| istioeks
+istioeks -->|mTLS| frontendeks
 
 subgraph GKE
-    subgraph istio-system[istio-system namespace]
-        istio
+    subgraph istio-system-gke[istio-system namespace]
+        istiogke
     end
     subgraph ob-prod-gke[ob-prod namespace]
         frontendgke
@@ -117,6 +121,9 @@ subgraph GKE
 end
 
 subgraph EKS
+    subgraph istio-system-eks[istio-system namespace]
+        istioeks
+    end
     subgraph ob-prod-eks[ob-prod namespace]
         frontendeks
     end
@@ -124,8 +131,8 @@ end
 
 class GKE gke;
 class EKS eks;
-%%class istio-system,ob-prod-gke,ob-prod-eks ns;
-class istio,frontendgke,frontendeks pod;
+%%class istio-system-gke,istio-system-eks,ob-prod-gke,ob-prod-eks ns;
+class istiogke,istioeks,frontendgke,frontendeks pod;
 
 ```
 

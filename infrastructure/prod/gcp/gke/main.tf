@@ -6,7 +6,7 @@ module "gke_prod_1" {
   zone               = var.gke1_zone
   env                = var.env
   acm_ssh_auth_key   = data.terraform_remote_state.prod_gcp_ssh_key.outputs.private_key
-  acm_sync_repo      = "git@gitlab.endpoints.${data.terraform_remote_state.prod_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/anthos-config-management.git"
+  acm_sync_repo      = "git@gitlab.endpoints.${data.terraform_remote_state.prod_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/${var.config-repo}.git"
   hub_sa_private_key = data.terraform_remote_state.prod_gcp_hub_gsa.outputs.private_key
 }
 
@@ -18,7 +18,7 @@ module "gke_prod_2" {
   zone               = var.gke2_zone
   env                = var.env
   acm_ssh_auth_key   = data.terraform_remote_state.prod_gcp_ssh_key.outputs.private_key
-  acm_sync_repo      = "git@gitlab.endpoints.${data.terraform_remote_state.prod_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/anthos-config-management.git"
+  acm_sync_repo      = "git@gitlab.endpoints.${data.terraform_remote_state.prod_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/${var.config-repo}.git"
   hub_sa_private_key = data.terraform_remote_state.prod_gcp_hub_gsa.outputs.private_key
 }
 

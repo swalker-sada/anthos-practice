@@ -1,0 +1,30 @@
+.commit-to-acm:
+  variables:
+    ACM: "config"
+  image: gcr.io/cloud-solutions-images/kustomize
+  script:
+    - echo "${MANIFEST_WRITER_KEY}" > ${CI_PROJECT_DIR}/key-file
+    - chmod 400 ${CI_PROJECT_DIR}/key-file
+    - export GIT_SSH_COMMAND="ssh -i ${CI_PROJECT_DIR}/key-file -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+    - git config --global user.email "${CI_PROJECT_NAME}-ci@${CI_SERVER_HOST}"
+    - git config --global user.name "${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+    # clone
+    - git clone ${ACM_REPO_SSH_URL}
+    - |
+      for SVC in ${SERVICES}
+        do
+          export HYDRATED_MANIFEST=${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+          if [[ -f ${HYDRATED_MANIFEST} ]]; then
+            cp ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml ${CI_PROJECT_DIR}/${ACM}/namespaces/${APPLICATION}/${NAMESPACE}-${SVC}/${SVC}-hydrated.yaml
+          fi 
+        done
+    - cd ${CI_PROJECT_DIR}/${ACM}
+    - |
+      # If files have changed, commit them back to the env repo in the staging branch
+      if [ -z "$(git status --porcelain)" ]; then
+        echo "No changes found in the repository."
+      else
+        git add .
+        git commit -m "${CI_COMMIT_REF_SLUG} -- ${CI_PIPELINE_URL}"
+        git push
+      fi

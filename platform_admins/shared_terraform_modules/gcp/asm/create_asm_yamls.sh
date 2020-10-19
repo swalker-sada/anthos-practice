@@ -15,6 +15,8 @@ do
     echo -e "Building file for $GKE..."
     echo -e "${HEADER}" > asm_$GKE.yaml
 
+    echo -e "${GKE_COMPONENT}" | sed -e s/ENV/$ENV/g >> asm_$GKE.yaml
+
     # Add values
     echo -e "${GCP_VALUES}" | sed -e s/GKE/$GKE/g -e s/GCP_NET/$GKE_NET/g >> asm_$GKE.yaml
 

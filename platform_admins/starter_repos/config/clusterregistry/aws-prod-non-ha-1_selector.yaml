@@ -1,0 +1,8 @@
+kind: ClusterSelector
+apiVersion: configmanagement.gke.io/v1
+metadata:
+  name: aws-prod-non-ha-1
+spec:
+  selector:
+    matchLabels:
+      clusterName: eks-prod-us-west2ab-1

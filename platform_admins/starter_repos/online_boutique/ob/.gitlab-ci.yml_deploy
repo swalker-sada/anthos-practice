@@ -1,0 +1,135 @@
+include:
+  - project: "platform-admins/shared-cd"
+    file: "build-manifest-file.yaml"
+  - project: "platform-admins/shared-cd"
+    file: "commit-to-acm.yaml"
+
+stages:
+  - build
+  - commit
+
+ad-build:
+  stage: build
+  only:
+    changes:
+      - services/ad/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "ad"
+    DEPLOYMENT: "adservice"
+
+cart-build:
+  stage: build
+  only:
+    changes:
+      - services/cart/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "cart"
+    DEPLOYMENT: "cartservice"
+
+checkout-build:
+  stage: build
+  only:
+    changes:
+      - services/checkout/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "checkout"
+    DEPLOYMENT: "checkoutservice"
+
+currency-build:
+  stage: build
+  only:
+    changes:
+      - services/currency/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "currency"
+    DEPLOYMENT: "currencyservice"
+
+email-build:
+  stage: build
+  only:
+    changes:
+      - services/email/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "email"
+    DEPLOYMENT: "emailservice"
+
+frontend-build:
+  stage: build
+  only:
+    changes:
+      - services/frontend/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "frontend"
+    DEPLOYMENT: "frontend"
+
+loadgenerator-build:
+  stage: build
+  only:
+    changes:
+      - services/loadgenerator/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "loadgenerator"
+
+payment-build:
+  stage: build
+  only:
+    changes:
+      - services/payment/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "payment"
+    DEPLOYMENT: "paymentservice"
+
+productcatalog-build:
+  stage: build
+  only:
+    changes:
+      - services/productcatalog/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "productcatalog"
+    DEPLOYMENT: "productcatalogservice"
+
+recommendation-build:
+  stage: build
+  only:
+    changes:
+      - services/recommendation/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "recommendation"
+    DEPLOYMENT: "recommendationservice"
+
+shipping-build:
+  stage: build
+  only:
+    changes:
+      - services/shipping/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "shipping"
+    DEPLOYMENT: "shippingservice"
+
+commit-to-acm:
+  stage: commit
+  extends: .commit-to-acm
+  variables:
+    SERVICES: "ad cart checkout currency email frontend loadgenerator payment productcatalog recommendation shipping"

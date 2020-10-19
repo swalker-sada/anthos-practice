@@ -1,0 +1,3 @@
+- op: add
+  path: "/metadata/annotations/configmanagement.gke.io~1cluster-selector"
+  value: "%%VALUE%%"

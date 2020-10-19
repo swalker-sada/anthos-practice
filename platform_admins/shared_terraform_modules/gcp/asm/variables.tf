@@ -6,3 +6,4 @@ variable "eks_ingress_ip_list" {}
 variable "eks_eip_list" {}
 variable "asm_version" {}
 variable "project_id" {}
+variable "env" {}

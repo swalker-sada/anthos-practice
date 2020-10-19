@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# include parse_yaml function
+source ./yaml.sh
+
+# create variables
+create_variables sample.yaml # name of yaml file
+
+# variables are name first_second_third etc

@@ -1,0 +1,1 @@
+../../variables/gclb_variables.tf

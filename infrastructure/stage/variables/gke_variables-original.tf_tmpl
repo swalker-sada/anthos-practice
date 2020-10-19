@@ -22,3 +22,8 @@ variable "env" {
   type    = string
   default = "stage"
 }
+
+variable "config-repo" {
+  type = string
+  default = "config"
+}

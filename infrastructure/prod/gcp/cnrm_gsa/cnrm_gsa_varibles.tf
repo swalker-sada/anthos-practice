@@ -1,0 +1,1 @@
+../../variables/cnrm_gsa_varibles.tf

@@ -115,6 +115,7 @@ resource "null_resource" "exec_eks_acm" {
       EKS_CLUSTER = module.eks.cluster_id
       PROJECT_ID  = var.project_id
       REPO_URL    = var.repo_url
+      SYNC_BRANCH = var.sync_branch
     }
   }
   triggers = {

@@ -1,0 +1,6 @@
+service:
+  workload:
+    environment: prod
+    provider: gcp
+    availability: non-ha
+    location: us-west

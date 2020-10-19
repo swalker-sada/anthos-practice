@@ -1,0 +1,10 @@
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: gke-dev-us-west1b-2
+  labels:
+    environment: dev
+    clusterName: gke-dev-us-west1b-2
+    infrastructure: gcp
+    region: us-west1
+    zone: b

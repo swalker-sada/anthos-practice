@@ -6,7 +6,10 @@ substitutions:
   _AWS_VPC: "true"
   _GKE: "true"
   _EKS: "true"
+  _KCC: "true"
+  _AUTONEG: "true"
   _ASM: "true"
+  _GCLB: "true"
 tags:
   - prod
 steps:
@@ -64,9 +67,35 @@ steps:
         terraform plan -out terraform.tfplan
         terraform apply -input=false -lock=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-kcc"
+    dir: infrastructure/prod/gcp/kcc
+    waitFor: ['prod-gcp-gke']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_KCC}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-autoneg"
+    dir: infrastructure/prod/gcp/autoneg
+    waitFor: ['prod-kcc']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_AUTONEG}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
     id: "prod-asm"
     dir: infrastructure/prod/gcp/asm
-    waitFor: ['prod-gcp-gke', 'prod-aws-eks']
+    waitFor: ['prod-gcp-gke', 'prod-aws-eks', 'prod-kcc']
     entrypoint: "bash"
     secretEnv: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     args:
@@ -74,6 +103,19 @@ steps:
       - "-c"
       - |
         [[ "${_ASM}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-gclb"
+    dir: infrastructure/prod/gcp/gclb
+    waitFor: ['prod-asm']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_GCLB}" == "false" ]] && exit 0
         terraform init
         terraform plan -out terraform.tfplan
         terraform apply -input=false -lock=false terraform.tfplan

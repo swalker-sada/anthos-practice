@@ -19,6 +19,16 @@ EOT
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
           service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "EIP1,EIP2"
 EOT
+  gke_component         = <<EOT
+  components:
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        service_annotations:
+          cloud.google.com/neg: '{"exposed_ports": {"80":{}}}'
+          anthos.cft.dev/autoneg: '{"name":"ENV-istio-ingressgateway-backend-svc", "max_rate_per_endpoint":100}'
+EOT
   eks_meshconfig        = <<EOT
   meshConfig:
     defaultConfig:

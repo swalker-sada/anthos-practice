@@ -6,7 +6,7 @@ module "eks_prod_1" {
   private_subnets  = data.terraform_remote_state.prod_aws_vpc.outputs.private_subnets
   project_id       = data.terraform_remote_state.prod_gcp_vpc.outputs.project_id
   env              = var.env
-  repo_url         = "git@gitlab.endpoints.${data.terraform_remote_state.prod_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/anthos-config-management.git"
+  repo_url         = "git@gitlab.endpoints.${data.terraform_remote_state.prod_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/${var.config-repo}.git"
 }
 #END:eks_prod_1
 
@@ -18,7 +18,7 @@ module "eks_prod_2" {
   private_subnets  = data.terraform_remote_state.prod_aws_vpc.outputs.private_subnets
   project_id       = data.terraform_remote_state.prod_gcp_vpc.outputs.project_id
   env              = var.env
-  repo_url         = "git@gitlab.endpoints.${data.terraform_remote_state.prod_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/anthos-config-management.git"
+  repo_url         = "git@gitlab.endpoints.${data.terraform_remote_state.prod_gcp_vpc.outputs.project_id}.cloud.goog:platform-admins/${var.config-repo}.git"
 }
 #END:eks_prod_2
 

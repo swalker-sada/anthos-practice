@@ -54,6 +54,7 @@ spec:
     templateLibraryInstalled: true
   git:
     syncRepo: $REPO_URL
+    syncBranch: $SYNC_BRANCH
     secretType: ssh
 EOF
 

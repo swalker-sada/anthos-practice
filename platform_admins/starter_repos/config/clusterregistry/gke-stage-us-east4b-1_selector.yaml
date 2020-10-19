@@ -1,0 +1,8 @@
+kind: ClusterSelector
+apiVersion: configmanagement.gke.io/v1
+metadata:
+  name: gke-stage-us-east4b-1
+spec:
+  selector:
+    matchLabels:
+      clusterName: gke-stage-us-east4b-1

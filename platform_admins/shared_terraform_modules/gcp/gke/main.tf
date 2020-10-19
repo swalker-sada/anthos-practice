@@ -52,6 +52,7 @@ module "acm" {
   ssh_auth_key     = var.acm_ssh_auth_key
   create_ssh_key   = false
   sync_repo        = var.acm_sync_repo
+  sync_branch      = var.acm_sync_branch
 }
 
 module "hub" {

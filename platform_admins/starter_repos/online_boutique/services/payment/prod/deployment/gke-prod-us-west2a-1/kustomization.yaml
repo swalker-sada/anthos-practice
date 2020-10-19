@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+nameSuffix: "-gke-prod-us-west2a-1"
+
+commonAnnotations:
+  configmanagement.gke.io/cluster-selector: gke-prod-us-west2a-1
+
+commonLabels:
+  cluster: gke-prod-us-west2a-1
+  provider: gcp

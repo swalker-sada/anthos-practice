@@ -1,0 +1,9 @@
+kind: ClusterSelector
+apiVersion: configmanagement.gke.io/v1
+metadata:
+  name: gcp-prod-ha
+spec:
+  selector:
+    matchLabels:
+      infrastructure: gcp
+      environment: prod

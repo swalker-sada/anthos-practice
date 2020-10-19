@@ -57,16 +57,22 @@ subgraph Dev
 end
 
 subgraph Gitlab
-  subgraph Repos
-    acmrepo[anthos-config-management]
+  subgraph platform-admins-group[platform-admins group]
+    acmrepo[config]
+    sharedcdrepo[shared-cd]
+  end
+  subgraph online-boutique-group[online-boutique group]
     obrepo[online-boutique]
+  end
+  subgraph bank-of-anthos-group[bank-of-anthos group]
+    boarepo[bank-of-anthos]
   end
 end
 devacm -.-> acmrepo
 stageacm -.-> acmrepo
 prodacm -.-> acmrepo
 
-class Prod prod;
+class Prod,platform-admins-group,online-boutique-group,bank-of-anthos-group prod;
 class Stage stage;
 class Dev dev;
 
@@ -97,11 +103,11 @@ The workshop is divided into two main sections:
 1. [**Foundation**](/README.md#foundation-building-anthos-platform) - Aimed at the platform admin persona, the foundation focuses on _building_ the Anthos platform. The foundation goes through tooling, build pipelines, automation, best practices and management of components of Anthos in GCP and AWS. The foundation covers a canonical approach of building and managing Anthos platform in a multi-cloud environment.
 1. [**User Stories**](/README.md#labs) - After the foundation, different personae can start _using_ the Anthos platform. This section is a series of labs that go through various user stories. The labs in this section are designed to be iterative and ever growing. The idea behind splitting the foundation from the user stories is so that anyone can build upon the foundation for a particular story. We will continue to add more stories (i.e. labs) in time and as we hear more use cases. Examples of user stories that are part of this workshop are as follows:
 
-- _I, application owner and operator, want to deploy my applications across multiple clusters in multiple cloud environments_
-- _I, application operator, want to move/migrate services between clusters in a multi-cloud environment._
-- _I, application owner and operator, want to run the same service in multiple cluster and in multiple cloud environments._
-- _I, application operator, want to use Cloud Monitoring to monitor metrics from all services running in all clusters in multiple cloud environments_
-- _I, platform administrator, want to add a new cluster to my multi-cloud environment_
+- [_I, application owner and operator, want to deploy my applications across multiple clusters in multiple cloud environments_](/README.md#labs)
+- [_I, application operator, want to move/migrate services between clusters in a multi-cloud environment._](/README.md#labs)
+- [_I, application owner and operator, want to run the same service in multiple cluster and in multiple cloud environments._](/README.md#labs)
+- [_I, application operator, want to use Cloud Monitoring to monitor metrics from all services running in all clusters in multiple cloud environments_](/README.md#labs)
+- [_I, platform administrator, want to add a new cluster to my multi-cloud environment_](/README.md#labs)
 
 ## Foundation - Building Anthos platform
 
@@ -195,7 +201,7 @@ gcloud auth list
 graph LR
 classDef pipeline fill:#FAFAC6,stroke:#333;
 
-commit[commit to main] -->|6mins|Main[Main - Create custom builder] -->|2mins| Project_Setup[Project Setup - SSH Keys and Anthos Hub GSA]
+commit[commit to main] -->|6mins|Main[Main - Create custom builder] -->|2mins| Project_Setup[Project Setup - SSH Keys and GCP Service Accounts]
 Project_Setup -->|7mins| Dev[Dev Pipeline - Sets up the dev environment]
 Project_Setup --> |23mins|Stage[Stage Pipeline - Sets up the stage environment]
 Project_Setup -->|26mins| Prod[Prod Pipeline - Sets up the prod environment]
@@ -233,7 +239,13 @@ devgke([2 x Dev GKE w/ ACM])
 gitlab([Gitlab])
 repos([Repos])
 hub_gsa([Anthos Hub GCP SA])
-ssh_key([SSH Key Pair for ACM])
+cloudops_gsa([Cloud Ops GCP SA])
+cicd_gsa([CICD GCP SA])
+cnrm_gsa([Config Connector GCP SA])
+gcr([Google Container Registry])
+kcc([Anthos Config Connector])
+autoneg([GKE Autoneg Controller])
+ssh_key([SSH Key Pair for ACM and all repos])
 
 prodawsvpc([Prod AWS VPC])
 stageawsvpc([Stage AWS VPC])
@@ -252,15 +264,19 @@ ssh_key --> stageawsvpc
 
 ssh_key --> devgcpvpc
 
-ssh_key --> gitlab -->|Create ACM and Online Boutique repos| repos
+ssh_key --> gitlab -->|Create repos| repos
 
-installer -->|Store creds in GCS| hub_gsa
-installer -->|Create SSH key pair and store in GCS| ssh_key
+installer -->|Register Anthos clusters to Hub and store creds in GCS| hub_gsa
+installer -->|For non-GCP clusters to send metrics to Cloud Ops and store creds in GCS| cloudops_gsa
+installer -->|For CICD runners to deploy applications and store creds in GCS| cicd_gsa
+installer -->|For Anthos Config Connector and store creds in GCS| cnrm_gsa
+installer -->|Make GCR public for CICD runners to use installer image| gcr
+installer -->|Create SSH key pair for ACM and all repos and store in GCS| ssh_key
 
-ssh_key -->|Public key as deploy token| repos
+ssh_key -.->|Public key as deploy token| repos
 
-hub_gsa --> prodeks
-hub_gsa --> stageeks
+%%hub_gsa -.-> prodeks
+%%hub_gsa -.-> stageeks
 
 subgraph Gitlab_Pipeline
   gitlab
@@ -268,8 +284,14 @@ subgraph Gitlab_Pipeline
 end
 
 subgraph Project_Pipeline
-  hub_gsa
   ssh_key
+  gcr
+  subgraph GCP Service Accounts
+    hub_gsa
+    cloudops_gsa
+    cicd_gsa
+    cnrm_gsa
+  end
 end
 
 subgraph Main_Pipeline
@@ -280,6 +302,8 @@ subgraph Prod_Pipeline
   subgraph Prod
     subgraph GCP_Prod[GCP]
       prodgcpvpc --> prodgke
+      prodgke --> kcc
+      prodgke --> autoneg
     end
     subgraph AWS_Prod[AWS]
       prodawsvpc --> prodeks
@@ -422,9 +446,7 @@ echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog"
 ```
 
 - Log in with the username `root` and the gitlab password from the `user_setup.sh` script.
-- You see two projects (or repos).
-  - `anthos-config-management` - ACM repo
-  - `online-boutique` - Online Boutique application repo
+- You see multiple projects (or repos).
 
 <img src="/platform_admins/docs/img/gitlab_repos.png" width=50% height=50%>
 

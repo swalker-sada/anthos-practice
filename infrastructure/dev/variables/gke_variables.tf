@@ -32,3 +32,8 @@ variable "env" {
   type    = string
   default = "dev"
 }
+
+variable "config-repo" {
+  type = string
+  default = "config"
+}

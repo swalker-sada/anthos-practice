@@ -1,0 +1,14 @@
+development:
+  adapter: mysql2 mysql3
+  encoding: utf8
+  database: my_database
+  username: root
+  password: drowssap
+  db:
+    name: db_name
+    table:
+      t1name: t1
+      t2name: t2
+    list:
+      - listOne
+      - listTwo

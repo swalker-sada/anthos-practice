@@ -4,6 +4,10 @@ logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
 substitutions:
   _SSH: "true"
   _HUB: "true"
+  _CLOUDOPS_GSA: "true"
+  _CICD_GSA: "true"
+  _CNRM_GSA: "true"
+  _GCR: "true"
 tags:
   - project-setup
 steps:
@@ -22,7 +26,7 @@ steps:
   - name: gcr.io/${PROJECT_ID}/platform-installer
     id: "prod-gcp-hub-gsa"
     dir: infrastructure/prod/gcp/hub_gsa
-    waitFor: ['-']
+    waitFor: ["-"]
     entrypoint: "bash"
     args:
       - "-xe"
@@ -31,17 +35,56 @@ steps:
         [[ "${_HUB}" == "false" ]] && exit 0
         terraform init
         terraform plan -out terraform.tfplan
-        terraform apply -input=false -lock=false terraform.tfplan 
+        terraform apply -input=false -lock=false terraform.tfplan
   - name: gcr.io/${PROJECT_ID}/platform-installer
     id: "prod-gcp-cloud-ops-gsa"
     dir: infrastructure/prod/gcp/cloud_ops_gsa
-    waitFor: ['-']
+    waitFor: ["-"]
     entrypoint: "bash"
     args:
       - "-xe"
       - "-c"
       - |
-        [[ "${_HUB}" == "false" ]] && exit 0
+        [[ "${_CLOUDOPS_GSA}" == "false" ]] && exit 0
         terraform init
         terraform plan -out terraform.tfplan
-        terraform apply -input=false -lock=false terraform.tfplan 
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-gcp-cicd-gsa"
+    dir: infrastructure/prod/gcp/cicd_gsa
+    waitFor: ["-"]
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_CICD_GSA}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-gcp-cnrm-gsa"
+    dir: infrastructure/prod/gcp/cnrm_gsa
+    waitFor: ["-"]
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_CNRM_GSA}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "prod-gcp-gcr-public"
+    dir: infrastructure/prod/gcp/gcr
+    waitFor: ["-"]
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_GCR}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan

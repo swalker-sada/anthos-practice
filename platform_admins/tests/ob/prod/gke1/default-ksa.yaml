@@ -3,4 +3,4 @@ kind: ServiceAccount
 metadata:
   name: default
   annotations:
-    iam.gke.io/gcp-service-account: GSA
+    iam.gke.io/gcp-service-account: cloud-ops@qwiklabs-gcp-03-42d5def4b8f6.iam.gserviceaccount.com

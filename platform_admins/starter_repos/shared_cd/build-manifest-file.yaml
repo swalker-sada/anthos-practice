@@ -1,0 +1,116 @@
+.build-manifest-file:
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - echo "${GCP_CICD_SA_KEY}" | base64 -d > ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - cat ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - gcloud auth activate-service-account cicd-sa@${PROJECT_ID}.iam.gserviceaccount.com --key-file=${CI_PROJECT_DIR}/cicd-sa-key.json --project=${PROJECT_ID}
+    - gcloud config set project ${PROJECT_ID}
+    # get cloud-ops-sa-key
+    - gsutil cp -r gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloud_ops_sa_key.json
+    - kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${CI_PROJECT_DIR}/cloud_ops_sa_key.json --dry-run -oyaml > ${CI_PROJECT_DIR}/services/${SVC}/prod/identity/cloud-ops-sa-secret.yaml
+    # create svc dashboard
+    - |
+      if [[ ${DEPLOYMENT} ]]; then
+        ${CI_PROJECT_DIR}/services/${SVC}/prod/monitoring/create-service-dashboard.sh ${CI_PROJECT_DIR}/services/${SVC}/prod/monitoring/service-dashboard.json_tmpl
+        # cat ${CI_PROJECT_DIR}/services/${SVC}/prod/monitoring/${SVC}-service-dashboard.json
+      fi
+    # get requirements
+    - source ${CI_PROJECT_DIR}/scripts/yaml.sh
+    - create_variables ${CI_PROJECT_DIR}/services/${SVC}/prod/requirements/requirements.yaml
+    - |
+      case "${service_workload_environment}" in
+        prod)
+          case "${service_workload_provider}" in
+            gcp)
+              case "${service_workload_availability}" in
+                non-ha)
+                  SUFFIX=$((1 + RANDOM % 2)) # pick one gke cluster at random
+                  echo $SUFFIX
+                  if [[ ${SUFFIX} == 1 ]]; then ZONE=a; else ZONE=b; fi # get gke zone
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2"${ZONE}"-"${SUFFIX}"
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
+                  kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
+                  ;;
+                ha)
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2a-1
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2b-2
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
+                  kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
+                  ;;
+                *)
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2a-1
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2b-2
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
+                  kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
+                  ;;
+              esac ;;
+            aws)
+              case "${service_workload_availability}" in
+                non-ha)
+                  SUFFIX=$((1 + RANDOM % 2)) # pick one eks cluster at random
+                  echo $SUFFIX
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-${SUFFIX}
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
+                  ;;
+                ha)
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-1
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-2
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
+                  ;;
+                *)
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-1
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
+                  cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-2
+                  kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
+                  ;;
+              esac ;;
+            *)
+              cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-1
+              kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+              if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
+              cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-2
+              kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+              if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
+              cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2a-1 
+              kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml 
+              cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2b-2 
+              kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml 
+              cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
+              kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
+              ;;
+          esac ;;
+        *)
+          cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-1
+          kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+          if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
+          cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-2
+          kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+          if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
+          cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2a-1 
+          kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml 
+          cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2b-2 
+          kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml 
+          cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
+          kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
+          ;;
+      esac
+    - mkdir -p ${CI_PROJECT_DIR}/output
+    - cd ${CI_PROJECT_DIR}/services/${SVC}/prod
+    - kustomize build --load_restrictor none . > ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+    - cat ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/output/*.yaml

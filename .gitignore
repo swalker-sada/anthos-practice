@@ -14,7 +14,8 @@ infrastructure/*/variables/project_variables.tf
 infrastructure/*/*/*/.terraform*
 infrastructure/*/*/*/terraform*
 
-platform_admins/*/*/*/*.yaml
+# platform_admins/*/*/*/*.yaml
+platform_admins/starter_repos/anthos_config_management/namespaces/*/*-hydrated.yaml
 
 platform_admins/tests/ob/*/*/cloud-ops-sa-secret.yaml
 

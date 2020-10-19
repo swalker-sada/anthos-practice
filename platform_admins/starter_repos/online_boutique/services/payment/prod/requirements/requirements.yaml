@@ -1,0 +1,6 @@
+service:
+  workload:
+    environment: prod
+    provider: aws
+    availability: ha
+    location: us-west2

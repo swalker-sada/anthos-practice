@@ -1,0 +1,17 @@
+.set-workload-identity-cloud-ops:
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - echo "${GCP_CICD_SA_KEY}" | base64 -d > ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - cat ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - gcloud auth activate-service-account cicd-sa@${PROJECT_ID}.iam.gserviceaccount.com --key-file=${CI_PROJECT_DIR}/cicd-sa-key.json --project=${PROJECT_ID}
+    - gcloud config set project ${PROJECT_ID}
+    # create workload identity permissions for the namespace
+    - |
+      for SVC in ${SERVICES[@]}
+      do
+        gcloud iam service-accounts add-iam-policy-binding cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com \
+        --project ${PROJECT_ID} \
+        --role roles/iam.workloadIdentityUser \
+        --member "serviceAccount:${PROJECT_ID}.svc.id.goog[${NAMESPACE}-${SVC}/${SVC}]"
+      done

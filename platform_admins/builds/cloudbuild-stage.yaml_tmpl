@@ -7,6 +7,7 @@ substitutions:
   _GKE: "true"
   _EKS: "true"
   _ASM: "true"
+  _GCLB: "true"
 tags:
   - stage
 steps:
@@ -74,6 +75,19 @@ steps:
       - "-c"
       - |
         [[ "${_ASM}" == "false" ]] && exit 0
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "stage-gclb"
+    dir: infrastructure/stage/gcp/gclb
+    waitFor: ['stage-asm']
+    entrypoint: "bash"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_GCLB}" == "false" ]] && exit 0
         terraform init
         terraform plan -out terraform.tfplan
         terraform apply -input=false -lock=false terraform.tfplan

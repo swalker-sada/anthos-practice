@@ -19,6 +19,9 @@ gsutil rm gs://${GOOGLE_PROJECT}/tfstate/prod/gcp/hub_gsa/default.tflock
 gsutil rm gs://${GOOGLE_PROJECT}/tfstate/prod/gcp/repos/default.tflock
 gsutil rm gs://${GOOGLE_PROJECT}/tfstate/prod/gcp/ssh_key/default.tflock
 gsutil rm gs://${GOOGLE_PROJECT}/tfstate/prod/gcp/asm/default.tflock
+gsutil rm gs://${GOOGLE_PROJECT}/tfstate/prod/gcp/kcc/default.tflock
+gsutil rm gs://${GOOGLE_PROJECT}/tfstate/prod/gcp/autoneg/default.tflock
 
 gsutil rm gs://${GOOGLE_PROJECT}/tfstate/prod/aws/vpc/default.tflock
 gsutil rm gs://${GOOGLE_PROJECT}/tfstate/prod/aws/eks/default.tflock
+

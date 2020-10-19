@@ -45,3 +45,8 @@ variable "env" {
   default = "prod"
 }
 #END:gke2
+
+variable "config-repo" {
+  type = string
+  default = "config"
+}

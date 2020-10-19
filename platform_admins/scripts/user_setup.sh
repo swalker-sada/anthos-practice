@@ -18,6 +18,7 @@ if [[ ! $USER_SETUP_RUN ]]; then
   gsutil cp -r gs://$GOOGLE_PROJECT/gitlab ${WORKDIR}/.
   gsutil cp -r gs://$GOOGLE_PROJECT/ssh-keys ${WORKDIR}/.
   gsutil cp -r gs://$GOOGLE_PROJECT/cloudopsgsa ${WORKDIR}/.
+  touch ${WORKDIR}/kubeconfig/workshop-config
 
   echo -e "export EKS_PROD_1=eks-prod-us-west2ab-1" >> ${WORKDIR}/vars.sh
   echo -e "export EKS_PROD_2=eks-prod-us-west2ab-2" >> ${WORKDIR}/vars.sh
@@ -28,11 +29,10 @@ if [[ ! $USER_SETUP_RUN ]]; then
   echo -e "export GKE_DEV_1=gke-dev-us-west1a-1" >> ${WORKDIR}/vars.sh
   echo -e "export GKE_DEV_2=gke-dev-us-west1b-2" >> ${WORKDIR}/vars.sh
   echo -e "export GKE_GITLAB=gitlab" >> ${WORKDIR}/vars.sh
+  echo -e "export KUBECONFIG=${WORKDIR}/kubeconfig/workshop-config" >> ${WORKDIR}/vars.sh
   source ${WORKDIR}/vars.sh
 
-  touch ${WORKDIR}/kubeconfig/workshop-config
   KUBECONFIG=${WORKDIR}/kubeconfig/kubeconfig_$EKS_PROD_1:${WORKDIR}/kubeconfig/kubeconfig_$EKS_PROD_2:${WORKDIR}/kubeconfig/kubeconfig_$EKS_STAGE_1 kubectl config view --merge --flatten > ${WORKDIR}/kubeconfig/workshop-config
-  export KUBECONFIG=${WORKDIR}/kubeconfig/workshop-config
 
   gcloud container clusters get-credentials $GKE_PROD_1 --zone us-west2-a --project ${GOOGLE_PROJECT}
   gcloud container clusters get-credentials $GKE_PROD_2 --zone us-west2-b --project ${GOOGLE_PROJECT}

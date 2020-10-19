@@ -1,0 +1,36 @@
+.secure-ingress:
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    # Activate the cicd-sa service account and set project
+    - echo "${GCP_CICD_SA_KEY}" | base64 -d > ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - cat ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - gcloud auth activate-service-account cicd-sa@${PROJECT_ID}.iam.gserviceaccount.com --key-file=${CI_PROJECT_DIR}/cicd-sa-key.json --project=${PROJECT_ID}
+    - gcloud config set project ${PROJECT_ID}
+    # Set terraform creds
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export GOOGLE_CREDENTIALS=$(cat cicd-sa-key.json)
+    # Configure terraform backend, variables and remote state tf files
+    - cd ${CI_PROJECT_DIR}/services/${SVC}/prod/traffic/ingress
+    - sed -e s/PROJECT_ID/${PROJECT_ID}/ backend.tf_tmpl > backend.tf
+    - sed -e s/PROJECT_ID/${PROJECT_ID}/ variables.tf_tmpl > variables.tf
+    - sed -e s/PROJECT_ID/${PROJECT_ID}/ prod_gcp_gclb_remote_state.tf_tmpl > prod_gcp_gclb_remote_state.tf
+    # Apply terraform
+    - terraform init
+    - terraform plan -out terraform.tfplan
+    - terraform apply -input=false -lock=false terraform.tfplan
+    # Check autoneg controller successfully  reconciles the backends
+    - gcloud container clusters get-credentials gke-prod-us-west2a-1 --zone us-west2-a --project ${PROJECT_ID}
+    - gcloud container clusters get-credentials gke-prod-us-west2b-2 --zone us-west2-b --project ${PROJECT_ID}
+    - export GKE_PROD_1="gke_${PROJECT_ID}_us-west2-a_gke-prod-us-west2a-1"
+    - export GKE_PROD_2="gke_${PROJECT_ID}_us-west2-b_gke-prod-us-west2b-2"
+    - export AUTONEG_BACKENDS=`gcloud compute backend-services describe prod-istio-ingressgateway-backend-svc --global --format=json | jq '.backends | length'`
+    - |
+      while [ ! $AUTONEG_BACKENDS -eq 2 ]; do
+        echo -e "Current autoneg backend length is $AUTONEG_BACKENDS. This should be 2..."
+        kubectl --context ${GKE_PROD_1} -n istio-system annotate service istio-ingressgateway anthos.cft.dev/autoneg-status-
+        kubectl --context ${GKE_PROD_2} -n istio-system annotate service istio-ingressgateway anthos.cft.dev/autoneg-status-
+        # Sleep for 5 seconds and recheck backend lengths
+        sleep 5 
+        export AUTONEG_BACKENDS=`gcloud compute backend-services describe prod-istio-ingressgateway-backend-svc --global --format=json | jq '.backends | length'`
+      done
