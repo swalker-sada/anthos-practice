@@ -216,7 +216,7 @@ class Main,Project_Setup,Dev,Stage,Prod,Gitlab pipeline;
 
 ## Infrastructure Pipeline
 
-The following illustration provides a detailed view of the pipelines and the resources that are created.
+The following illustration provides a detailed view of the pipelines and the resources that are created, for more information see the [infrastructure pipeline documentation](platform_admins/docs/pipelines.md#infrastructure-pipeline).
 
 ```mermaid
 %%{init: { 'theme': 'default' } }%%
