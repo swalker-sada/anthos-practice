@@ -27,6 +27,11 @@ At a high level you perform the following steps:
 
 ```
 cd ${WORKDIR}
+# init git
+git config --global user.email "${GCLOUD_USER}"
+git config --global user.name "Cloud Shell"
+# pre-grab gitlab public key
+ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
 git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:platform-admins/config.git
 cd config
 cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/config/. .
@@ -118,6 +123,8 @@ echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog/online-boutique/o
 ```
 
 Wait until the pipeline successfully completes.
+
+> If the pipeline fails, for instance on the `SecureIngress` job, just retry the pipeline job.
 
 <img src="/platform_admins/docs/img/multicluster-cd-pipeline-success.png" width=70% height=70%>
 
