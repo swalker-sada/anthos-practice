@@ -83,11 +83,13 @@ In this example, lets assume you want to only see traffic flowing to the `fronte
 If you did [Lab 3: Introduction to Distributed Services](/platform_admins/docs/distributed-service-intro.md), you should see two line graphs. The legend shows the two clusters the `frontend` workloads (Depolyments) are running in. Otherwise, you should see a single line graph.
 
 ## Scripted Dashboard for Production
+> If you skipped the steps above, you need to initialize the Cloud Ops Monitoring Workspace in the Google Cloud Console.
+
 1. A pre-created created dashboard for production is available.
 
     ```
     ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ops/services-dashboard.sh \
-      ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ops/services-dashboard-prod.json
+      ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ops/services-dashboard-prod
     ```
 
     Output (do not copy)

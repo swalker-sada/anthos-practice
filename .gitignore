@@ -19,6 +19,8 @@ platform_admins/starter_repos/anthos_config_management/namespaces/*/*-hydrated.y
 
 platform_admins/tests/ob/*/*/cloud-ops-sa-secret.yaml
 
+platform_admins/tests/ops/services-*.json
+
 .DS_Store
 
 wget-log
