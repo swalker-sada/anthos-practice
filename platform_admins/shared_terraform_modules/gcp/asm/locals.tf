@@ -8,6 +8,8 @@ spec:
       enabled: true
     grafana:
       enabled: true
+    istiocoredns:
+      enabled: true
 EOT
   eks_component         = <<EOT
   components:
@@ -47,10 +49,13 @@ EOT
     kiali:
       createDemoSecret: true
     global:
+      podDNSSearchNamespaces:
+        - global
       mtls:
         enabled: true
       multiCluster:
         clusterName: GKE
+        enabled: true
       network: GCP_NET
       meshNetworks:
         GCP_NET:
@@ -68,10 +73,13 @@ EOT
     kiali:
       createDemoSecret: true
     global:
+      podDNSSearchNamespaces:
+        - global
       mtls:
         enabled: true
       multiCluster:
         clusterName: EKS
+        enabled: true
       network: EKS-net
       meshNetworks:
         GCP_NET:
@@ -120,5 +128,45 @@ spec:
       mode: AUTO_PASSTHROUGH
     hosts:
     - "*.local"
+EOT
+  gke_kubedns_configmap = <<EOT
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-dns
+  namespace: kube-system
+data:
+  stubDomains: |
+    {"global": ["COREDNS_IP"]}
+EOT
+  eks_coredns_configmap = <<EOT
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+           pods insecure
+           upstream
+           fallthrough in-addr.arpa ip6.arpa
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf
+        cache 30
+        loop
+        reload
+        loadbalance
+    }
+    global:53 {
+        errors
+        cache 30
+        forward . COREDNS_IP:53
+    }
 EOT
 }

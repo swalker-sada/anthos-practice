@@ -1,5 +1,5 @@
 {
-  "name": "projects/qwiklabs-gcp-03-42d5def4b8f6/dashboards/servicesdash",
+  "name": "projects/PROJECT_ID/dashboards/servicesdash",
   "displayName": "Services Dashboard - Production",
   "etag": "",
   "gridLayout": {

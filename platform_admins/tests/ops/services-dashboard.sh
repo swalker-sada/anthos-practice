@@ -7,7 +7,8 @@ sed -i 's/PROJECT_ID/'${GOOGLE_PROJECT}'/g' \
   ${DASHBOARD_JSON}
 
 # get auth token
-OAUTH_TOKEN=$(gcloud auth application-default print-access-token)
+# OAUTH_TOKEN=$(gcloud auth application-default print-access-token)
+OAUTH_TOKEN=$(gcloud auth print-access-token)
 
 # create dashboard
 curl -X POST -H "Authorization: Bearer $OAUTH_TOKEN" -H "Content-Type: application/json" \

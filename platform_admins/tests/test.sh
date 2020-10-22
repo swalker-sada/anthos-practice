@@ -26,10 +26,10 @@ kubectl --context $1 -n $2 get deploy $3 &> /dev/null
 }
 
 # Define vars
-export GKE1=gke-r1a-prod-1
-export EKS1=eks-r1ab-prod-1
-export GKE2=gke-r1b-prod-2
-export EKS2=eks-r1ab-prod-2
+export GKE1=${GKE_PROD_1}
+export EKS1=${EKS_PROD_1}
+export GKE2=${GKE_PROD_2}
+export EKS2=${EKS_PROD_2}
 
 # Verify Pods are ready
 is_deployment_ready ${GKE1} app1 httpbin

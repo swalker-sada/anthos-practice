@@ -97,4 +97,3 @@ do
     echo -e "\n######### $EKS YAML ###########\n"
     cat asm_$EKS.yaml
 done
-

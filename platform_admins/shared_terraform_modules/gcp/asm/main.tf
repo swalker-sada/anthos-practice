@@ -41,6 +41,8 @@ resource "null_resource" "exec_install_asm" {
       GKE_LOC_STRING        = var.gke_location_list
       EKS_LIST_STRING       = var.eks_list
       CLUSTER_AWARE_GATEWAY = local.cluster_aware_gateway
+      GKE_KUBEDNS_CONFIGMAP = local.gke_kubedns_configmap
+      EKS_COREDNS_CONFIGMAP = local.eks_coredns_configmap
     }
   }
   triggers = {
