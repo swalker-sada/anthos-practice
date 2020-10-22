@@ -227,6 +227,19 @@ cd ${WORKDIR}/anthos-multicloud-workshop/
 
 1. Navigate to the **Cloudbuild** page from Cloud Console left hand navbar and wait until the `stage` pipeline finishes successfully.
 
+## Logging in to the GKE cluster
+
+1. Login to the new GKE cluster.
+
+```bash
+echo -e "export GKE_STAGE_2=gke-stage-us-east4c-2" >> ${WORKDIR}/vars.sh
+source ${WORKDIR}/vars.sh
+gcloud container clusters get-credentials ${GKE_STAGE_2} --zone us-east4-c --project ${GOOGLE_PROJECT}
+kubectl ctx $GKE_STAGE_2=gke_${GOOGLE_PROJECT}_us-east4-c_$GKE_STAGE_2
+```
+
+You can now access the new GKE cluster through your kubeconfig file.
+
 ## Logging in to the EKS cluster
 
 1. Login to the new EKS cluster in Cloud Console. Download the EKS token from the GCS bucket and login via the Kubbernetes admin page.
@@ -235,6 +248,9 @@ cd ${WORKDIR}/anthos-multicloud-workshop/
 gsutil cp -r gs://$GOOGLE_PROJECT/kubeconfig ${WORKDIR}/.
 echo -e "export EKS_STAGE_2=eks-stage-us-east1ab-2" >> ${WORKDIR}/vars.sh
 source ${WORKDIR}/vars.sh
+KUBECONFIG=${WORKDIR}/kubeconfig/workshop-config:${WORKDIR}/kubeconfig/kubeconfig_${EKS_STAGE_2} kubectl config view --merge --flatten > ${WORKDIR}/kubeconfig/workshop-config-added-cluster
+cp ${WORKDIR}/kubeconfig/workshop-config-added-cluster ${WORKDIR}/kubeconfig/workshop-config
+kubectl ctx $EKS_STAGE_2=eks_$EKS_STAGE_2
 echo "*** $EKS_STAGE_2 Token ***\n"
 cat ${WORKDIR}/kubeconfig/$EKS_STAGE_2-ksa-token.txt && echo -e "\n"
 ```
