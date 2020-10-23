@@ -30,4 +30,4 @@ spec:
         name: http
         protocol: HTTP
       hosts:
-        - "*"
+        - "*.cloud.goog"
