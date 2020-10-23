@@ -44,7 +44,7 @@ module "gke" {
 }
 
 module "acm" {
-  source           = "github.com/CloudPharaoh/terraform-google-kubernetes-engine//modules/acm?ref=hub_depends_on"
+  source           = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm?ref=dynamic-acm-operator"
   project_id       = local.project
   cluster_name     = module.gke.name
   location         = module.gke.location
@@ -56,7 +56,7 @@ module "acm" {
 
 module "hub" {
   # Replace when new release including fix is merged
-  source = "github.com/CloudPharaoh/terraform-google-kubernetes-engine//modules/hub?ref=hub_depends_on"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/hub?ref=dynamic-acm-operator"
 
   module_depends_on       = [module.acm.wait]
   project_id              = local.project
