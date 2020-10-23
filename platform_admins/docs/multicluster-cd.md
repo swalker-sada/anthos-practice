@@ -30,6 +30,10 @@ cd ${WORKDIR}
 # init git
 git config --global user.email "${GCLOUD_USER}"
 git config --global user.name "Cloud Shell"
+if [ ! -d ${HOME}/.ssh ]; then
+  mkdir ${HOME}/.ssh
+  chmod 700 ${HOME}/.ssh
+fi
 # pre-grab gitlab public key
 ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
 git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:platform-admins/config.git
