@@ -46,7 +46,7 @@ Wait a few moments until Cloud Monitoring service sets up your [workspace](https
 
 ## Adding additional charts to the dashboard
 
-The easiest way to add a chat is to copy an existing chart to the same dashbard and then editing its attributes.
+The easiest way to add a chart is to copy an existing chart to the same dashbard and then editing its attributes.
 
 1. Click on the three-dots at the top left corner of the existing chart and select **Copy Chart**.
 
