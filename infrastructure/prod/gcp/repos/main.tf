@@ -136,7 +136,7 @@ resource "gitlab_group" "bank-of-anthos" {
   path             = var.bank_of_anthos_group
   description      = "Bank of Anthos group"
   visibility_level = "internal"
-  depends_on       = [gitlab_project.online-boutique]
+  depends_on       = [gitlab_project.shared-cd]
 }
 
 resource "gitlab_group_variable" "bank-of-anthos-cicd-gsa-private-key" {
