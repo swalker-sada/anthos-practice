@@ -57,6 +57,24 @@ fi
 grep -q "export GOOGLE_PROJECT.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export GOOGLE_PROJECT=${GOOGLE_PROJECT}" >> ${SCRIPT_DIR}/../../../vars.sh
 grep -q "gcloud config set project.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "gcloud config set project ${GOOGLE_PROJECT}" >> ${SCRIPT_DIR}/../../../vars.sh
 
+if [[ ! ${GCLOUD_USER} ]]; then
+    title_no_wait "You have not defined your username in the GCLOUD_USER variable."
+    read -p "Please enter your GCP username: " GCLOUD_USER
+fi
+
+title_and_wait "Verifying that you are logged in with the correct user. The user should be ${GCLOUD_USER}."
+print_and_execute "gcloud config list account --format=json | jq -r .core.account"
+export ACCOUNT=`gcloud config list account --format=json | jq -r .core.account`
+if [ ${ACCOUNT} == ${GCLOUD_USER} ]; then
+    title_no_wait "You are logged in with the correct user account."
+    grep -q "export GCLOUD_USER.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export GCLOUD_USER=${GCLOUD_USER}" >> ${SCRIPT_DIR}/../../../vars.sh
+else
+    error_no_wait "You are logged in with user ${ACCOUNT}, which does not match the intended ${GCLOUD_USER} user. Ensure you are logged in with ${GCLOUD_USER} by running 'gcloud auth login' and following the instructions. Exiting script."
+    exit 1
+fi
+echo -e "\n"
+
+
 if [[ ! ${AWS_ACCESS_KEY_ID} ]]; then
     title_no_wait "You have not defined your AWS Access Key ID in the AWS_ACCESS_KEY_ID variable."
     read -p "Please enter your AWS Access Key ID: " AWS_ACCESS_KEY_ID
@@ -68,9 +86,6 @@ if [[ ! ${AWS_SECRET_ACCESS_KEY} ]]; then
     read -p "Please enter your AWS Secret Access Key: " AWS_SECRET_ACCESS_KEY
 fi
 grep -q "export AWS_SECRET_ACCESS_KEY.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> ${SCRIPT_DIR}/../../../vars.sh
-
-export GCLOUD_USER=$(gcloud config get-value account)
-grep -q "export GCLOUD_USER.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export GCLOUD_USER=${GCLOUD_USER}" >> ${SCRIPT_DIR}/../../../vars.sh
 
 # Add WORKDIR to vars
 grep -q "export WORKDIR=.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export WORKDIR=${WORKDIR}" >> ${SCRIPT_DIR}/../../../vars.sh

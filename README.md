@@ -152,11 +152,12 @@ In Qwiklabs, you should see two labs. One lab starts the GCP environment, and th
 ssh.cloud.google.com
 ```
 
-- Set GCP and AWS credentials. Get the value of the GCP Project ID, AWS Access Key ID and AWS Secret Access
+- Set GCP and AWS credentials. Get the value of the GCP Project ID, GCP Username, AWS Access Key ID and AWS Secret Access
   Key from Qwiklabs and replace the values with your values below.
 
 ```
 export GOOGLE_PROJECT=[GCP PROJECT ID] # example export GOOGLE_PROJECT=qwiklabs-gcp-1234abcd
+export GCLOUD_USER=[GCP USERNAME] # example export GCLOUD_USER=student-123@qwiklabs.net
 export AWS_ACCESS_KEY_ID=[AWS_ACCESS_KEY_ID] # example export AWS_ACCESS_KEY_ID=ABCDEF123456
 export AWS_SECRET_ACCESS_KEY=[AWS_SECRET_ACCESS_KEY] # example export AWS_SECRET_ACCESS_KEY=123abc456def789def
 ```
