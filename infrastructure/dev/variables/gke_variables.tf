@@ -1,11 +1,11 @@
 variable "gke1_subnet_name" {
   type    = string
-  default = "us-west1/dev-gcp-vpc-01-us-west1-subnet-01"
+  default = "us-west4/dev-gcp-vpc-01-us-west4-subnet-01"
 }
 
 variable "gke1_region" {
   type    = string
-  default = "us-west1"
+  default = "us-west4"
 }
 
 variable "gke1_suffix" {

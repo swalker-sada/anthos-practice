@@ -1,12 +1,12 @@
 #START:gke1
 variable "gke1_subnet_name" {
   type    = string
-  default = "us-west2/prod-gcp-vpc-01-us-west2-subnet-01"
+  default = "us-west4/prod-gcp-vpc-01-us-west4-subnet-01"
 }
 
 variable "gke1_region" {
   type    = string
-  default = "us-west2"
+  default = "us-west4"
 }
 
 variable "gke1_suffix" {
@@ -23,11 +23,11 @@ variable "gke1_zone" {
 #START:gke2
 variable "gke2_subnet_name" {
   type    = string
-  default = "us-west2/prod-gcp-vpc-01-us-west2-subnet-01"
+  default = "us-west4/prod-gcp-vpc-01-us-west4-subnet-01"
 }
 variable "gke2_region" {
   type    = string
-  default = "us-west2"
+  default = "us-west4"
 }
 
 variable "gke2_suffix" {
