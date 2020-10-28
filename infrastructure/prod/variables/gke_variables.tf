@@ -16,7 +16,7 @@ variable "gke1_suffix" {
 
 variable "gke1_zone" {
   type    = string
-  default = "a"
+  default = "b"
 }
 #END:gke1
 
@@ -37,7 +37,7 @@ variable "gke2_suffix" {
 
 variable "gke2_zone" {
   type    = string
-  default = "b"
+  default = "c"
 }
 
 variable "env" {

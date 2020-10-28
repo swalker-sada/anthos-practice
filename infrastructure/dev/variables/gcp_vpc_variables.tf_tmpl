@@ -1,28 +1,28 @@
 variable "subnets" {
     default = [
         {
-            subnet_name = "dev-gcp-vpc-01-us-west1-subnet-01"
+            subnet_name = "dev-gcp-vpc-01-us-west4-subnet-01"
             subnet_ip = "10.4.0.0/22"
-            subnet_region = "us-west1"
+            subnet_region = "us-west4"
             secondary_ranges = [
                 {
-                    range_name = "dev-gcp-vpc-01-us-west1-subnet-01-secondary-range-01-pod"
+                    range_name = "dev-gcp-vpc-01-us-west4-subnet-01-secondary-range-01-pod"
                     ip_cidr_range = "10.0.0.0/14"
                 },
                 {
-                    range_name = "dev-gcp-vpc-01-us-west1-subnet-01-secondary-range-02-svc"
+                    range_name = "dev-gcp-vpc-01-us-west4-subnet-01-secondary-range-02-svc"
                     ip_cidr_range = "10.5.0.0/20"
                 },
                 {
-                    range_name = "dev-gcp-vpc-01-us-west1-subnet-01-secondary-range-03-svc"
+                    range_name = "dev-gcp-vpc-01-us-west4-subnet-01-secondary-range-03-svc"
                     ip_cidr_range = "10.5.16.0/20"
                 },
                 {
-                    range_name = "dev-gcp-vpc-01-us-west1-subnet-01-secondary-range-04-svc"
+                    range_name = "dev-gcp-vpc-01-us-west4-subnet-01-secondary-range-04-svc"
                     ip_cidr_range = "10.5.32.0/20"
                 },
                 {
-                    range_name = "dev-gcp-vpc-01-us-west1-subnet-01-secondary-range-05-svc"
+                    range_name = "dev-gcp-vpc-01-us-west4-subnet-01-secondary-range-05-svc"
                     ip_cidr_range = "10.5.48.0/20"
                 },
             ]
