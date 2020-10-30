@@ -56,7 +56,7 @@ You can view the Envoy proxy-configs for any Pod running in the mesh. You can vi
 1. In the `istio-ingressgateway` Pod in ${GKE_PROD_1} running in the `istio-system` namespace, validate the `frontend` service has two endpoint IP addresses.
 ```
 export GKE_1_INGRESSGATEWAY_POD=$(kubectl get pod -n istio-system -l istio=ingressgateway --context=${GKE_PROD_1} -o jsonpath='{.items[0].metadata.name}')
-istioctl --context ${GKE_PROD_1} proxy-config endpoints ${GKE_1_INGRESSGATEWAY_POD} | grep "outbound|80||frontend.ob-prod.svc.cluster.local"
+istioctl --context ${GKE_PROD_1} -n istio-system proxy-config endpoints ${GKE_1_INGRESSGATEWAY_POD} | grep "outbound|80||frontend.ob-prod.svc.cluster.local"
 ```
 
 Output (Do not copy)
