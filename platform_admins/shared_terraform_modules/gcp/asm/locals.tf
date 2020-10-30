@@ -3,6 +3,7 @@ locals {
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 spec:
+  profile: asm-multicloud
   addonComponents:
     kiali:
       enabled: true
