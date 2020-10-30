@@ -26,6 +26,7 @@ At a high level you perform the following steps:
 1. Run the following commands to initialize the `config` repository.
 
 ```
+source ${WORKDIR}/anthos-multicloud-workshop/user_setup.sh
 cd ${WORKDIR}
 # init git
 git config --global user.email "${GCLOUD_USER}"
@@ -47,6 +48,7 @@ git push -u origin main
 
 1. Wait a few moments and ensure all clusters (except `gitlab` cluster) are `SYNCED` to the `config` repo. Run the following command.
 
+ - if you're having trouble with git and ssh-keys, make sure your ssh-agent is running. the easiest thing to do is to re-run the setup script via: `source ${WORKDIR}/anthos-multicloud-workshop/user_setup.sh` (note the prefix `source `)
 ```
 nomos status
 ```
