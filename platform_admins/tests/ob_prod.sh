@@ -58,18 +58,28 @@ export PROD_NS=ob-prod
 # Export a SCRIPT_DIR var and make all links relative to SCRIPT_DIR
 export SCRIPT_DIR=$(dirname $(readlink -f $0 2>/dev/null) 2>/dev/null || echo "${PWD}/$(dirname $0)")
 
+## Stage 1: Preparation
+# Retrieve & replace asm rev label 
+ASM_REV_LABEL=$(kubectl get deploy -n istio-system -l app=istiod -o jsonpath={.items[*].metadata.labels.'istio\.io\/rev'})
+
+sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/prod/gke1/ob-namespace-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke1/ob-namespace-patch.yaml
+sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/prod/gke2/ob-namespace-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke2/ob-namespace-patch.yaml
+sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/prod/eks1/ob-namespace-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/eks1/ob-namespace-patch.yaml
+sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/prod/eks2/ob-namespace-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/eks2/ob-namespace-patch.yaml
+
 # Create Cloud-Ops GSA secret YAML
 kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/eks1/cloud-ops-sa-secret.yaml
 kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/eks2/cloud-ops-sa-secret.yaml
 
 # Workload Identity for Cloud-Ops GSA/KSA Mapping
-sed -e "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke1/default-ksa.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke1/default-ksa.yaml
-sed -e "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke2/default-ksa.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke2/default-ksa.yaml
+sed -e "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke1/default-ksa-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke1/default-ksa-patch.yaml
+sed -e "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke2/default-ksa-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke2/default-ksa-patch.yaml
 
 gcloud iam service-accounts add-iam-policy-binding $GSA \
   --role roles/iam.workloadIdentityUser \
   --member "serviceAccount:${GOOGLE_PROJECT}.svc.id.goog[${PROD_NS}/$KSA]"
 
+## Stage 2: Deploy
 echo -e "\n"
 echo_cyan "*** Deploying Online Boutique app to ${GKE1} cluster... ***\n"
 kubectl --context=${GKE1} apply -k ${SCRIPT_DIR}/ob/prod/gke1
@@ -83,6 +93,7 @@ echo -e "\n"
 echo_cyan "*** Deploying Online Boutique app to ${EKS2} cluster... ***\n"
 kubectl --context=${EKS2} apply -k ${SCRIPT_DIR}/ob/prod/eks2
 
+## Stage 3: Validation
 echo -e "\n"
 echo_cyan "*** Verifying all Deployments are Ready in all clusters... ***\n"
 is_deployment_ready ${GKE1} ${PROD_NS} emailservice

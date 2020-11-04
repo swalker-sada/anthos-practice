@@ -52,6 +52,7 @@ resource "null_resource" "exec_install_asm" {
     command     = "${path.module}/install_asm.sh"
     environment = {
       ASM_VERSION           = var.asm_version
+      ASM_REV_LABEL         = var.asm_rev_label
       PROJECT_ID            = var.project_id
       GKE_LIST_STRING       = var.gke_list
       GKE_LOC_STRING        = var.gke_location_list
@@ -59,6 +60,7 @@ resource "null_resource" "exec_install_asm" {
       CLUSTER_AWARE_GATEWAY = local.cluster_aware_gateway
       GKE_KUBEDNS_CONFIGMAP = local.gke_kubedns_configmap
       EKS_COREDNS_CONFIGMAP = local.eks_coredns_configmap
+      ISTIOD_SERVICE        = local.istiod_service
     }
   }
   triggers = {
@@ -66,4 +68,3 @@ resource "null_resource" "exec_install_asm" {
   }
   depends_on = [null_resource.exec_create_asm_yamls]
 }
-

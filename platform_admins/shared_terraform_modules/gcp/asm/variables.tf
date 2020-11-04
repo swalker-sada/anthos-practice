@@ -21,5 +21,7 @@ variable "eks_list" {}
 variable "eks_ingress_ip_list" {}
 variable "eks_eip_list" {}
 variable "asm_version" {}
+variable "asm_rev_label" {}
 variable "project_id" {}
 variable "env" {}
+

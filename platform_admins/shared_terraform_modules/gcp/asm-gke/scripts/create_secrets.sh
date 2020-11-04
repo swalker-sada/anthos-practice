@@ -19,16 +19,11 @@ IFS=',' read -r -a CLUSTER_NAMES <<< "${CLUSTERS_STRING}"
 IFS=',' read -r -a CLUSTER_TYPES <<< "${REGIONAL_STRING}"
 IFS=',' read -r -a CLUSTER_LOCS <<< "${LOCATIONS_STRING}"
 
-ASM_VERSION="1.6.8-asm.9"
-
 # Download ASM to get istioctl
 curl -LO https://storage.googleapis.com/gke-release/asm/istio-${ASM_VERSION}-linux-amd64.tar.gz
 tar xzf istio-${ASM_VERSION}-linux-amd64.tar.gz
 rm -rf istio-${ASM_VERSION}-linux-amd64.tar.gz
 export PATH=istio-${ASM_VERSION}/bin:$PATH
-
-# check istioctl is in PATH
-istioctl version --remote=false
 
 for i in "${!CLUSTER_NAMES[@]}"; do
   # Set cmdline org for region/zone

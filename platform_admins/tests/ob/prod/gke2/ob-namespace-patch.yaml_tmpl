@@ -12,16 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-  values:
-    kiali:
-      createDemoSecret: true
-    global:
-      mtls:
-        enabled: true
-      multiCluster:
-        clusterName: ${GKE}
-      network: ${GCP_NET}
-      meshNetworks:
-        ${GCP_NET}:
-          endpoints:
-          # Always use Kubernetes as the registry name for the main cluster in the mesh network configuration
+- op: add
+  path: /metadata/labels
+  value: 
+    istio.io/rev: ASM_REV_LABEL

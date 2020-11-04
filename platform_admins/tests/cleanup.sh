@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: "ob-dev"
-resources:
-  - ob-namespace.yaml
-  - services-all.yaml
-  - deployments-cart-recommendation.yaml
-  - deployments-shipping-ad-loadgen.yaml
-patchesJson6902:
-- path: ob-namespace-patch.yaml
-  target:
-    version: v1
-    kind: Namespace
-    name: ob-dev
+export DEV_NS=ob-dev
+export STAGE_NS=ob-stage
+export PROD_NS=ob-prod
+
+for CLUSTER in ${GKE_DEV_1} ${GKE_DEV_2}
+do
+  kubectl delete ns ${DEV_NS} --context ${CLUSTER}
+done
+
+for CLUSTER in ${GKE_STAGE_1} ${EKS_STAGE_1}
+do
+  kubectl delete ns ${STAGE_NS} --context ${CLUSTER}
+done
+
+for CLUSTER in ${GKE_PROD_1} ${GKE_PROD_2} ${EKS_PROD_1} ${EKS_PROD_2}
+do
+  kubectl delete ns ${PROD_NS} --context ${CLUSTER}
+done

@@ -22,3 +22,14 @@ resources:
   - deployments-payment-productcatalog-currency.yaml
   - istio-control.yaml
   - default-ksa.yaml
+patchesJson6902:
+- path: ob-namespace-patch.yaml
+  target:
+    version: v1
+    kind: Namespace
+    name: ob-stage
+- path: default-ksa-patch.yaml
+  target:
+    version: v1
+    kind: ServiceAccount
+    name: default    

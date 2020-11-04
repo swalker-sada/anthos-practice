@@ -12,22 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-  values:
-    telemetry:
-      enabled: true
-      v2:
-        enabled: true
-        stackdriver:
-          enabled: true  # This enables Stackdriver metrics          
-    kiali:
-      createDemoSecret: true
-    global:
-      mtls:
-        enabled: true
-      multiCluster:
-        clusterName: ${EKS}
-      network: ${EKS}-net
-      meshNetworks:
-        ${GCP_NET}:
-          endpoints:
-          # Always use Kubernetes as the registry name for the main cluster in the mesh network configuration
+- op: add
+  path: /metadata/labels
+  value: 
+    istio.io/rev: ASM_REV_LABEL

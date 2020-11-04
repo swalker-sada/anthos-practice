@@ -40,7 +40,7 @@ IFS=',' read -r -a EKS_EIP_LIST <<< "${EKS_EIP_LIST_STRING}"
 ASM_DIR=istio-${ASM_VERSION}
 
 # Get ASM
-wget https://storage.googleapis.com/gke-release/asm/istio-${ASM_VERSION}-linux-amd64.tar.gz
+curl -LO https://storage.googleapis.com/gke-release/asm/istio-${ASM_VERSION}-linux-amd64.tar.gz
 tar xzf istio-${ASM_VERSION}-linux-amd64.tar.gz
 rm -rf istio-${ASM_VERSION}-linux-amd64.tar.gz
 export PATH=istio-${ASM_VERSION}/bin:$PATH
@@ -75,6 +75,9 @@ done
 cat ${DEFAULT_KUBECONFIG}
 export KUBECONFIG=${DEFAULT_KUBECONFIG}
 
+# prepare istiod-service
+echo -e "${ISTIOD_SERVICE}" | sed -e s/ASM_REV_LABEL/${ASM_REV_LABEL}/g > istiod-service.yaml
+
 # install asm and process secrets
 processEKS() {
     EKS=${1}
@@ -83,8 +86,10 @@ processEKS() {
     kubectl --context=eks_${EKS} get po --all-namespaces
     kubectl --context=eks_${EKS} apply -f istio-system.yaml
     kubectl --context=eks_${EKS} apply -f cacerts.yaml
-    istioctl --context=eks_${EKS} install -f asm_${EKS}.yaml
+    istioctl --context=eks_${EKS} install -f asm_${EKS}.yaml \
+      --set revision="${ASM_REV_LABEL}"
     kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml
+    kubectl --context=eks_${EKS} apply -f istiod-service.yaml
     istioctl x create-remote-secret --context=eks_${EKS} --name ${EKS} > kubeconfig_secret_${EKS}.yaml
 }
 
@@ -96,8 +101,10 @@ processGKE() {
     GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
     kubectl --context=${GKE_CTX} apply -f istio-system.yaml
     kubectl --context=${GKE_CTX} apply -f cacerts.yaml
-    istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml
+    istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml \
+      --set revision="${ASM_REV_LABEL}"
     kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml
+    kubectl --context=${GKE_CTX} apply -f istiod-service.yaml
     istioctl x create-remote-secret --context=${GKE_CTX} --name ${GKE_LIST[IDX]} > kubeconfig_secret_${GKE_LIST[IDX]}.yaml
 }
 

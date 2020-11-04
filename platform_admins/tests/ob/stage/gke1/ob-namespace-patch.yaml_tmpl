@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-  meshConfig:
-    defaultConfig:
-      proxyMetadata:
-        ISTIO_METAJSON_PLATFORM_METADATA: |-
-          {\"PLATFORM_METADATA\":{\"gcp_gke_cluster_name\":\"${EKS}\",\"gcp_project\":\"${PROJECT_ID}\",\"gcp_location\":\"${CLUSTER_LOCATION}\"}}
+- op: add
+  path: /metadata/labels
+  value: 
+    istio.io/rev: ASM_REV_LABEL

@@ -21,3 +21,14 @@ resources:
   - deployments-email-checkout-frontend.yaml
   - istio-control.yaml
   - default-ksa.yaml
+patchesJson6902:
+- path: ob-namespace-patch.yaml
+  target:
+    version: v1
+    kind: Namespace
+    name: ob-prod
+- path: default-ksa-patch.yaml
+  target:
+    version: v1
+    kind: ServiceAccount
+    name: default

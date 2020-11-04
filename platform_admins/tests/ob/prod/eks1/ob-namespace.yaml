@@ -16,5 +16,3 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: ob-prod
-  labels:
-    istio-injection: enabled

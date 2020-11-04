@@ -53,7 +53,15 @@ export DEV_NS=ob-dev
 
 # Export a SCRIPT_DIR var and make all links relative to SCRIPT_DIR
 export SCRIPT_DIR=$(dirname $(readlink -f $0 2>/dev/null) 2>/dev/null || echo "${PWD}/$(dirname $0)")
- 
+
+## Stage 1: Preparation
+# Retrieve & replace asm rev label 
+ASM_REV_LABEL=$(kubectl get deploy -n istio-system -l app=istiod -o jsonpath={.items[*].metadata.labels.'istio\.io\/rev'})
+
+sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/dev/gke1/ob-namespace-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/dev/gke1/ob-namespace-patch.yaml
+sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/dev/gke2/ob-namespace-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/dev/gke2/ob-namespace-patch.yaml
+
+## Stage 2: Deploy
 echo -e "\n"
 echo_cyan "*** Deploying Online Boutique app to ${GKE1} cluster... ***\n"
 kubectl --context=${GKE1} apply -k ${SCRIPT_DIR}/ob/dev/gke1
@@ -61,6 +69,7 @@ echo -e "\n"
 echo_cyan "*** Deploying Online Boutique app to ${GKE2} cluster... ***\n"
 kubectl --context=${GKE2} apply -k ${SCRIPT_DIR}/ob/dev/gke2
 
+## Stage 3: Validation
 echo -e "\n"
 echo_cyan "*** Verifying all Deployments are Ready in all clusters... ***\n"
 is_deployment_ready ${GKE1} ${DEV_NS} emailservice

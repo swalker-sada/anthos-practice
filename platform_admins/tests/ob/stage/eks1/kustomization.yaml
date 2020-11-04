@@ -24,3 +24,9 @@ resources:
 commonAnnotations:
   sidecar.istio.io/userVolume: '[{"name": "cloud-ops-sa-volume", "secret": {"secretName": "cloud-ops-sa"}}]'
   sidecar.istio.io/userVolumeMount: '[{"name": "cloud-ops-sa-volume", "mountPath": "/home/istio-proxy/.config/gcloud"}]'
+patchesJson6902:
+- path: ob-namespace-patch.yaml
+  target:
+    version: v1
+    kind: Namespace
+    name: ob-stage

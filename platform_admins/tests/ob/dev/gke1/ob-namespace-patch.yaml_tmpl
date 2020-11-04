@@ -12,4 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-          - fromRegistry: ${GKE}
+- op: add
+  path: /metadata/labels
+  value: 
+    istio.io/rev: ASM_REV_LABEL

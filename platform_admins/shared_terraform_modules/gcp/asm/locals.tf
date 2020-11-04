@@ -21,10 +21,13 @@ kind: IstioOperator
 spec:
   profile: asm-multicloud
   addonComponents:
-    kiali:
-      enabled: true
-    grafana:
-      enabled: true
+    # commented out because asm-multicloud already has this enabled
+    # could not overlay user config over base: json merge error (unable to find api field in struct externalComponentSpec...
+    #
+    # kiali:
+    #   enabled: true
+    # grafana:
+    #   enabled: true
     istiocoredns:
       enabled: true
 EOT
@@ -68,8 +71,6 @@ EOT
     global:
       podDNSSearchNamespaces:
         - global
-      mtls:
-        enabled: true
       multiCluster:
         clusterName: GKE
         enabled: true
@@ -92,8 +93,6 @@ EOT
     global:
       podDNSSearchNamespaces:
         - global
-      mtls:
-        enabled: true
       multiCluster:
         clusterName: EKS
         enabled: true
@@ -185,5 +184,35 @@ data:
         cache 30
         forward . COREDNS_IP:53
     }
+EOT
+  istiod_service = <<EOT
+apiVersion: v1
+kind: Service
+metadata:
+  name: istiod
+  namespace: istio-system
+  labels:
+    istio.io/rev: ASM_REV_LABEL
+    app: istiod
+    istio: pilot
+    release: istio
+spec:
+  ports:
+    - port: 15010
+      name: grpc-xds # plaintext
+      protocol: TCP
+    - port: 15012
+      name: https-dns # mTLS with k8s-signed cert
+      protocol: TCP
+    - port: 443
+      name: https-webhook # validation and injection
+      targetPort: 15017
+      protocol: TCP
+    - port: 15014
+      name: http-monitoring # prometheus stats
+      protocol: TCP
+  selector:
+    app: istiod
+    istio.io/rev: ASM_REV_LABEL
 EOT
 }

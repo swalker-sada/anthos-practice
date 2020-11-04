@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: install.istio.io/v1alpha1
-kind: IstioOperator
-spec:
-  addonComponents:
-    kiali:
-      enabled: true
-    grafana:
-      enabled: true
+- op: add
+  path: /metadata/labels
+  value: 
+    istio.io/rev: ASM_REV_LABEL

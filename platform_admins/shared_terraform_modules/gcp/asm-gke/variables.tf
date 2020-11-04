@@ -28,3 +28,12 @@ variable "clusters" {
     regional = bool
   }))
 }
+
+variable "asm_properties" {
+  description = "ASM properties that may be distinct by ASM version.  The branch can be branch or tag"
+  type = object({
+    version   = string
+    rev_label = string
+    branch    = string
+  })
+}

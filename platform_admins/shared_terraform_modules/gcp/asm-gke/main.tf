@@ -19,6 +19,9 @@ locals {
   regional_string  = join(",", [for cluster in var.clusters : cluster.regional])
   clusters_string  = join(",", [for cluster in var.clusters : cluster.name])
   locations_string = join(",", [for cluster in var.clusters : cluster.location])
+  asm_version      = var.asm_properties.version
+  asm_branch       = var.asm_properties.branch
+  asm_rev_label    = var.asm_properties.rev_label
 }
 
 resource "null_resource" "asm-gke" {
@@ -30,6 +33,9 @@ resource "null_resource" "asm-gke" {
       REGIONAL_STRING  = local.regional_string
       CLUSTERS_STRING  = local.clusters_string
       LOCATIONS_STRING = local.locations_string
+      ASM_VERSION      = local.asm_version
+      ASM_BRANCH       = local.asm_branch
+      ASM_REV_LABEL    = local.asm_rev_label
     }
   }
 
@@ -51,6 +57,9 @@ resource "null_resource" "asm-gke" {
     regional_string  = local.regional_string
     clusters_string  = local.clusters_string
     locations_string = local.locations_string
+    asm_version      = local.asm_version
+    asm_branch       = local.asm_branch
+    asm_rev_label    = local.asm_rev_label
   }
 }
 
@@ -67,6 +76,7 @@ resource "null_resource" "create_secrets_cross_discovery" {
       REGIONAL_STRING  = local.regional_string
       CLUSTERS_STRING  = local.clusters_string
       LOCATIONS_STRING = local.locations_string
+      ASM_VERSION      = local.asm_version
     }
   }
 

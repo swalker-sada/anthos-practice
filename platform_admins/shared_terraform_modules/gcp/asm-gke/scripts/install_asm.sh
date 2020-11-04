@@ -19,7 +19,7 @@
 IFS=',' read -r -a CLUSTER_NAMES <<< "${CLUSTERS_STRING}"
 IFS=',' read -r -a CLUSTER_TYPES <<< "${REGIONAL_STRING}"
 IFS=',' read -r -a CLUSTER_LOCS <<< "${LOCATIONS_STRING}"
-ASM_VERSION="1.6.8-asm.9"
+
 ENVIRON_PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format='value(projectNumber)')
 
 # Download ASM to get istioctl
@@ -62,18 +62,21 @@ do
   GKE_CTX=gke_${PROJECT_ID}_${CLUSTER_LOCS[$i]}_${CLUSTER_NAMES[$i]}
 
   # Download ASM package for istio-operator and other resource configuration files
-  kpt pkg get https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages.git/asm@"${ASM_VERSION}" "${CLUSTER_NAMES[$i]}"
+  kpt pkg get https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages.git/asm@"${ASM_BRANCH}" "${CLUSTER_NAMES[$i]}"
 
   # Prepare config files
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ gcloud.core.project "${PROJECT_ID}"
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ gcloud.container.cluster "${CLUSTER_NAMES[$i]}"
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ gcloud.compute.location "${CLUSTER_LOCS[$i]}"
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ gcloud.project.environProjectNumber ${ENVIRON_PROJECT_NUMBER}
-  kpt cfg set "${CLUSTER_NAMES[$i]}"/ anthos.servicemesh.profile asm-gcp
+  kpt cfg set "${CLUSTER_NAMES[$i]}"/ anthos.servicemesh.rev "${ASM_REV_LABEL}"
   kpt cfg list-setters "${CLUSTER_NAMES[$i]}"/
 
   # Install ASM
-  istioctl install -f "${CLUSTER_NAMES[$i]}"/cluster/istio-operator.yaml
+  istioctl install -f "${CLUSTER_NAMES[$i]}"/istio/istio-operator.yaml --revision="${ASM_REV_LABEL}"
+
+  # Install validating webhook to locate istiod via rev label
+  kubectl --context=${GKE_CTX} apply -f "${CLUSTER_NAMES[$i]}"/istio/istiod-service.yaml
 
   # Install canonical-service controllers to enable ASM UI
   kubectl --context=${GKE_CTX} apply -f "${CLUSTER_NAMES[$i]}"/canonical-service/controller.yaml

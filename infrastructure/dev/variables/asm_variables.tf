@@ -14,3 +14,16 @@
  * limitations under the License.
  */
 
+variable "asm_properties" {
+  description = "ASM properties that may be distinct by ASM version.  The branch can be branch or tag"
+  type = object({
+    version   = string
+    rev_label = string
+    branch    = string
+  })
+  default = {
+    version   = "1.7.3-asm.6"
+    rev_label = "asm-173-6"
+    branch    = "1.7.3-asm.6+config1"
+  }
+}
