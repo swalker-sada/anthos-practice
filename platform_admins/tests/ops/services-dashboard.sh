@@ -31,7 +31,7 @@ OAUTH_TOKEN=$(gcloud auth print-access-token)
 # create dashboard
 curl -X POST -H "Authorization: Bearer $OAUTH_TOKEN" -H "Content-Type: application/json" \
   "https://monitoring.googleapis.com/v1/projects/${GOOGLE_PROJECT}/dashboards" \
-  -d @${DASHBOARD}.json
+  -d @${DASHBOARD_JSON}
 
 # create direct link
 echo "https://console.cloud.google.com/monitoring/dashboards/custom/servicesdash?cloudshell=false&project=${GOOGLE_PROJECT}"
