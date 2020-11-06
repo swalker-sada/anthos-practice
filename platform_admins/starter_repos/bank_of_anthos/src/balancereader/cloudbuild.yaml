@@ -1,0 +1,12 @@
+---
+timeout: 3600s
+logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
+tags:
+  - bank-of-anthos-balancereader
+steps:
+  - name: maven:3.3-jdk-8-alpine
+    id: "build-balancereader"
+    entrypoint: "bash"
+    args:
+      - -c
+      - mvn compile com.google.cloud.tools:jib-maven-plugin:2.1.0:build -Dimage=gcr.io/${PROJECT_ID}/bank-of-anthos/balancereader

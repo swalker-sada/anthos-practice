@@ -25,3 +25,4 @@ commonAnnotations:
 commonLabels:
   provider: aws
   cluster: eks-prod-us-west2ab-1
+  env: prod

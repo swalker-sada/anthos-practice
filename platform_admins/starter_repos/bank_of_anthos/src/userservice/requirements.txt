@@ -61,6 +61,7 @@ webencodings==0.5.1       # via -r requirements.in, bleach
 werkzeug==1.0.1           # via -r requirements.in, flask
 wrapt==1.12.1             # via -r requirements.in, opentelemetry-instrumentation, opentelemetry-instrumentation-sqlalchemy
 zipp==1.2.0               # via -r requirements.in, importlib-metadata
+sqlalchemy-cockroachdb
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

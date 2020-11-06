@@ -20,6 +20,7 @@ import logging
 import random
 from sqlalchemy import create_engine, MetaData, Table, Column, String, Date, LargeBinary
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+# from cockroachdb.sqlalchemy import run_transaction
 
 class UserDb:
     """

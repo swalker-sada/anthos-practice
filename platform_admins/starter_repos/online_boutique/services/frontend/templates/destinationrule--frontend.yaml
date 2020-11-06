@@ -28,3 +28,6 @@ spec:
     - name: gcp
       labels:
         provider: gcp
+    - name: prod
+      labels:
+        env: prod

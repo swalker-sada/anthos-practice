@@ -1,0 +1,20 @@
+.crdb-init-job:
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - echo "${GCP_CICD_SA_KEY}" | base64 -d > ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - cat ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - gcloud auth activate-service-account cicd-sa@${PROJECT_ID}.iam.gserviceaccount.com --key-file=${CI_PROJECT_DIR}/cicd-sa-key.json --project=${PROJECT_ID}
+    - gcloud config set project ${PROJECT_ID}
+    # Run init job in the GKE Prod 1 cluster
+    - gcloud container clusters get-credentials gke-prod-us-west2a-1 --zone us-west2-a --project ${PROJECT_ID}
+    - cd ${CI_PROJECT_DIR}/prod/job
+    - kustomize build --load_restrictor none . > crdb-init.yaml
+    - |
+      GKE_CRDB_0_RUNNING=$(kubectl -n db-crdb get pod gke-crdb-0 -o json | jq -r '.status.phase')
+      while [[ $GKE_CRDB_0_RUNNING != "Running" ]]; do
+        echo -e "Waiting for gke-crdb-0 pod to be available..."
+        sleep 5
+        GKE_CRDB_0_RUNNING=$(kubectl -n db-crdb get pod gke-crdb-0 -o json | jq -r '.status.phase')
+      done
+      kubectl -n db-crdb apply -f crdb-init.yaml

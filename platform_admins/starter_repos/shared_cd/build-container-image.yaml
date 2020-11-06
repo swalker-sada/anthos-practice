@@ -1,0 +1,10 @@
+.build-container-image:
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - echo "${GCP_CICD_SA_KEY}" | base64 -d > ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - cat ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - gcloud auth activate-service-account cicd-sa@${PROJECT_ID}.iam.gserviceaccount.com --key-file=${CI_PROJECT_DIR}/cicd-sa-key.json --project=${PROJECT_ID}
+    - gcloud config set project ${PROJECT_ID}
+    - cd ${CI_PROJECT_DIR}/src/${SVC}
+    - gcloud builds submit .

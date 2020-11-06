@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../templates/statefulset--eks-crdb.yaml
+
+commonAnnotations:
+  configmanagement.gke.io/cluster-selector: eks-prod-us-west2ab-1
+
+commonLabels:
+  provider: aws
+  cluster: eks-prod-us-west2ab-1

@@ -23,3 +23,7 @@ variable "online_boutique_project" { default = "online-boutique" }
 
 variable "bank_of_anthos_group" { default = "bank-of-anthos" }
 variable "bank_of_anthos_project" { default = "bank-of-anthos" }
+
+variable "databases_group" { default = "databases" }
+variable "crdb" { default = "cockroachdb" }
+variable "redis" { default = "redis" }

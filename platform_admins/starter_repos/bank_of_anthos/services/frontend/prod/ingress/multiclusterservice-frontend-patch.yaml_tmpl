@@ -1,0 +1,8 @@
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: boafrontend-istio-mcs
+spec:
+  clusters:
+    - link: "GKE_PROD_1_LOCATION/GKE_PROD_1_NAME"
+    - link: "GKE_PROD_2_LOCATION/GKE_PROD_2_NAME"

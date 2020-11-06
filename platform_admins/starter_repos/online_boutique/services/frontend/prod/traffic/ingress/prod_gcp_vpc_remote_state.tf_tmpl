@@ -1,8 +1,0 @@
-data "terraform_remote_state" "prod_gcp_vpc" {
-  backend = "gcs"
-
-  config = {
-    bucket  = "PROJECT_ID"
-    prefix  = "tfstate/prod/gcp/vpc"
-  }
-}

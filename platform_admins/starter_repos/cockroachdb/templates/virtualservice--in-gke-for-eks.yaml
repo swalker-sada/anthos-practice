@@ -1,0 +1,38 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: eks-crdb-0.eks-crdb.db-crdb
+  namespace: db-crdb
+spec:
+  hosts:
+  - eks-crdb-0.eks-crdb.db-crdb
+  http:
+  - route:
+    - destination:
+        host: eks-crdb-0.eks-crdb.db-crdb.global
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: eks-crdb-1.eks-crdb.db-crdb
+  namespace: db-crdb
+spec:
+  hosts:
+  - eks-crdb-1.eks-crdb.db-crdb
+  http:
+  - route:
+    - destination:
+        host: eks-crdb-1.eks-crdb.db-crdb.global
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: eks-crdb-2.eks-crdb.db-crdb
+  namespace: db-crdb
+spec:
+  hosts:
+  - eks-crdb-2.eks-crdb.db-crdb
+  http:
+  - route:
+    - destination:
+        host: eks-crdb-2.eks-crdb.db-crdb.global

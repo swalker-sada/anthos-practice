@@ -204,3 +204,79 @@ resource "gitlab_deploy_key" "bank-of-anthos" {
   can_push   = "true"
   depends_on = [gitlab_project.bank-of-anthos]
 }
+
+resource "gitlab_group" "databases" {
+  name             = var.databases_group
+  path             = var.databases_group
+  description      = "Databases group"
+  visibility_level = "internal"
+  depends_on       = [gitlab_project.bank-of-anthos]
+}
+
+resource "gitlab_group_variable" "databases-cicd-gsa-private-key" {
+   group     = gitlab_group.databases.id
+   key       = "GCP_CICD_SA_KEY"
+   value     = data.terraform_remote_state.prod_gcp_cicd_gsa.outputs.cicd_sa_key_base64
+   protected = false
+   masked    = false
+}
+
+resource "gitlab_group_variable" "databases-ssh-private-key" {
+   group     = gitlab_group.databases.id
+   key       = "MANIFEST_WRITER_KEY"
+   value     = data.terraform_remote_state.prod_gcp_ssh_key.outputs.private_key
+   protected = false
+   masked    = false
+}
+
+resource "gitlab_group_variable" "databases-acm-repo" {
+   group     = gitlab_group.databases.id
+   key       = "ACM_REPO_SSH_URL"
+   value     = gitlab_project.anthos-config-management.ssh_url_to_repo
+   protected = false
+   masked    = false
+}
+
+resource "gitlab_group_variable" "databases-gcp-project" {
+   group     = gitlab_group.databases.id
+   key       = "PROJECT_ID"
+   value     = var.project_id
+   protected = false
+   masked    = false
+}
+
+resource "gitlab_project" "crdb" {
+  name                   = var.crdb
+  description            = "CRDB project"
+  namespace_id           = gitlab_group.databases.id
+  visibility_level       = "internal"
+  shared_runners_enabled = true
+  default_branch         = "main"
+  depends_on             = [gitlab_group.databases]
+}
+
+resource "gitlab_deploy_key" "databases" {
+  project    = gitlab_project.crdb.id
+  title      = "ssh deploy key"
+  key        = data.terraform_remote_state.prod_gcp_ssh_key.outputs.public_key_openssh
+  can_push   = "true"
+  depends_on = [gitlab_project.crdb]
+}
+
+resource "gitlab_project" "redis" {
+  name                   = var.redis
+  description            = "Redis project"
+  namespace_id           = gitlab_group.databases.id
+  visibility_level       = "internal"
+  shared_runners_enabled = true
+  default_branch         = "main"
+  depends_on             = [gitlab_project.crdb]
+}
+
+resource "gitlab_deploy_key" "redis" {
+  project    = gitlab_project.redis.id
+  title      = "ssh deploy key"
+  key        = data.terraform_remote_state.prod_gcp_ssh_key.outputs.public_key_openssh
+  can_push   = "true"
+  depends_on = [gitlab_project.redis]
+}

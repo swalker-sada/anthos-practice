@@ -18,8 +18,8 @@ kind: ConfigMap
 metadata:
   name: service-api-config
 data:
-  TRANSACTIONS_API_ADDR: "ledgerwriter:8080"
-  BALANCES_API_ADDR: "balancereader:8080"
-  HISTORY_API_ADDR: "transactionhistory:8080"
-  CONTACTS_API_ADDR: "contacts:8080"
-  USERSERVICE_API_ADDR: "userservice:8080"
+  TRANSACTIONS_API_ADDR: "ledgerwriter.boa-ledgerwriter:8080"
+  BALANCES_API_ADDR: "balancereader.boa-balancereader:8080"
+  HISTORY_API_ADDR: "transactionhistory.boa-transactionhistory:8080"
+  CONTACTS_API_ADDR: "contacts.boa-contacts:8080"
+  USERSERVICE_API_ADDR: "userservice.boa-userservice:8080"

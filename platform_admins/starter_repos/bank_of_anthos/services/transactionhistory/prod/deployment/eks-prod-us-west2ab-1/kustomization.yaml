@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+nameSuffix: "-eks-prod-us-west2ab-1"
+
+commonAnnotations:
+  configmanagement.gke.io/cluster-selector: eks-prod-us-west2ab-1
+  sidecar.istio.io/userVolume: '[{"name": "cloud-ops-sa-volume", "secret": {"secretName": "cloud-ops-sa"}}]'
+  sidecar.istio.io/userVolumeMount: '[{"name": "cloud-ops-sa-volume", "mountPath": "/home/istio-proxy/.config/gcloud"}]'
+
+commonLabels:
+  provider: aws
+  cluster: eks-prod-us-west2ab-1

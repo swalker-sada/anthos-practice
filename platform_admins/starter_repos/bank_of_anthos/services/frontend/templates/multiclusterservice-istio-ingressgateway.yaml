@@ -1,0 +1,19 @@
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: boafrontend-istio-mcs
+  annotations:
+    beta.cloud.google.com/backend-config: '{"ports": {"80":"boa-istio-ingress-config"}}'
+spec:
+  template:
+    spec:
+      selector:
+        app: istio-ingressgateway
+      ports:
+      - name: boafrontend
+        protocol: TCP
+        port: 80
+        targetPort: 8080
+  clusters:
+  - link: "GKE_PROD_1_LOCATION/GKE_PROD_1_NAME"
+  - link: "GKE_PROD_2_LOCATION/GKE_PROD_2_NAME"

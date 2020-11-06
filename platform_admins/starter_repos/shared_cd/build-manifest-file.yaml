@@ -44,22 +44,27 @@
                   if [[ ${SUFFIX} == 1 ]]; then ZONE=a; else ZONE=b; fi # get gke zone
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2"${ZONE}"-"${SUFFIX}"
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
                   kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
                   ;;
                 ha)
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2a-1
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2b-2
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
                   kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
                   ;;
                 *)
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2a-1
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2b-2
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
                   kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
                   ;;
@@ -71,36 +76,45 @@
                   echo $SUFFIX
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-${SUFFIX}
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
                   ;;
                 ha)
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-1
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-2
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
                   ;;
                 *)
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-1
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
                   cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-2
                   kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+                  [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
                   if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
                   ;;
               esac ;;
             *)
               cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-1
               kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+              [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
               if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
               cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-2
               kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+              [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
               if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
               cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2a-1 
               kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml 
+              [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
               cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2b-2 
-              kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml 
+              kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+              [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest 
               cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
               kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
               ;;
@@ -108,22 +122,64 @@
         *)
           cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-1
           kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+          [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
           if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
           cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/eks-prod-us-west2ab-2
           kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml
+          [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
           if [[ ${SVC} == "frontend" ]]; then kustomize edit add patch deployment--patch.yaml; fi
           cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2a-1 
           kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml 
+          [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
           cd ${CI_PROJECT_DIR}/services/${SVC}/prod/deployment/gke-prod-us-west2b-2 
           kustomize edit add resource ../../../templates/deployment--${DEPLOYMENT}.yml 
+          [ $USE_OWN_IMAGE ] && kustomize edit set image ${SVC}=gcr.io/${PROJECT_ID}/${APPLICATION}/${SVC}:latest
           cd ${CI_PROJECT_DIR}/services/${SVC}/prod/identity
           kustomize edit add annotation iam.gke.io/gcp-service-account:cloud-ops@"${PROJECT_ID}".iam.gserviceaccount.com
           ;;
       esac
+    # Set terraform creds
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export GOOGLE_CREDENTIALS=$(cat ${CI_PROJECT_DIR}/cicd-sa-key.json)
+    # Configure dns, managed cert, mci and virtual service
+    - |
+      if [[ $SVC == $SVC_INGRESS ]]; then
+        cd ${CI_PROJECT_DIR}/services/${SVC}/prod/traffic/dns
+        sed -e s/PROJECT_ID/${PROJECT_ID}/ backend.tf_tmpl > backend.tf
+        sed -e s/PROJECT_ID/${PROJECT_ID}/ variables.tf_tmpl > variables.tf
+        sed -e s/PROJECT_ID/${PROJECT_ID}/ prod_gcp_gke_remote_state.tf_tmpl > prod_gcp_gke_remote_state.tf
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+        export GCLB_IP_ADDRESS=$(terraform output gclb-ip-address)
+        export GKE_PROD_1_NAME=$(terraform output gke_prod_1_name)
+        export GKE_PROD_1_LOCATION=$(terraform output gke_prod_1_location)
+        export GKE_PROD_2_NAME=$(terraform output gke_prod_2_name)
+        export GKE_PROD_2_LOCATION=$(terraform output gke_prod_2_location)
+        cd ${CI_PROJECT_DIR}/services/${SVC}/prod/traffic/virtualservice
+        sed -e s/PROJECT_ID/$PROJECT_ID/g gateway-frontend-patch.yaml_tmpl > gateway-frontend-patch.yaml
+        sed -e s/PROJECT_ID/$PROJECT_ID/g virtualservice-frontend-patch.yaml_tmpl > virtualservice-frontend-patch.yaml
+        cd ${CI_PROJECT_DIR}/services/${SVC}/prod/ingress
+        kustomize edit add annotation networking.gke.io/static-ip:$GCLB_IP_ADDRESS
+        sed -e s/PROJECT_ID/${PROJECT_ID}/g multiclusteringress-frontend-patch.yaml_tmpl > multiclusteringress-frontend-patch.yaml
+        sed -e s/GKE_PROD_1_LOCATION/$GKE_PROD_1_LOCATION/g \
+          -e s/GKE_PROD_1_NAME/$GKE_PROD_1_NAME/g \
+          -e s/GKE_PROD_2_LOCATION/$GKE_PROD_2_LOCATION/g \
+          -e s/GKE_PROD_2_NAME/$GKE_PROD_2_NAME/g \
+          multiclusterservice-frontend-patch.yaml_tmpl > multiclusterservice-frontend-patch.yaml
+        mkdir -p ${CI_PROJECT_DIR}/output
+        kustomize build --load_restrictor none . > ${CI_PROJECT_DIR}/output/${APPLICATION}-${SVC}-ingress-hydrated.yaml
+        echo -e "*************** START ${APPLICATION}-${SVC}-ingress-hydrated.yaml ********************"
+        cat ${CI_PROJECT_DIR}/output/${APPLICATION}-${SVC}-ingress-hydrated.yaml
+        echo -e "*************** END ${APPLICATION}-${SVC}-ingress-hydrated.yaml ********************"
+      fi
+    # Build hydrated manifest
     - mkdir -p ${CI_PROJECT_DIR}/output
     - cd ${CI_PROJECT_DIR}/services/${SVC}/prod
     - kustomize build --load_restrictor none . > ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+    - echo -e "*************** START ${SVC}-hydrated.yaml ********************"
     - cat ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+    - echo -e "*************** END ${SVC}-hydrated.yaml ********************"
   artifacts:
     expire_in: 30 days
     paths:

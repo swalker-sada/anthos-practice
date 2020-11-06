@@ -19,7 +19,7 @@ metadata:
   name: frontend-ingress
 spec:
   hosts:
-    - "*"
+    - "OB_HOSTNAME"
   gateways:
     - frontend-gateway
   http:
@@ -28,3 +28,4 @@ spec:
             host: frontend
             port:
               number: 80
+            subset: prod

@@ -26,11 +26,11 @@ spec:
       labels:
         app: balancereader
     spec:
-      serviceAccountName: default
+      serviceAccountName: balancereader
       terminationGracePeriodSeconds: 5
       containers:
         - name: balancereader
-          image: gcr.io/bank-of-anthos/balancereader:v0.3.0
+          image: balancereader
           volumeMounts:
             - name: publickey
               mountPath: "/root/.ssh"
@@ -40,20 +40,20 @@ spec:
               value: "v0.3.0"
             - name: PORT
               value: "8080"
-        # toggle Cloud Trace export
+            # toggle Cloud Trace export
             - name: ENABLE_TRACING
-              value: "true"
+              value: "false"
             - name: ENABLE_METRICS
-              value: "true"
+              value: "false"
             - name: POLL_MS
               value: "100"
             - name: CACHE_SIZE
               value: "1000000"
-        # tell Java to obey container memory limits
+            # tell Java to obey container memory limits
             - name: JVM_OPTS
               value: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-        # Valid levels are debug, info, warn, error, fatal.
-        # If no valid level is set, will default to info.
+            # Valid levels are debug, info, warn, error, fatal.
+            # If no valid level is set, will default to info.
             - name: LOG_LEVEL
               value: "info"
             - name: NAMESPACE
@@ -63,7 +63,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: environment-config
-        # add ledger-db credentials from ConfigMap
+            # add ledger-db credentials from ConfigMap
             - configMapRef:
                 name: ledger-db-config
           resources:

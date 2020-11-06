@@ -1,0 +1,12 @@
+---
+timeout: 3600s
+logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
+tags:
+  - bank-of-anthos-frontend
+steps:
+  - name: gcr.io/${PROJECT_ID}/platform-installer
+    id: "build-frontend"
+    entrypoint: "bash"
+    args:
+      - -c
+      - gcloud builds submit . --tag=gcr.io/${PROJECT_ID}/bank-of-anthos/frontend

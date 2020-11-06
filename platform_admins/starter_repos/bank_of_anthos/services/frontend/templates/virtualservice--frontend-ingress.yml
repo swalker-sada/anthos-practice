@@ -19,7 +19,7 @@ metadata:
   name: frontend-ingress
 spec:
   hosts:
-    - "*"
+    - "BOA_HOSTNAME"
   gateways:
     - frontend-gateway
   http:

@@ -215,6 +215,18 @@ sed -e s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g ${SCRIPT_DIR}/../builds/cloudbuild-sta
 sed -i -e s~AWS_ACCESS_KEY_ID_ENCRYPTED_PASS~"${AWS_ACCESS_KEY_ID_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../builds/cloudbuild-stage.yaml
 sed -i -e s~AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS~"${AWS_SECRET_ACCESS_KEY_ENCRYPTED_PASS_NO_SPACES}"~g ${SCRIPT_DIR}/../builds/cloudbuild-stage.yaml
 
+title_no_wait "Preparing AWS credentials secrets..."
+if [[ $(gcloud secrets describe aws-access-key-id &> /dev/null || echo $?) ]]; then
+  echo $AWS_ACCESS_KEY_ID | gcloud secrets create aws-access-key-id --data-file=-
+else
+  title_no_wait "AWS access key ID secret exists."
+fi
+if [[ $(gcloud secrets describe aws-secret-access-key &> /dev/null || echo $?) ]]; then
+  echo $AWS_SECRET_ACCESS_KEY | gcloud secrets create aws-secret-access-key --data-file=-
+else
+  title_no_wait "AWS secret access key secret exists."
+fi
+
 title_no_wait "Preparing terraform backends and remote state files..."
 
 ENVS="prod stage dev"

@@ -14,3 +14,10 @@
 
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+resources:
+  - ../../templates/service--frontend.yml
+  - ../../templates/configmap--demo-data-config.yml
+  - ../../templates/configmap--environment-config.yml
+  - ../../templates/configmap--service-api-config.yml
+  - ../../templates/secret--jwt-secret.yml

@@ -20,7 +20,7 @@ metadata:
   labels:
     app: accounts-db
 data:
-  POSTGRES_DB: accounts-db
+  POSTGRES_DB: accountsdb
   POSTGRES_USER: accounts-admin
   POSTGRES_PASSWORD: accounts-pwd
-  ACCOUNTS_DB_URI: postgresql://accounts-admin:accounts-pwd@accounts-db:5432/accounts-db
+  ACCOUNTS_DB_URI: cockroachdb://root@crdb.db-crdb:26257/accountsdb

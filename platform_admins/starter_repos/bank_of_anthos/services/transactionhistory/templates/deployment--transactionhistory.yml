@@ -26,11 +26,11 @@ spec:
       labels:
         app: transactionhistory
     spec:
-      serviceAccountName: default
+      serviceAccountName: transactionhistory
       terminationGracePeriodSeconds: 5
       containers:
         - name: transactionhistory
-          image: gcr.io/bank-of-anthos/transactionhistory:v0.3.0
+          image: transactionhistory
           volumeMounts:
             - name: publickey
               mountPath: "/root/.ssh"
@@ -41,9 +41,9 @@ spec:
             - name: PORT
               value: "8080"
             - name: ENABLE_TRACING
-              value: "true"
+              value: "false"
             - name: ENABLE_METRICS
-              value: "true"
+              value: "false"
             - name: POLL_MS
               value: "100"
             - name: CACHE_SIZE
@@ -52,13 +52,13 @@ spec:
               value: "60"
             - name: HISTORY_LIMIT
               value: "100"
-          # tell Java to obey container memory limits
+              # tell Java to obey container memory limits
             - name: JVM_OPTS
               value: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-        #- name: EXTRA_LATENCY_MILLIS
-        #  value: "5000"
-        # Valid levels are debug, info, warn, error, fatal.
-        # If no valid level is set, will default to info.
+            #- name: EXTRA_LATENCY_MILLIS
+            #  value: "5000"
+            # Valid levels are debug, info, warn, error, fatal.
+            # If no valid level is set, will default to info.
             - name: LOG_LEVEL
               value: "info"
             - name: NAMESPACE
@@ -68,7 +68,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: environment-config
-        # add ledger-db credentials from ConfigMap
+            # add ledger-db credentials from ConfigMap
             - configMapRef:
                 name: ledger-db-config
           resources:

@@ -28,15 +28,15 @@ spec:
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
-      serviceAccountName: default
+      serviceAccountName: loadgenerator
       terminationGracePeriodSeconds: 5
       restartPolicy: Always
       containers:
         - name: loadgenerator
-          image: gcr.io/bank-of-anthos/loadgenerator:v0.3.0
+          image: loadgenerator
           env:
             - name: FRONTEND_ADDR
-              value: "frontend:80"
+              value: "frontend.boa-frontend:80"
             - name: USERS
               value: "5"
             - name: LOG_LEVEL

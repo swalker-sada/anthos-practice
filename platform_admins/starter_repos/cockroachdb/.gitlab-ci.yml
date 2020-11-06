@@ -1,0 +1,30 @@
+include:
+  - project: "platform-admins/shared-cd"
+    file: "build-crdb-manifest.yaml"
+  - project: "platform-admins/shared-cd"
+    file: "commit-to-acm.yaml"
+  - project: "platform-admins/shared-cd"
+    file: "crdb-init-job.yaml"
+
+variables:
+  NAMESPACE: "db"
+  APPLICATION: "cockroachdb"
+  SVC: "crdb"
+  SERVICES: "crdb"
+
+stages:
+  - build
+  - commit
+  - initializeDB
+
+crdb-build:
+  stage: build
+  extends: .build-crdb-manifest
+
+commit-to-acm:
+  stage: commit
+  extends: .commit-to-acm
+
+initialize-db:
+  stage: initializeDB
+  extends: .crdb-init-job

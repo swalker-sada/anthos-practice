@@ -25,4 +25,4 @@ spec:
         name: http
         protocol: HTTP
       hosts:
-        - "*"
+        - "BOA_HOSTNAME"

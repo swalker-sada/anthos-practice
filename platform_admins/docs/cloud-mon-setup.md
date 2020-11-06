@@ -89,7 +89,7 @@ If you did [Lab 3: Introduction to Distributed Services](/platform_admins/docs/d
 
     ```
     ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ops/services-dashboard.sh \
-      ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ops/services-dashboard-prod
+    ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ops/services-dashboard-prod.json_tmpl
     ```
 
     Output (do not copy)

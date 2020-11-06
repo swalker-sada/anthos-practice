@@ -1,0 +1,18 @@
+timeout: 3600s
+logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
+tags:
+  - online-boutique-frontend
+steps:
+  - name: "gcr.io/kaniko-project/executor:v1.0.0"
+    id: "build-frontend-image"
+    args:
+      - --destination=gcr.io/${PROJECT_ID}/online-boutique/frontend
+      - --cache=true
+      - --cache-ttl=12h
+  # - name: gcr.io/${PROJECT_ID}/platform-installer
+  #   id: "build-frontend"
+  #   entrypoint: "bash"
+  #   args:
+  #     - -c
+  #     - docker build -t gcr.io/${PROJECT_ID}/online-boutique/frontend .
+  #     - docker push gcr.io/${PROJECT_ID}/online-boutique/frontend

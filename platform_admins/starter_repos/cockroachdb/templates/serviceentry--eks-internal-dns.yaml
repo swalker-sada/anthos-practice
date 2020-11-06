@@ -1,0 +1,54 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: eks-crdb-0-internal-dns
+  namespace: db-crdb
+spec:
+  hosts:
+    - eks-crdb-0.eks-crdb.db-crdb.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+    - number: 26257
+      name: crdbheadless1
+      protocol: TCP
+    - number: 8080
+      name: crdbheadless2
+      protocol: HTTP
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: eks-crdb-1-internal-dns
+  namespace: db-crdb
+spec:
+  hosts:
+    - eks-crdb-1.eks-crdb.db-crdb.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+    - number: 26257
+      name: crdbheadless1
+      protocol: TCP
+    - number: 8080
+      name: crdbheadless2
+      protocol: HTTP
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: eks-crdb-2-internal-dns
+  namespace: db-crdb
+spec:
+  hosts:
+    - eks-crdb-2.eks-crdb.db-crdb.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+    - number: 26257
+      name: crdbheadless1
+      protocol: TCP
+    - number: 8080
+      name: crdbheadless2
+      protocol: HTTP
+  resolution: DNS
+---

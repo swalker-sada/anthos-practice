@@ -1,0 +1,202 @@
+#
+include:
+  - project: "platform-admins/shared-cd"
+    file: "build-container-image.yaml"
+  - project: "platform-admins/shared-cd"
+    file: "build-manifest-file.yaml"
+  - project: "platform-admins/shared-cd"
+    file: "set-workload-identity-cloud-ops.yaml"
+  - project: "platform-admins/shared-cd"
+    file: "commit-to-acm.yaml"
+
+variables:
+  NAMESPACE: "boa"
+  APPLICATION: "bank-of-anthos"
+  USE_OWN_IMAGE: "true"
+  SVC_INGRESS: "frontend"
+  SERVICES: "balancereader contacts frontend ledgerwriter loadgenerator transactionhistory userservice"
+
+stages:
+  - buildContainers
+  - buildConfigs
+  - commitToConfigRepo
+  - setupWorkloadIdentity
+
+balancereader-container:
+  stage: buildContainers
+  only:
+    changes:
+      - src/balancereader/**/*
+      # - services/balancereader/**/*
+      # - .gitlab-ci.yml
+  extends: .build-container-image
+  variables:
+    SVC: "balancereader"
+    DEPLOYMENT: "balancereader"
+
+balancereader-config:
+  stage: buildConfigs
+  only:
+    changes:
+      - src/balancereader/**/*
+      - services/balancereader/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "balancereader"
+    DEPLOYMENT: "balancereader"
+
+contacts-container:
+  stage: buildContainers
+  only:
+    changes:
+      - src/contacts/**/*
+      # - services/contacts/**/*
+      # - .gitlab-ci.yml
+  extends: .build-container-image
+  variables:
+    SVC: "contacts"
+    DEPLOYMENT: "contacts"
+
+contacts-config:
+  stage: buildConfigs
+  only:
+    changes:
+      - src/contacts/**/*
+      - services/contacts/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "contacts"
+    DEPLOYMENT: "contacts"
+
+frontend-container:
+  stage: buildContainers
+  only:
+    changes:
+      - src/frontend/**/*
+      # - services/frontend/**/*
+      # - .gitlab-ci.yml
+  extends: .build-container-image
+  variables:
+    SVC: "frontend"
+    DEPLOYMENT: "frontend"
+
+frontend-config:
+  stage: buildConfigs
+  only:
+    changes:
+      - src/frontend/**/*
+      - services/frontend/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "frontend"
+    DEPLOYMENT: "frontend"
+
+ledgerwriter-container:
+  stage: buildContainers
+  only:
+    changes:
+      - src/ledgerwriter/**/*
+      # - services/ledgerwriter/**/*
+      # - .gitlab-ci.yml
+  extends: .build-container-image
+  variables:
+    SVC: "ledgerwriter"
+    DEPLOYMENT: "ledgerwriter"
+
+ledgerwriter-config:
+  stage: buildConfigs
+  only:
+    changes:
+      - src/ledgerwriter/**/*
+      - services/ledgerwriter/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "ledgerwriter"
+    DEPLOYMENT: "ledgerwriter"
+
+loadgenerator-container:
+  stage: buildContainers
+  only:
+    changes:
+      - src/loadgenerator/**/*
+      # - services/loadgenerator/**/*
+      # - .gitlab-ci.yml
+  extends: .build-container-image
+  variables:
+    SVC: "loadgenerator"
+    DEPLOYMENT: "loadgenerator"
+
+loadgenerator-config:
+  stage: buildConfigs
+  only:
+    changes:
+      - src/loadgenerator/**/*
+      - services/loadgenerator/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "loadgenerator"
+    DEPLOYMENT: "loadgenerator"
+
+transactionhistory-container:
+  stage: buildContainers
+  only:
+    changes:
+      - src/transactionhistory/**/*
+      # - services/transactionhistory/**/*
+      # - .gitlab-ci.yml
+  extends: .build-container-image
+  variables:
+    SVC: "transactionhistory"
+    DEPLOYMENT: "transactionhistory"
+
+transactionhistory-config:
+  stage: buildConfigs
+  only:
+    changes:
+      - src/transactionhistory/**/*
+      - services/transactionhistory/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "transactionhistory"
+    DEPLOYMENT: "transactionhistory"
+
+userservice-container:
+  stage: buildContainers
+  only:
+    changes:
+      - src/userservice/**/*
+      # - services/userservice/**/*
+      # - .gitlab-ci.yml
+  extends: .build-container-image
+  variables:
+    SVC: "userservice"
+    DEPLOYMENT: "userservice"
+
+userservice-config:
+  stage: buildConfigs
+  only:
+    changes:
+      - src/userservice/**/*
+      - services/userservice/**/*
+      - .gitlab-ci.yml
+  extends: .build-manifest-file
+  variables:
+    SVC: "userservice"
+    DEPLOYMENT: "userservice"
+
+commit-to-acm:
+  stage: commitToConfigRepo
+  extends: .commit-to-acm
+
+set-workload-identity:
+  stage: setupWorkloadIdentity
+  only:
+    changes:
+      - wi/*
+  extends: .set-workload-identity-cloud-ops

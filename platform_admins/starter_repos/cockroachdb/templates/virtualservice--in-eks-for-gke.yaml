@@ -1,0 +1,38 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: gke-crdb-0.gke-crdb.db-crdb
+  namespace: db-crdb
+spec:
+  hosts:
+  - gke-crdb-0.gke-crdb.db-crdb
+  http:
+  - route:
+    - destination:
+        host: gke-crdb-0.gke-crdb.db-crdb.global
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: gke-crdb-1.gke-crdb.db-crdb
+  namespace: db-crdb
+spec:
+  hosts:
+  - gke-crdb-1.gke-crdb.db-crdb
+  http:
+  - route:
+    - destination:
+        host: gke-crdb-1.gke-crdb.db-crdb.global
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: gke-crdb-2.gke-crdb.db-crdb
+  namespace: db-crdb
+spec:
+  hosts:
+  - gke-crdb-2.gke-crdb.db-crdb
+  http:
+  - route:
+    - destination:
+        host: gke-crdb-2.gke-crdb.db-crdb.global

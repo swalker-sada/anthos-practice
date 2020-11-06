@@ -5,6 +5,13 @@ platform_admins/builds/cloudbuild-prod.yaml
 platform_admins/builds/cloudbuild-stage.yaml
 platform_admins/builds/cloudbuild.yaml_tmpl_orig
 platform_admins/builds/*-test.yaml
+platform_admins/tests/ob/stage/eks1/cloud-ops-sa-secret.yaml
+platform_admins/tests/ob/stage/gke1/default-ksa.yaml
+
+platform_admins/tests/ops/services-dashboard-prod.json
+
+platform_admins/tests/ob/prod/eks*/cloud-ops-sa-secret.yaml
+platform_admins/tests/ob/prod/gke*/default-ksa.yaml
 
 infrastructure/*/backends/*_backend.tf
 infrastructure/*/states/*_remote_state.tf

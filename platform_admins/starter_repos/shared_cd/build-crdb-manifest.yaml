@@ -1,0 +1,27 @@
+.build-crdb-manifest:
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - echo "${GCP_CICD_SA_KEY}" | base64 -d > ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - cat ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - gcloud auth activate-service-account cicd-sa@${PROJECT_ID}.iam.gserviceaccount.com --key-file=${CI_PROJECT_DIR}/cicd-sa-key.json --project=${PROJECT_ID}
+    - gcloud config set project ${PROJECT_ID}
+    # Get GKE and EKS PROD 1 clusters' ingress
+    - gcloud container clusters get-credentials gke-prod-us-west2a-1 --zone us-west2-a --project ${PROJECT_ID}
+    - export GKE_PROD_1_INGRESS=$(kubectl get -n istio-system service istio-ingressgateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')
+    - gsutil cp -r gs://${PROJECT_ID}/kubeconfig/kubeconfig_eks-prod-us-west2ab-1 ${CI_PROJECT_DIR}/kubeconfig_eks-prod-us-west2ab-1
+    - export AWS_ACCESS_KEY_ID=$(gcloud secrets versions access 1 --secret=aws-access-key-id)
+    - export AWS_SECRET_ACCESS_KEY=$(gcloud secrets versions access 1 --secret=aws-secret-access-key)
+    - export EKS_PROD_1_INGRESS=$(kubectl --kubeconfig=${CI_PROJECT_DIR}/kubeconfig_eks-prod-us-west2ab-1 get -n istio-system service istio-ingressgateway -o json | jq -r '.status.loadBalancer.ingress[0].hostname')
+    - sed -e s/GKE_PROD_1_INGRESS/${GKE_PROD_1_INGRESS}/g ${CI_PROJECT_DIR}/templates/serviceentry--in-eks-for-gke-global.yaml_tmpl > ${CI_PROJECT_DIR}/templates/serviceentry--in-eks-for-gke-global.yaml
+    - sed -e s/EKS_PROD_1_INGRESS/${EKS_PROD_1_INGRESS}/g ${CI_PROJECT_DIR}/templates/serviceentry--in-gke-for-eks-global.yaml_tmpl > ${CI_PROJECT_DIR}/templates/serviceentry--in-gke-for-eks-global.yaml
+    # Create hydrated manifests
+    - mkdir -p ${CI_PROJECT_DIR}/output
+    - cd ${CI_PROJECT_DIR}/prod
+    - kustomize build --load_restrictor none . > ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+    - cat ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/output/*.yaml
+

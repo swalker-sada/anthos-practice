@@ -1,0 +1,2 @@
+# Edit/change this file to kick off the .setup-workload-identity CI job
+setup workload identity

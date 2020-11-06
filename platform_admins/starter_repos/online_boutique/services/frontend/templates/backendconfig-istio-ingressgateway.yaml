@@ -1,0 +1,9 @@
+apiVersion: cloud.google.com/v1beta1
+kind: BackendConfig
+metadata:
+  name: ob-istio-ingress-config
+spec:
+  healthCheck:
+    type: HTTP
+    port: 15020
+    requestPath: /healthz/ready

@@ -23,3 +23,4 @@ commonAnnotations:
 commonLabels:
   cluster: gke-prod-us-west2a-1
   provider: gcp
+  env: prod

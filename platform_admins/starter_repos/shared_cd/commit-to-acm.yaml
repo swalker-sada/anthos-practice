@@ -28,8 +28,12 @@
       for SVC in ${SERVICES}
         do
           export HYDRATED_MANIFEST=${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+          export HYDRATED_INGRESS_MANIFEST=${CI_PROJECT_DIR}/output/${APPLICATION}-${SVC}-ingress-hydrated.yaml
           if [[ -f ${HYDRATED_MANIFEST} ]]; then
             cp ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml ${CI_PROJECT_DIR}/${ACM}/namespaces/${APPLICATION}/${NAMESPACE}-${SVC}/${SVC}-hydrated.yaml
+          fi 
+          if [[ -f ${HYDRATED_INGRESS_MANIFEST} ]]; then
+            cp ${CI_PROJECT_DIR}/output/${APPLICATION}-${SVC}-ingress-hydrated.yaml ${CI_PROJECT_DIR}/${ACM}/namespaces/asm/istio-system/${APPLICATION}-${SVC}-ingress-hydrated.yaml
           fi 
         done
     - cd ${CI_PROJECT_DIR}/${ACM}

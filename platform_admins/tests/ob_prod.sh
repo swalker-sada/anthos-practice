@@ -63,8 +63,8 @@ kubectl create secret generic cloud-ops-sa --from-file=application_default_crede
 kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/eks2/cloud-ops-sa-secret.yaml
 
 # Workload Identity for Cloud-Ops GSA/KSA Mapping
-sed -i "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke1/default-ksa.yaml
-sed -i "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke2/default-ksa.yaml
+sed -e "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke1/default-ksa.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke1/default-ksa.yaml
+sed -e "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke2/default-ksa.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke2/default-ksa.yaml
 
 gcloud iam service-accounts add-iam-policy-binding $GSA \
   --role roles/iam.workloadIdentityUser \

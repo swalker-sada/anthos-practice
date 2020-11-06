@@ -1,0 +1,92 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gke-crdb-0-global
+  namespace: db-crdb
+spec:
+  hosts:
+  # must be of form name.namespace.global
+  - gke-crdb-0.gke-crdb.db-crdb.global
+  # Treat remote cluster services as part of the service mesh
+  # as all clusters in the service mesh share the same root of trust.
+  location: MESH_INTERNAL
+  ports:
+  - name: tcp-cockroachdb
+    number: 26257
+    protocol: TCP
+  - name: cockroachdb-http
+    number: 8080
+    protocol: http
+  resolution: DNS
+  addresses:
+  - 240.0.0.10
+  endpoints:
+  # This is the routable address of the ingress gateway in gke-crdb that
+  # sits in front of eks-crdb.service.. Traffic from the sidecar will be
+  # routed to this address.
+  - address: GKE_PROD_1_INGRESS
+    ports:
+      tcp-cockroachdb: 15443 # Do not change this port value
+      cockroachdb-http: 15443 # Do not change this port value
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gke-crdb-1-global
+  namespace: db-crdb
+spec:
+  hosts:
+  # must be of form name.namespace.global
+  - gke-crdb-1.gke-crdb.db-crdb.global
+  # Treat remote cluster services as part of the service mesh
+  # as all clusters in the service mesh share the same root of trust.
+  location: MESH_INTERNAL
+  ports:
+  - name: tcp-cockroachdb
+    number: 26257
+    protocol: TCP
+  - name: cockroachdb-http
+    number: 8080
+    protocol: http
+  resolution: DNS
+  addresses:
+  - 240.0.0.11
+  endpoints:
+  # This is the routable address of the ingress gateway in gke-crdb that
+  # sits in front of eks-crdb.service.. Traffic from the sidecar will be
+  # routed to this address.
+  - address: GKE_PROD_1_INGRESS
+    ports:
+      tcp-cockroachdb: 15443 # Do not change this port value
+      cockroachdb-http: 15443 # Do not change this port value
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gke-crdb-2-global
+  namespace: db-crdb
+spec:
+  hosts:
+  # must be of form name.namespace.global
+  - gke-crdb-2.gke-crdb.db-crdb.global
+  # Treat remote cluster services as part of the service mesh
+  # as all clusters in the service mesh share the same root of trust.
+  location: MESH_INTERNAL
+  ports:
+  - name: tcp-cockroachdb
+    number: 26257
+    protocol: TCP
+  - name: cockroachdb-http
+    number: 8080
+    protocol: http
+  resolution: DNS
+  addresses:
+  - 240.0.0.12
+  endpoints:
+  # This is the routable address of the ingress gateway in gke-crdb that
+  # sits in front of eks-crdb.service.. Traffic from the sidecar will be
+  # routed to this address.
+  - address: GKE_PROD_1_INGRESS
+    ports:
+      tcp-cockroachdb: 15443 # Do not change this port value
+      cockroachdb-http: 15443 # Do not change this port value

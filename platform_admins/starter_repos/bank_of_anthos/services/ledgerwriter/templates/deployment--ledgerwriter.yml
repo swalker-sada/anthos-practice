@@ -26,11 +26,11 @@ spec:
       labels:
         app: ledgerwriter
     spec:
-      serviceAccountName: default
+      serviceAccountName: ledgerwriter
       terminationGracePeriodSeconds: 5
       containers:
         - name: ledgerwriter
-          image: gcr.io/bank-of-anthos/ledgerwriter:v0.3.0
+          image: ledgerwriter
           volumeMounts:
             - name: publickey
               mountPath: "/root/.ssh"
@@ -41,13 +41,13 @@ spec:
             - name: PORT
               value: "8080"
             - name: ENABLE_TRACING
-              value: "true"
+              value: "false"
             - name: ENABLE_METRICS
-              value: "true"
-         # tell Java to obey container memory limits
+              value: "false"
+              # tell Java to obey container memory limits
             - name: JVM_OPTS
               value: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-        # service level override of log level
+            # service level override of log level
             - name: LOG_LEVEL
               value: "info"
             - name: NAMESPACE
@@ -59,7 +59,7 @@ spec:
                 name: environment-config
             - configMapRef:
                 name: service-api-config
-        # add ledger-db credentials from ConfigMap
+            # add ledger-db credentials from ConfigMap
             - configMapRef:
                 name: ledger-db-config
           resources:

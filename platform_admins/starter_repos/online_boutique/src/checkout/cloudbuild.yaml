@@ -1,0 +1,18 @@
+timeout: 3600s
+logsBucket: "gs://${PROJECT_ID}/logs/cloudbuild"
+tags:
+  - online-boutique-checkout
+steps:
+  - name: "gcr.io/kaniko-project/executor:v1.0.0"
+    id: "build-checkout-image"
+    args:
+      - --destination=gcr.io/${PROJECT_ID}/online-boutique/checkout
+      - --cache=true
+      - --cache-ttl=12h
+  # - name: gcr.io/${PROJECT_ID}/platform-installer
+  #   id: "build-checkout"
+  #   entrypoint: "bash"
+  #   args:
+  #     - -c
+  #     - docker build -t gcr.io/${PROJECT_ID}/online-boutique/checkout .
+  #     - docker push gcr.io/${PROJECT_ID}/online-boutique/checkout

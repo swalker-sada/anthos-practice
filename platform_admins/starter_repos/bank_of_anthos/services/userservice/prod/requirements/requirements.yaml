@@ -16,5 +16,5 @@ service:
   workload: 
     environment: prod
     provider: gcp
-    availability: non-ha
+    availability: ha
     location: us-west

@@ -26,11 +26,11 @@ spec:
       labels:
         app: contacts
     spec:
-      serviceAccountName: default
+      serviceAccountName: contacts
       terminationGracePeriodSeconds: 5
       containers:
         - name: contacts
-          image: gcr.io/bank-of-anthos/contacts:v0.3.0
+          image: contacts
           volumeMounts:
             - name: publickey
               mountPath: "/root/.ssh"
@@ -41,9 +41,9 @@ spec:
             - name: PORT
               value: "8080"
             - name: ENABLE_TRACING
-              value: "true"
-        # Valid levels are debug, info, warning, error, critical.
-        # If no valid level is set, will default to info.
+              value: "false"
+            # Valid levels are debug, info, warning, error, critical.
+            # If no valid level is set, will default to info.
             - name: LOG_LEVEL
               value: "info"
           envFrom:

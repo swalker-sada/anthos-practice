@@ -13,13 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Export a SCRIPT_DIR var and make all links relative to SCRIPT_DIR
+export SCRIPT_DIR=$(dirname $(readlink -f $0 2>/dev/null) 2>/dev/null || echo "${PWD}/$(dirname $0)")
 
-DASHBOARD=$1
+DASHBOARD_JSON_TMPL=$1
 
 # replace project variable
-sed 's/PROJECT_ID/'${GOOGLE_PROJECT}'/g' \
-  ${DASHBOARD}.json_tmpl \
-  > ${DASHBOARD}.json
+sed -e 's/PROJECT_ID/'${GOOGLE_PROJECT}'/g' \
+  ${DASHBOARD_JSON_TMPL} > ${SCRIPT_DIR}/services-dashboard-prod.json
+
+DASHBOARD_JSON=${SCRIPT_DIR}/services-dashboard-prod.json
 
 # get auth token
 # OAUTH_TOKEN=$(gcloud auth application-default print-access-token)

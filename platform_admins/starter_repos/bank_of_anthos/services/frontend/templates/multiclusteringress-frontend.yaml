@@ -1,0 +1,19 @@
+apiVersion: networking.gke.io/v1beta1
+kind: MultiClusterIngress
+metadata:
+  name: boafrontend-istio-mci
+  annotations:
+    networking.gke.io/pre-shared-certs: "bank-managed-ssl-cert"
+spec:
+  template:
+    spec:
+      backend:
+        serviceName: boafrontend-istio-mcs
+        servicePort: 80
+      rules:
+      - host: BOA_HOSTNAME
+        http:
+          paths:
+          - backend:
+              serviceName: boafrontend-istio-mcs
+              servicePort: 80

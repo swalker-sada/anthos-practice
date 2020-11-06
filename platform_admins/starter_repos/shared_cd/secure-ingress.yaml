@@ -25,26 +25,41 @@
     - export GOOGLE_PROJECT=${PROJECT_ID}
     - export GOOGLE_CREDENTIALS=$(cat cicd-sa-key.json)
     # Configure terraform backend, variables and remote state tf files
-    - cd ${CI_PROJECT_DIR}/services/${SVC}/prod/traffic/ingress
+    - cd ${CI_PROJECT_DIR}/services/${SVC}/prod/traffic/dns
     - sed -e s/PROJECT_ID/${PROJECT_ID}/ backend.tf_tmpl > backend.tf
     - sed -e s/PROJECT_ID/${PROJECT_ID}/ variables.tf_tmpl > variables.tf
-    - sed -e s/PROJECT_ID/${PROJECT_ID}/ prod_gcp_gclb_remote_state.tf_tmpl > prod_gcp_gclb_remote_state.tf
+    - sed -e s/PROJECT_ID/${PROJECT_ID}/ prod_gcp_gke_remote_state.tf_tmpl > prod_gcp_gke_remote_state.tf
     # Apply terraform
     - terraform init
     - terraform plan -out terraform.tfplan
     - terraform apply -input=false -lock=false terraform.tfplan
-    # Check autoneg controller successfully  reconciles the backends
-    - gcloud container clusters get-credentials gke-prod-us-west2a-1 --zone us-west2-a --project ${PROJECT_ID}
-    - gcloud container clusters get-credentials gke-prod-us-west2b-2 --zone us-west2-b --project ${PROJECT_ID}
-    - export GKE_PROD_1="gke_${PROJECT_ID}_us-west2-a_gke-prod-us-west2a-1"
-    - export GKE_PROD_2="gke_${PROJECT_ID}_us-west2-b_gke-prod-us-west2b-2"
-    - export AUTONEG_BACKENDS=`gcloud compute backend-services describe prod-istio-ingressgateway-backend-svc --global --format=json | jq '.backends | length'`
+    # Define variables
+    - export BOA_GCLB_IP_ADDRESS=$(terraform output boa-gclb-ip-address)
+    - export GKE_PROD_1_NAME=$(terraform output gke_prod_1_name)
+    - export GKE_PROD_1_LOCATION=$(terraform output gke_prod_1_location)
+    - export GKE_PROD_2_NAME=$(terraform output gke_prod_2_name)
+    - export GKE_PROD_2_LOCATION=$(terraform output gke_prod_2_location)
+    # Prep multiclusteringress
+    - cd ${CI_PROJECT_DIR}/services/${SVC}/prod/traffic/ingress
+    - kustomize edit add annotation networking.gke.io/static-ip:$BOA_GCLB_IP_ADDRESS
+    - sed -e s/PROJECT_ID/${PROJECT_ID}/g multiclusteringress-frontend-patch.yaml_tmpl > multiclusteringress-frontend-patch.yaml
     - |
-      while [ ! $AUTONEG_BACKENDS -eq 2 ]; do
-        echo -e "Current autoneg backend length is $AUTONEG_BACKENDS. This should be 2..."
-        kubectl --context ${GKE_PROD_1} -n istio-system annotate service istio-ingressgateway anthos.cft.dev/autoneg-status-
-        kubectl --context ${GKE_PROD_2} -n istio-system annotate service istio-ingressgateway anthos.cft.dev/autoneg-status-
-        # Sleep for 5 seconds and recheck backend lengths
-        sleep 5 
-        export AUTONEG_BACKENDS=`gcloud compute backend-services describe prod-istio-ingressgateway-backend-svc --global --format=json | jq '.backends | length'`
-      done
+      sed -e s/GKE_PROD_1_LOCATION/$GKE_PROD_1_LOCATION/g \
+        -e s/GKE_PROD_1_NAME/$GKE_PROD_1_NAME/g \
+        -e s/GKE_PROD_2_LOCATION/$GKE_PROD_2_LOCATION/g \
+        -e s/GKE_PROD_2_NAME/$GKE_PROD_2_NAME/g \
+        multiclusterservice-frontend-patch.yaml_tmpl > multiclusterservice-frontend-patch.yaml
+    # Prep gateway and virtualservice
+    - cd ${CI_PROJECT_DIR}/services/${SVC}/prod/traffic/virtualservice
+    - sed -e s/PROJECT_ID/$PROJECT_ID/g gateway-frontend-patch.yaml_tmpl > gateway-frontend-patch.yaml
+    - sed -e s/PROJECT_ID/$PROJECT_ID/g virtualservice-frontend-patch.yaml_tmpl > virtualservice-frontend-patch.yaml
+    # Build traffic manifest
+    - mkdir -p ${CI_PROJECT_DIR}/output
+    - cd ${CI_PROJECT_DIR}/services/${SVC}/prod
+    - kustomize build --load_restrictor none . > ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+    - cat ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/output/*.yaml
+
