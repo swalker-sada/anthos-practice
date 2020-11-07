@@ -23,6 +23,10 @@ Before exploring CockroachDB it is briefly introduced next
 
 ## What is CockroachDB?
 
+CockroachDB is a distributed relational database management system implemeting PostgreSQL semantics. It is an active-active database system that ensures transactional consistency of any transaction across its instances: independent of the instance a transaction is executed, all other instances are transactional updated and consistent.
+
+In context of the Anthos Multicloud Workshop 6 CockroachDB instances are deployed, 3 in the Google Cloud cluster, and 3 in the EKS cluster. All form a single CockroachDB cluster and the database that hosts the data of Bank Of Anthos spans all 6 nodes across the two clusters in the two clouds.
+
 ## Creating a transaction using Bank Of Anthos
 
 ## Connecting to the database using the CLI
