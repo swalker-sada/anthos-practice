@@ -85,6 +85,7 @@ TBD Chris
 TBD Chris
 - show how backup works
 - show how restore works
+- show how data loss looks like if backup did not contain latest changes
 - use bucket
 
 ## Developing a backup strategy
