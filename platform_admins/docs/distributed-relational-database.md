@@ -35,6 +35,8 @@ Before exploring CockroachDB it is briefly introduced next
 
 ## Simulating a node crash
 
+## Simulating a cluster outage
+
 ## Backing up and restoring the database
 
 ## Developing a backup strategy
