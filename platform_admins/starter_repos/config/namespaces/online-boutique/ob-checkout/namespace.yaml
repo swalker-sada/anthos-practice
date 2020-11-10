@@ -16,5 +16,3 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: ob-checkout
-  labels:
-    istio-injection: enabled

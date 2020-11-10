@@ -16,5 +16,3 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: ob-email
-  labels:
-    istio-injection: enabled

@@ -37,6 +37,14 @@ resource "gitlab_group_variable" "platform-admins-ssh-private-key" {
    masked    = false
 }
 
+resource "gitlab_group_variable" "platform-admins-acm-repo" {
+   group     = gitlab_group.platform-admins.id
+   key       = "ACM_REPO_SSH_URL"
+   value     = gitlab_project.anthos-config-management.ssh_url_to_repo
+   protected = false
+   masked    = false
+}
+
 resource "gitlab_group_variable" "ob-repo" {
    group     = gitlab_group.platform-admins.id
    key       = "OB_REPO_SSH_URL"
