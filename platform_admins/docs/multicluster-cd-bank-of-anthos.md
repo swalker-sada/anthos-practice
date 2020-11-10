@@ -124,7 +124,7 @@ git push -u origin main
 Every time you commit to the `bank-of-anthos` repository, you can view the pipeline by accessing the following link. You can also navigate to the same link by clicking on the **CI/CD > Pipelines** link from the left hand nav bar.
 
 ```
-echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog/bank_of_anthos/bank_of_anthos/-/pipelines"
+echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog/bank-of-anthos/bank-of-anthos/-/pipelines"
 ```
 
 Wait until the pipeline successfully completes.
