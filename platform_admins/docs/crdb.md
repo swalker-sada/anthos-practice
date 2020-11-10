@@ -98,7 +98,7 @@ CREATE DATABASE postgresdb;
 1. Import data using the SQL dump files.
 
 ```
-# Import DBs,
+-- Import DBs,
 USE accountsdb;
 IMPORT PGDUMP 'nodelocal://1/dump-accounts-db.sql';
 SHOW TABLES;
