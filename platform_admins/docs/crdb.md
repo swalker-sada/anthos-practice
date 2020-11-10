@@ -26,7 +26,7 @@ git push -u origin main
 
 ## Verify installation
 
-1. Ensure the cockroachdb StatefulSets are _Running_.
+1. Ensure the cockroachdb StatefulSets are _Running_ (it might take a while).
 
 ```
 kubectl --context=${GKE_PROD_1} -n db-crdb get pods
