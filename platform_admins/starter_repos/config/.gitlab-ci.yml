@@ -21,7 +21,7 @@ include:
   - project: "platform-admins/shared-cd"
     file: "prepare-asm-label.yaml"
   - project: "platform-admins/shared-cd"
-    file: "commit-to-acm.yaml"
+    file: "commit-to-config.yaml"
  
 stages:
   - build
@@ -33,4 +33,4 @@ prepare-asm-build:
  
 commit-to-acm:
   stage: commit
-  extends: .commit-to-acm
+  extends: .commit-to-config

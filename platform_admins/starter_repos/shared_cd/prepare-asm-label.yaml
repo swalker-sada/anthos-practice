@@ -30,8 +30,8 @@
     # Gather and apply changes
     - |
       set -x
-      cd namespaces
-      export APPS="bank-of-anthos cockroachdb online-boutique redis"
+      cd ${CI_PROJECT_DIR}/namespaces
+      export APPS="bank-of-anthos cockroachdb online-boutique"
  
       export SERVICES=""
       for APP in ${APPS}
@@ -55,3 +55,7 @@
         mv temp.yaml ${SERVICE}/namespace.yaml
         rm kustomization.yaml
       done
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/namespaces
