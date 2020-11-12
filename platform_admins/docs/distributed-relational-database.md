@@ -35,11 +35,14 @@ TBD Chris to discuss
 
 ## Creating a transaction using Bank Of Anthos
 
-Start the Bank Of Anthos user interface:
+Start the Bank Of Anthos user interface by running this command in gcloud and clicking on the resulting link:
 
 ```
 echo -e "https://bank.endpoints.${GOOGLE_PROJECT}.cloud.goog"
 ```
+
+Once the user interface is up and running, make a deposit and remember the amount, e.g., 5432.00 USD. Later you will lookup this amount in the database directly using a database client.
+
 
 ## Connecting to the database using the CLI
 
