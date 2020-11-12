@@ -18,17 +18,25 @@
 set -e
 
 # Functions
-get_svc_ingress_ip() { 
-    export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer.ingress[].hostname')
-export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
-        while [[ ${ingress_ip} == *"127."*  ]]
-            do 
-                sleep 5
-                echo -e "Waiting for service $2 in cluster $1 to get an IP address..."
-                export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer.ingress[].hostname')
-                export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
-            done
-        echo -e "$2 in cluster $1 has an ip address of ${ingress_ip}."
+# ex: retry "command args" 2 10
+retry() {
+    COMMAND=${1}
+    # Default retry count 5
+    RETRY_COUNT=${2:-5}
+    # Default retry sleep 10s
+    RETRY_SLEEP=${3:-10}
+    COUNT=1
+
+    while [ ${COUNT} -le ${RETRY_COUNT} ]; do
+      ${COMMAND} && break
+      echo "### Count ${COUNT}/${RETRY_COUNT} | Failed Command: ${COMMAND}"
+      if [ ${COUNT} -eq ${RETRY_COUNT} ]; then
+        echo "### Exit Failed: ${COMMAND}"
+        exit 1
+      fi
+      let COUNT=${COUNT}+1
+      sleep ${RETRY_SLEEP}
+    done
 }
 
 # Create bash arrays from lists
@@ -81,10 +89,10 @@ processEKS() {
     exec 1> >(sed "s/^/${EKS} SO: /")
     exec 2> >(sed "s/^/${EKS} SE: /" >&2)
     kubectl --context=eks_${EKS} get po --all-namespaces
-    kubectl --context=eks_${EKS} apply -f istio-system.yaml
-    kubectl --context=eks_${EKS} apply -f cacerts.yaml
-    istioctl --context=eks_${EKS} install -f asm_${EKS}.yaml
-    kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml
+    retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
+    retry "istioctl --context=eks_${EKS} install -f asm_${EKS}.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml"
     istioctl x create-remote-secret --context=eks_${EKS} --name ${EKS} > kubeconfig_secret_${EKS}.yaml
 }
 
@@ -94,10 +102,10 @@ processGKE() {
     exec 2> >(sed "s/^/${IDX} SE: /" >&2)
     kubectl --context=eks_${EKS} get po --all-namespaces
     GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
-    kubectl --context=${GKE_CTX} apply -f istio-system.yaml
-    kubectl --context=${GKE_CTX} apply -f cacerts.yaml
-    istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml
-    kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml
+    retry "kubectl --context=${GKE_CTX} apply -f istio-system.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
+    retry "istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml"
     istioctl x create-remote-secret --context=${GKE_CTX} --name ${GKE_LIST[IDX]} > kubeconfig_secret_${GKE_LIST[IDX]}.yaml
 }
 
@@ -121,21 +129,21 @@ do
     echo -e "##### Kube DNS configmap for ${EKS}... #####\n"
     COREDNS_IP=$(kubectl --context=eks_${EKS} get svc -n istio-system istiocoredns -o jsonpath={.spec.clusterIP})
     echo -e "${EKS_COREDNS_CONFIGMAP}" | sed -e s/COREDNS_IP/$COREDNS_IP/g >> eks_coredns_configmap_${EKS}.yaml
-    kubectl --context=eks_${EKS} apply -f eks_coredns_configmap_${EKS}.yaml
+    retry "kubectl --context=eks_${EKS} apply -f eks_coredns_configmap_${EKS}.yaml"
 
     echo -e "##### Secrets for ${EKS}... #####\n"
     for EKS_SECRET in ${EKS_LIST[@]}
     do
         if [[ ! $EKS == $EKS_SECRET ]]; then
             echo -e "Creating kubeconfig secret in cluster ${EKS_SECRET} for ${EKS}..."
-            kubectl --context=eks_${EKS_SECRET} apply -f kubeconfig_secret_${EKS}.yaml
+            retry "kubectl --context=eks_${EKS_SECRET} apply -f kubeconfig_secret_${EKS}.yaml"
         fi
     done
     for GKE_SECRET_IDX in ${!GKE_LIST[@]}
     do
         echo -e "Creating kubeconfig secret in cluster ${GKE_LIST[GKE_SECRET_IDX]} for ${EKS}..."
         GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[GKE_SECRET_IDX]}_${GKE_LIST[GKE_SECRET_IDX]}
-        kubectl --context=${GKE_CTX} apply -f kubeconfig_secret_${EKS}.yaml
+        retry "kubectl --context=${GKE_CTX} apply -f kubeconfig_secret_${EKS}.yaml"
     done
 done
 
@@ -145,22 +153,20 @@ do
     GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
     COREDNS_IP=$(kubectl --context=${GKE_CTX} get svc -n istio-system istiocoredns -o jsonpath={.spec.clusterIP})
     echo -e "${GKE_KUBEDNS_CONFIGMAP}" | sed -e s/COREDNS_IP/$COREDNS_IP/g >> gke_kubedns_configmap_${GKE_CTX}.yaml
-    kubectl --context=${GKE_CTX} apply -f gke_kubedns_configmap_${GKE_CTX}.yaml
+    retry "kubectl --context=${GKE_CTX} apply -f gke_kubedns_configmap_${GKE_CTX}.yaml"
 
     echo -e "##### Secrets for ${GKE_LIST[IDX]}... #####\n"
     for EKS_SECRET in ${EKS_LIST[@]}
     do
         echo -e "Creating kubeconfig secret in cluster ${EKS_SECRET} for ${GKE_LIST[IDX]}..."
-        kubectl --context=eks_${EKS_SECRET} apply -f \
-          kubeconfig_secret_${GKE_LIST[IDX]}.yaml
+        retry "kubectl --context=eks_${EKS_SECRET} apply -f kubeconfig_secret_${GKE_LIST[IDX]}.yaml"
     done
     for GKE_SECRET_IDX in ${!GKE_LIST[@]}
     do
         if [[ ! ${GKE_LIST[IDX]} == ${GKE_LIST[GKE_SECRET_IDX]} ]]; then
             echo -e "Creating kubeconfig secret in cluster ${GKE_LIST[GKE_SECRET_IDX]} for ${GKE_LIST[IDX]}..."
             GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[GKE_SECRET_IDX]}_${GKE_LIST[GKE_SECRET_IDX]}
-            kubectl --context=${GKE_CTX} apply -f \
-              kubeconfig_secret_${GKE_LIST[IDX]}.yaml
+            retry "kubectl --context=${GKE_CTX} apply -f kubeconfig_secret_${GKE_LIST[IDX]}.yaml"
         fi
     done
 done
