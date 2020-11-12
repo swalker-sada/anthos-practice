@@ -35,9 +35,11 @@ TBD Chris to discuss
 
 ## Creating a transaction using Bank Of Anthos
 
-TBD Chris
-- guide student through UI
-- ask student to type in easily recognizable transaction amount
+Start the Bank Of Anthos user interface:
+
+```
+echo -e "https://bank.endpoints.${GOOGLE_PROJECT}.cloud.goog"
+```
 
 ## Connecting to the database using the CLI
 
