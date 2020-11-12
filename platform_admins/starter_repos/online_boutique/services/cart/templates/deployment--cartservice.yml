@@ -30,13 +30,15 @@ spec:
       serviceAccount: cart
       terminationGracePeriodSeconds: 5
       containers:
-        - name: server
-          image: gcr.io/google-samples/microservices-demo/cartservice:v0.2.0
+        - name: cart
+          # image: gcr.io/google-samples/microservices-demo/cartservice:v0.2.0
+          image: cart
           ports:
             - containerPort: 7070
           env:
             - name: REDIS_ADDR
-              value: "redis.ob-redis:6379"
+              # value: "redis.ob-redis:6379"
+              value: "gke-redis-0.gke-redis.db-redis:6379,gke-redis-1.gke-redis.db-redis:6379,gke-redis-2.gke-redis.db-redis:6379,eks-redis-0.eks-redis.db-redis:6379,eks-redis-1.eks-redis.db-redis:6379,eks-redis-2.eks-redis.db-redis:6379"
             - name: PORT
               value: "7070"
             - name: LISTEN_ADDR

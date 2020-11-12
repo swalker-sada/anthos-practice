@@ -1,0 +1,90 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gke-redis-0-global
+spec:
+  hosts:
+  # must be of form name.namespace.global
+  - gke-redis-0.gke-redis.db-redis.global
+  # Treat remote cluster services as part of the service mesh
+  # as all clusters in the service mesh share the same root of trust.
+  location: MESH_INTERNAL
+  ports:
+  - name: tcp-client
+    number: 6379
+    protocol: TCP
+  - name: tcp-gossip
+    number: 16379
+    protocol: TCP
+  resolution: DNS
+  addresses:
+  - 240.0.0.20
+  endpoints:
+  # This is the routable address of the ingress gateway in eks-redis that
+  # sits in front of eks-redis.service.. Traffic from the sidecar will be
+  # routed to this address.
+  - address: gke-redis-0.gke-redis.db-redis.svc.cluster.local
+    ports:
+      tcp-client: 6379 # Do not change this port value
+      tcp-gossip: 16379 # Do not change this port value
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gke-redis-1-global
+spec:
+  hosts:
+  # must be of form name.namespace.global
+  - gke-redis-1.gke-redis.db-redis.global
+  # Treat remote cluster services as part of the service mesh
+  # as all clusters in the service mesh share the same root of trust.
+  location: MESH_INTERNAL
+  ports:
+  - name: tcp-client
+    number: 6379
+    protocol: TCP
+  - name: tcp-gossip
+    number: 16379
+    protocol: TCP
+  resolution: DNS
+  addresses:
+  - 240.0.0.21
+  endpoints:
+  # This is the routable address of the ingress gateway in eks-redis that
+  # sits in front of eks-redis.service.. Traffic from the sidecar will be
+  # routed to this address.
+  - address: gke-redis-1.gke-redis.db-redis.svc.cluster.local
+    ports:
+      tcp-client: 6379 # Do not change this port value
+      tcp-gossip: 16379 # Do not change this port value
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gke-redis-2-global
+spec:
+  hosts:
+  # must be of form name.namespace.global
+  - gke-redis-2.gke-redis.db-redis.global
+  # Treat remote cluster services as part of the service mesh
+  # as all clusters in the service mesh share the same root of trust.
+  location: MESH_INTERNAL
+  ports:
+  - name: tcp-client
+    number: 6379
+    protocol: TCP
+  - name: tcp-gossip
+    number: 16379
+    protocol: TCP
+  resolution: DNS
+  addresses:
+  - 240.0.0.22
+  endpoints:
+  # This is the routable address of the ingress gateway in eks-redis that
+  # sits in front of eks-redis.service.. Traffic from the sidecar will be
+  # routed to this address.
+  - address: gke-redis-2.gke-redis.db-redis.svc.cluster.local
+    ports:
+      tcp-client: 6379 # Do not change this port value
+      tcp-gossip: 16379 # Do not change this port value

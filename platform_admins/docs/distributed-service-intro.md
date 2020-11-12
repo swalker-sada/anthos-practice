@@ -16,7 +16,7 @@ A [Distributed Service](https://medium.com/google-cloud/gke-multi-cluster-life-c
 Deploy `frontend` distributed service to GKE and an EKS cluster. When you follow the steps in the [Deploying Online Boutique application](/platform_admins/docs/multicluster-networking.md), `frontend` is deployed only on ${GKE_PROD_1} cluster. In this guide, you add the `frontend` service to the ${EKS_PROD_1} cluster.
 
 1. Access the Online Boutique application by navigating to the `istio-ingressgateway` load balancer public IP address in ${GKE_PROD_1} cluster.
-```
+```bash
 source ${WORKDIR}/vars.sh
 kubectl --context ${GKE_PROD_1} get -n istio-system service istio-ingressgateway -o json | jq -r '.status.loadBalancer.ingress[0].ip'
 ```
@@ -24,14 +24,14 @@ kubectl --context ${GKE_PROD_1} get -n istio-system service istio-ingressgateway
 The `frontend` Deployment is currently running on the ${GKE_PROD_1} cluster. Navigate through the application by browsing items, adding them to cart, and checking out. You see a **Google Cloud** banner on every page. The banner represents the location of the `frontend` Deployment.
 
 1. Deploy `frontend` to the ${EKS_PROD_1} cluster.
-```
+```bash
 kubectl ctx ${EKS_PROD_1}
 kubectl ns ob-prod
 kubectl apply -f ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ob/frontend-deployment-aws.yaml
 ```
 
 1. Wait a few moments until the `frontend` Pod is *Running*.
-```
+```bash
 kubectl get pods
 ```
 
@@ -54,7 +54,7 @@ frontend-88f5c79cd-pwpbl           2/2     **Running**   0          49s
 You can view the Envoy proxy-configs for any Pod running in the mesh. You can view the IP addresses of endpoints for all services in the Envoy proxy-config.
 
 1. In the `istio-ingressgateway` Pod in ${GKE_PROD_1} running in the `istio-system` namespace, validate the `frontend` service has two endpoint IP addresses.
-```
+```bash
 export GKE_1_INGRESSGATEWAY_POD=$(kubectl get pod -n istio-system -l istio=ingressgateway --context=${GKE_PROD_1} -o jsonpath='{.items[0].metadata.name}')
 istioctl --context ${GKE_PROD_1} -n istio-system proxy-config endpoints ${GKE_1_INGRESSGATEWAY_POD} | grep "outbound|80||frontend.ob-prod.svc.cluster.local"
 ```
@@ -70,7 +70,7 @@ The `istio-ingressgateway` Pod sees two endpoint IP addresses for the `frontend`
 You can verify this by doing a `nslookup` on the `istio-ingressgateway` ELB hostname.
 
 1. Validate the IP address of the `istio-ingressgateway` service running in the ${EKS_PROD_1} cluster.
-```
+```bash
 export EKS_1_INGRESSGATEWAY_HOSTNAME=$(kubectl get svc -n istio-system -l istio=ingressgateway --context=${EKS_PROD_1} -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')
 nslookup ${EKS_1_INGRESSGATEWAY_HOSTNAME}
 ```

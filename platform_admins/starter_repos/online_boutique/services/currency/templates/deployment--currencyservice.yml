@@ -30,8 +30,9 @@ spec:
       serviceAccount: currency
       terminationGracePeriodSeconds: 5
       containers:
-        - name: server
-          image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.0
+        - name: currency
+          # image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.0
+          image: currency
           ports:
             - name: grpc
               containerPort: 7000

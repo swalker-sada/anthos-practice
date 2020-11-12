@@ -1,0 +1,45 @@
+.build-redis-manifest:
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - echo "${GCP_CICD_SA_KEY}" | base64 -d > ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - cat ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - gcloud auth activate-service-account cicd-sa@${PROJECT_ID}.iam.gserviceaccount.com --key-file=${CI_PROJECT_DIR}/cicd-sa-key.json --project=${PROJECT_ID}
+    - gcloud config set project ${PROJECT_ID}
+    # Set terraform creds
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export GOOGLE_CREDENTIALS=$(cat ${CI_PROJECT_DIR}/cicd-sa-key.json)
+    # Get GKE and EKS cluster details
+    - |
+      cd ${CI_PROJECT_DIR}/prod/service/tf
+        sed -e s/PROJECT_ID/${PROJECT_ID}/ prod_aws_eks_remote_state.tf_tmpl > prod_aws_eks_remote_state.tf
+        sed -e s/PROJECT_ID/${PROJECT_ID}/ prod_gcp_gke_remote_state.tf_tmpl > prod_gcp_gke_remote_state.tf
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+        export GKE_PROD_1_NAME=$(terraform output gke_prod_1_name)
+        export GKE_PROD_1_LOCATION=$(terraform output gke_prod_1_location)
+        export GKE_PROD_2_NAME=$(terraform output gke_prod_2_name)
+        export GKE_PROD_2_LOCATION=$(terraform output gke_prod_2_location)
+        export EKS_PROD_1_NAME=$(terraform output eks_prod_1_name)
+        export EKS_PROD_2_NAME=$(terraform output eks_prod_1_name)
+    # Get GKE and EKS PROD 1 clusters' ingress
+    - gcloud container clusters get-credentials ${GKE_PROD_1_NAME} --zone ${GKE_PROD_1_LOCATION} --project ${PROJECT_ID}
+    - export GKE_PROD_1_INGRESS=$(kubectl get -n istio-system service istio-ingressgateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')
+    - gsutil cp -r gs://${PROJECT_ID}/kubeconfig/kubeconfig_${EKS_PROD_1_NAME} ${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_1_NAME}
+    - export AWS_ACCESS_KEY_ID=$(gcloud secrets versions access 1 --secret=aws-access-key-id)
+    - export AWS_SECRET_ACCESS_KEY=$(gcloud secrets versions access 1 --secret=aws-secret-access-key)
+    - export EKS_PROD_1_INGRESS=$(kubectl --kubeconfig=${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_1_NAME} get -n istio-system service istio-ingressgateway -o json | jq -r '.status.loadBalancer.ingress[0].hostname')
+    - sed -e s/GKE_PROD_1_INGRESS/${GKE_PROD_1_INGRESS}/g ${CI_PROJECT_DIR}/templates/serviceentry-in-eks-for-gke-redis-global.yaml_tmpl > ${CI_PROJECT_DIR}/templates/serviceentry-in-eks-for-gke-redis-global.yaml
+    - sed -e s/EKS_PROD_1_INGRESS/${EKS_PROD_1_INGRESS}/g ${CI_PROJECT_DIR}/templates/serviceentry-in-eks2-for-eks1-redis-global.yaml_tmpl > ${CI_PROJECT_DIR}/templates/serviceentry-in-eks2-for-eks1-redis-global.yaml
+    - sed -e s/EKS_PROD_1_INGRESS/${EKS_PROD_1_INGRESS}/g ${CI_PROJECT_DIR}/templates/serviceentry-in-gke-for-eks-redis-global.yaml_tmpl > ${CI_PROJECT_DIR}/templates/serviceentry-in-gke-for-eks-redis-global.yaml
+    - sed -e s/GKE_PROD_1_INGRESS/${GKE_PROD_1_INGRESS}/g ${CI_PROJECT_DIR}/templates/serviceentry-in-gke2-for-gke1-redis-global.yaml_tmpl > ${CI_PROJECT_DIR}/templates/serviceentry-in-gke2-for-gke1-redis-global.yaml
+    # Create hydrated manifests
+    - mkdir -p ${CI_PROJECT_DIR}/output
+    - cd ${CI_PROJECT_DIR}/prod
+    - kustomize build --load_restrictor none . > ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+    - cat ${CI_PROJECT_DIR}/output/${SVC}-hydrated.yaml
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/output/*.yaml

@@ -474,3 +474,11 @@ With the setup complete, you can proceed with the following labs.
 #### [Lab 5: Add a New Cluster](/platform_admins/docs/add-cluster.md)
 
 > "I, platform administrator, want to add a new cluster to my multi-cloud environment"
+
+#### [Lab 6: Deploying an application using CI/CD Pipeline - Online Boutique](/platform_admins/docs/multicluster-cd-online-boutique.md)
+
+> "I, platform administrator, want to deploy a multicloud application (Online Boutique) using CI/CD pipeline"
+
+#### [Lab 7: Deploying an application using CI/CD Pipeline - Bank of Anthos](/platform_admins/docs/multicluster-cd-bank-of-anthos.md)
+
+> "I, platform administrator, want to deploy a multicloud application (Bank of Anthos) using CI/CD pipeline"

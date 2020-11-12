@@ -1,0 +1,12 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: frontend-gateway
+spec:
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "shop.endpoints.PROJECT_ID.cloud.goog"

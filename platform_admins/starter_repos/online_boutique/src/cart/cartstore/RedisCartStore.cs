@@ -44,7 +44,8 @@ namespace cartservice.cartstore
             // Serialize empty cart into byte array.
             var cart = new Hipstershop.Cart();
             emptyCartBytes = cart.ToByteArray();
-            connectionString = $"{redisAddress},ssl=false,allowAdmin=true,connectRetry=5";
+            // connectionString = $"{redisAddress},ssl=false,allowAdmin=true,connectRetry=5";
+            connectionString = $"{redisAddress}";
 
             redisConnectionOptions = ConfigurationOptions.Parse(connectionString);
 

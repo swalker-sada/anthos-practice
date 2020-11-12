@@ -1,0 +1,19 @@
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: obfrontend-istio-mcs
+  annotations:
+    beta.cloud.google.com/backend-config: '{"ports": {"80":"ob-istio-ingress-config"}}'
+spec:
+  template:
+    spec:
+      selector:
+        app: istio-ingressgateway
+      ports:
+      - name: obfrontend
+        protocol: TCP
+        port: 80
+        targetPort: 8080
+  clusters:
+  - link: "GKE_PROD_1_LOCATION/GKE_PROD_1_NAME"
+  - link: "GKE_PROD_2_LOCATION/GKE_PROD_2_NAME"

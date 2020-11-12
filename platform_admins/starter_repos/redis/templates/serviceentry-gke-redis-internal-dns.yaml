@@ -1,0 +1,51 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gke-redis-0-internal-dns
+spec:
+  hosts:
+    - gke-redis-0.gke-redis.db-redis.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+    - number: 6379
+      name: tcp-client
+      protocol: TCP
+    - number: 16379
+      name: tcp-gossip
+      protocol: TCP
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gke-redis-1-internal-dns
+spec:
+  hosts:
+    - gke-redis-1.gke-redis.db-redis.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+    - number: 6379
+      name: tcp-client
+      protocol: TCP
+    - number: 16379
+      name: tcp-gossip
+      protocol: TCP
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gke-redis-2-internal-dns
+spec:
+  hosts:
+    - gke-redis-2.gke-redis.db-redis.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+    - number: 6379
+      name: tcp-client
+      protocol: TCP
+    - number: 16379
+      name: tcp-gossip
+      protocol: TCP
+  resolution: DNS
+---
