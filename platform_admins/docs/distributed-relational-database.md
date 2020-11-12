@@ -46,11 +46,61 @@ Once the user interface is up and running, make a deposit and remember the amoun
 
 ## Connecting to the database using the CLI
 
-TBD Chris
-- show that access location does not matter
-- command line connection
-    - connect to service
-    - connect to specific pod
+Determine the pods running CockroachDB on GKE by executing this command in gcloud:
+
+```
+kubectl --context=${GKE_PROD_1} -n db-crdb get pods
+```
+
+Open a command line to pod _gke-crdb-1_ as follows in glcloud:
+
+```
+kubectl exec -it gke-crdb-1 -- bash
+cockroach sql --insecure --host=crdb
+```
+Now you can run database commands. To show all databases run
+
+```
+show databases;
+```
+
+Select _postgresdb_:
+
+```
+use postgresdb;
+```
+
+Show all tables in that database:
+
+```
+show tables;
+```
+
+Show the schema of _transactions_:
+
+```
+\d transactions;
+```
+
+And finally, find the transaction that you executed in the user interface. First, select the 10 most recent transactions:
+
+```
+select * from transactions order by timestamp desc limit 10;
+```
+
+As you can see, the amount is stored in USD times 100. So to find your transaction run
+
+```
+select * from transactions where amount = 543200;
+```
+
+In case you want to verify the time (as the database might run in a different time zone from you) run
+
+```
+select now();
+```
+
+The time shows the current time and your interface interaction might have been a few minutes earlier.
 
 ## Connecting to the database using an IDE
 
