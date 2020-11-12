@@ -34,7 +34,7 @@ spec:
       terminationGracePeriodSeconds: 5
       restartPolicy: Always
       containers:
-        - name: main
+        - name: loadgenerator
           image: gcr.io/google-samples/microservices-demo/loadgenerator:v0.2.0
           env:
             - name: FRONTEND_ADDR

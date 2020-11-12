@@ -21,7 +21,7 @@ spec:
     spec:
       serviceAccountName: frontend
       containers:
-        - name: server
+        - name: frontend
           env:
             - name: ENV_PLATFORM
               value: aws

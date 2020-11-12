@@ -1,0 +1,36 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: eks-redis-0.eks-redis.db-redis
+spec:
+  hosts:
+  - eks-redis-0.eks-redis.db-redis
+  http:
+  - route:
+    - destination:
+        host: eks-redis-0.eks-redis.db-redis.global
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: eks-redis-1.eks-redis.db-redis
+spec:
+  hosts:
+  - eks-redis-1.eks-redis.db-redis
+  http:
+  - route:
+    - destination:
+        host: eks-redis-1.eks-redis.db-redis.global
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: eks-redis-2.eks-redis.db-redis
+spec:
+  hosts:
+  - eks-redis-2.eks-redis.db-redis
+  http:
+  - route:
+    - destination:
+        host: eks-redis-2.eks-redis.db-redis.global
+

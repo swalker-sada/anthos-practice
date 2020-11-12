@@ -1,0 +1,7 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: frontend-ingress
+spec:
+  hosts:
+    - "shop.endpoints.PROJECT_ID.cloud.goog"

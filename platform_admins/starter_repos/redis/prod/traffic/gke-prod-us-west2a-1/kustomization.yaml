@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+nameSuffix: "-gke-prod-us-west2a-1"
+
+resources:
+  - ../../../templates/virtualservice-in-gke-for-eks-redis.yaml
+
+commonAnnotations:
+  configmanagement.gke.io/cluster-selector: gke-prod-us-west2a-1
+
+commonLabels:
+  provider: gcp
+  cluster: gke-prod-us-west2a-1

@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: gke-redis-0.gke-redis.db-redis
+spec:
+  hosts:
+  - gke-redis-0.gke-redis.db-redis
+  http:
+  - route:
+    - destination:
+        host: gke-redis-0.gke-redis.db-redis.global
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: gke-redis-1.gke-redis.db-redis
+spec:
+  hosts:
+  - gke-redis-1.gke-redis.db-redis
+  http:
+  - route:
+    - destination:
+        host: gke-redis-1.gke-redis.db-redis.global
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: gke-redis-2.gke-redis.db-redis
+spec:
+  hosts:
+  - gke-redis-2.gke-redis.db-redis
+  http:
+  - route:
+    - destination:
+        host: gke-redis-2.gke-redis.db-redis.global

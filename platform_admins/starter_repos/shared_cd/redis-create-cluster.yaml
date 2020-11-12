@@ -1,0 +1,72 @@
+.redis-cluster-create:
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - echo "${GCP_CICD_SA_KEY}" | base64 -d > ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - cat ${CI_PROJECT_DIR}/cicd-sa-key.json
+    - gcloud auth activate-service-account cicd-sa@${PROJECT_ID}.iam.gserviceaccount.com --key-file=${CI_PROJECT_DIR}/cicd-sa-key.json --project=${PROJECT_ID}
+    - gcloud config set project ${PROJECT_ID}
+    # Set terraform creds
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export GOOGLE_CREDENTIALS=$(cat ${CI_PROJECT_DIR}/cicd-sa-key.json)
+    # Get GKE and EKS cluster details
+    - |
+      cd ${CI_PROJECT_DIR}/prod/service/tf
+        sed -e s/PROJECT_ID/${PROJECT_ID}/ prod_aws_eks_remote_state.tf_tmpl > prod_aws_eks_remote_state.tf
+        sed -e s/PROJECT_ID/${PROJECT_ID}/ prod_gcp_gke_remote_state.tf_tmpl > prod_gcp_gke_remote_state.tf
+        terraform init
+        terraform plan -out terraform.tfplan
+        terraform apply -input=false -lock=false terraform.tfplan
+        export GKE_PROD_1_NAME=$(terraform output gke_prod_1_name)
+        export GKE_PROD_1_LOCATION=$(terraform output gke_prod_1_location)
+        export GKE_PROD_2_NAME=$(terraform output gke_prod_2_name)
+        export GKE_PROD_2_LOCATION=$(terraform output gke_prod_2_location)
+        export EKS_PROD_1_NAME=$(terraform output eks_prod_1_name)
+        export EKS_PROD_2_NAME=$(terraform output eks_prod_1_name)
+    # Get GKE and EKS PROD 1 clusters' ingress
+    - gcloud container clusters get-credentials ${GKE_PROD_1_NAME} --zone ${GKE_PROD_1_LOCATION} --project ${PROJECT_ID}
+    - |
+      export exit_code=1
+      while [ ! " ${exit_code} " -eq 0 ]; do 
+        kubectl -n db-redis wait --for condition=ready --timeout=300s pod gke-redis-0
+        export exit_code=$?
+      done
+    - |
+      export exit_code=1
+      while [ ! " ${exit_code} " -eq 0 ]; do 
+        kubectl -n db-redis wait --for condition=ready --timeout=300s pod gke-redis-1
+        export exit_code=$?
+      done
+    - |
+      export exit_code=1
+      while [ ! " ${exit_code} " -eq 0 ]; do 
+        kubectl -n db-redis wait --for condition=ready --timeout=300s pod gke-redis-2
+        export exit_code=$?
+      done
+    - gsutil cp -r gs://${PROJECT_ID}/kubeconfig/kubeconfig_${EKS_PROD_1_NAME} ${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_1_NAME}
+    - export AWS_ACCESS_KEY_ID=$(gcloud secrets versions access 1 --secret=aws-access-key-id)
+    - export AWS_SECRET_ACCESS_KEY=$(gcloud secrets versions access 1 --secret=aws-secret-access-key)
+    - |
+      export exit_code=1
+      while [ ! " ${exit_code} " -eq 0 ]; do 
+        kubectl --kubeconfig=${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_1_NAME} -n db-redis wait --for condition=ready --timeout=300s pod eks-redis-0
+        export exit_code=$?
+      done
+    - |
+      export exit_code=1
+      while [ ! " ${exit_code} " -eq 0 ]; do 
+        kubectl --kubeconfig=${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_1_NAME} -n db-redis wait --for condition=ready --timeout=300s pod eks-redis-1
+        export exit_code=$?
+      done
+    - |
+      export exit_code=1
+      while [ ! " ${exit_code} " -eq 0 ]; do 
+        kubectl --kubeconfig=${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_1_NAME} -n db-redis wait --for condition=ready --timeout=300s pod eks-redis-2
+        export exit_code=$?
+      done
+    - export CLUSTER_NODES=$(kubectl -n db-redis exec -it gke-redis-0 -- redis-cli cluster nodes | wc -l)
+    - |
+      if [[ ! ${CLUSTER_NODES} == 6 ]]; then
+        kubectl -n db-redis exec -it gke-redis-0 -- redis-cli --cluster create --verbose --cluster-replicas 1 240.0.0.20:6379 240.0.0.21:6379 240.0.0.22:6379 240.0.0.10:6379 240.0.0.11:6379 240.0.0.12:6379 --cluster-yes
+      else echo -e "Cluster is already created."
+      fi

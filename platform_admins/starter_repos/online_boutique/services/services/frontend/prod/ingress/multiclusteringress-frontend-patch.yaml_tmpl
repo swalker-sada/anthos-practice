@@ -1,0 +1,17 @@
+apiVersion: networking.gke.io/v1beta1
+kind: MultiClusterIngress
+metadata:
+  name: obfrontend-istio-mci
+spec:
+  template:
+    spec:
+      backend:
+        serviceName: obfrontend-istio-mcs
+        servicePort: 80
+      rules:
+      - host: shop.endpoints.PROJECT_ID.cloud.goog
+        http:
+          paths:
+          - backend:
+              serviceName: obfrontend-istio-mcs
+              servicePort: 80

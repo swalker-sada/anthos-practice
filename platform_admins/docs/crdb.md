@@ -2,6 +2,36 @@
 
 1. Deploy a CockroachDB database on GKE ($GKE_PROD_1) and EKS ($EKS_PROD_1) clusters. You deploy a 6 [node](https://www.cockroachlabs.com/docs/v20.1/architecture/overview.html#terms) cluster with 3 nodes in each cluster running as [StatefulSets](https://kubernetes.io/docs/concepts/workloads/controllers/StatefulSet/).
 
+```mermaid
+%%{init: { 'theme': 'default' } }%%
+graph TD
+classDef eks fill:#F2ECE8,stroke:#333,stroke-width:1px;
+classDef ns fill:#99C4C8,color:#fff,stroke:#333,stroke-width:1px;
+classDef gke fill:#C3E5E9,stroke:#333,stroke-width:1px;
+classDef pod fill:#E7ECEF,stroke:#333,stroke-width:1px;
+
+subgraph crdb[CockroachDB Cluster]
+    subgraph GKE
+        subgraph db-crdb-gke[db-crdb namespace]
+            gke-crdb-0
+            gke-crdb-1
+            gke-crdb-2
+        end
+    end
+    subgraph EKS[EKS Prod 1]
+        subgraph db-crdb-eks[db-crdb namespace]
+            eks-crdb-0
+            eks-crdb-1
+            eks-crdb-2
+        end
+    end   
+end
+
+class GKE gke;
+class EKS eks;
+class db-crdb-gke,db-crdb-eks pod;
+```
+
 ## Prerequisite
 
 1. Initial workshop build completed successfully (using the `build.sh` script).
@@ -13,7 +43,7 @@
 
 1. Run the following set of commands to initialize the `cockroachdb` repository in Gitlab. Committing to this repository will initiate the CD pipeline which deploys cockroackdb cluster on the two Kubernetes clusters.
 
-```
+```bash
 cd ${WORKDIR}
 git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:databases/cockroachdb.git
 cd ${WORKDIR}/cockroachdb
@@ -24,11 +54,22 @@ git branch -m master main
 git push -u origin main
 ```
 
+Upon committing to the `cockroachdb` repo, a CI/CD pipeline is triggered which deploys the CockroachDB cluster on `$GKE_PROD_1` (three nodes) and `$EKS_PROD_1` (three nodes) clusters.
+
+1. You can view the CI/CD pipeline by navigating to the output of the following link.
+
+```bash
+echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog/databases/cockroachdb/-/pipelines" 
+```
+
+1. Wait until the pipeline finishes successfully.
+
+
 ## Verify installation
 
 1. Ensure the cockroachdb StatefulSets are _Running_.
 
-```
+```bash
 kubectl --context=${GKE_PROD_1} -n db-crdb get pods
 kubectl --context=${EKS_PROD_1} -n db-crdb get pods
 ```
@@ -55,7 +96,7 @@ eks-crdb-2   2/2     Running   0          62m
 
 1. Log into the cockroachdb admin UI.
 
-```
+```bash
 kubectl --context=${GKE_PROD_1} -n db-crdb port-forward gke-crdb-0 9080:8080 &
 ```
 
@@ -73,7 +114,7 @@ kubectl --context=${GKE_PROD_1} -n db-crdb port-forward gke-crdb-0 9080:8080 &
 
 1. Copy the SQL dump files to one of the cockroachdb nodes.
 
-```
+```bash
 kubectl ctx ${GKE_PROD_1}
 kubectl ns db-crdb
 kubectl exec -it gke-crdb-0 -- mkdir -p /cockroach/cockroach-data/extern
@@ -83,22 +124,21 @@ kubectl cp ${WORKDIR}/cockroachdb/templates/dump-postgresdb.sql gke-crdb-0:/cock
 
 1. Log in to the `gke-crdb-0` node.
 
-```
-kubectl exec -it gke-crdb-0 -- bash
-cockroach sql --insecure --host=crdb
+```bash
+kubectl exec -it gke-crdb-0 -- cockroach sql --insecure --host=crdb
 ```
 
 1. Create two databases. Bank of Anthos app uses two databases named `accountsdb` and `postgresdb`.
 
-```
+```sql
 CREATE DATABASE accountsdb;
 CREATE DATABASE postgresdb;
 ```
 
 1. Import data using the SQL dump files.
 
-```
-# Import DBs,
+```sql
+-- Import DBs
 USE accountsdb;
 IMPORT PGDUMP 'nodelocal://1/dump-accounts-db.sql';
 SHOW TABLES;
@@ -113,9 +153,8 @@ SELECT * FROM transactions;
 
 1. Exit out of the node.
 
-```
+```bash
 \q
-exit
 ```
 
 #### [Back to Bank of Anthos application deployment](platform_admins/docs/multicluster-cd-bank-of-anthos.md)

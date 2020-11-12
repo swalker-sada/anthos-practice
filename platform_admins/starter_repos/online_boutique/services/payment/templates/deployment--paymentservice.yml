@@ -30,8 +30,9 @@ spec:
       serviceAccount: payment
       terminationGracePeriodSeconds: 5
       containers:
-        - name: server
-          image: gcr.io/google-samples/microservices-demo/paymentservice:v0.2.0
+        - name: payment
+          # image: gcr.io/google-samples/microservices-demo/paymentservice:v0.2.0
+          image: payment
           ports:
             - containerPort: 50051
           env:

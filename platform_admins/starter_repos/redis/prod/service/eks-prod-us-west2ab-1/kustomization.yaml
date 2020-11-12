@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+nameSuffix: "-eks-prod-us-west2ab-1"
+
+resources:
+  - ../../../templates/serviceentry-eks-redis-internal-dns.yaml
+  - ../../../templates/serviceentry-in-eks-for-gke-redis-global.yaml
+  - ../../../templates/serviceentry-in-eks1-for-eks1-global.yaml
+
+commonAnnotations:
+  configmanagement.gke.io/cluster-selector: eks-prod-us-west2ab-1
+
+commonLabels:
+  provider: aws
+  cluster: eks-prod-us-west2ab-1

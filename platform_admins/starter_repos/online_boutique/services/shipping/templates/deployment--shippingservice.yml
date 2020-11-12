@@ -29,8 +29,9 @@ spec:
     spec:
       serviceAccount: shipping
       containers:
-        - name: server
-          image: gcr.io/google-samples/microservices-demo/shippingservice:v0.2.0
+        - name: shipping
+          # image: gcr.io/google-samples/microservices-demo/shippingservice:v0.2.0
+          image: shipping
           ports:
             - containerPort: 50051
           env:

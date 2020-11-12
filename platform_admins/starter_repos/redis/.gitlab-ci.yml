@@ -1,0 +1,30 @@
+include:
+  - project: "platform-admins/shared-cd"
+    file: "build-redis-manifest.yaml"
+  - project: "platform-admins/shared-cd"
+    file: "commit-to-acm.yaml"
+  - project: "platform-admins/shared-cd"
+    file: "redis-create-cluster.yaml"
+
+variables:
+  NAMESPACE: "db"
+  APPLICATION: "redis"
+  SVC: "redis"
+  SERVICES: "redis"
+
+stages:
+  - build
+  - commit
+  - createCluster
+
+redis-build:
+  stage: build
+  extends: .build-redis-manifest
+
+commit-to-acm:
+  stage: commit
+  extends: .commit-to-acm
+
+create-redis-cluster:
+  stage: createCluster
+  extends: .redis-cluster-create

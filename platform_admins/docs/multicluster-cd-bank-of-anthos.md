@@ -4,7 +4,9 @@
 
 ## Prerequisites
 
-1. Ensure Cockroach DB is already deployed and two databases (`accountsdb` and `postgresdb`) are already created and hydrated on the platform. Follow the instructions [here](/platform_admins/docs/crdb.md).
+1. Initialize the `config` repository. Follow the steps [here](/platform_admins/docs/init-config-repo.md). `config` repository ensures that the Online Boutique namespaces are created in all clusters in the `prod` environment.
+1. Initialize the `shared-cd` repository. Follow the steps [here](/platform_admins/docs/init-shared-cd-repo.md). `shared-cd` repository contains the CI/CD jobs/stages required to deploy Online Boutique to the platform.
+1. Ensure Cockroach DB is already deployed and two databases (`accountsdb` and `postgresdb`) are  created and hydrated. Follow the instructions [here](/platform_admins/docs/crdb.md).
 
 ## Multicloud Continuous Delivery
 
@@ -16,83 +18,16 @@ Your goal is to deploy the containerized services along with their configuration
 
 At a high level you perform the following steps:
 
-1. Initialize three repositories using the files in the `/platform_admins/starter_repos` folder of the workshop repository. `config`, `bank-of-anthos` and `shared-cd` repositories.
-1. `config` repository. This repository is responsible for creating a _landing zone_ for each service to be deployed. The term _landing zone_ refers to a portion of the platform that is configured for a specific service. In Kubernetes, this could be a [namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/) as well as policies that may be required for a particular service. Each service gets deployed in its own namespace. Anthos Config Management [ACM](https://cloud.google.com/anthos/config-management) _config sync_ functionality is used to _pull_ Kubernetes config from the `config` repo and apply to the clusters. This ensures these namespaces are created in all clusters. `config` repo is also used to deploy the final _hydrated_ service configs to the clusters. Hydrated Kubernetes config refers to the final intended state for a service.
+1. Initialize `config` and `shared-cd` repositories. See [Prerequisites](#prerequisites) for details.
+1. Deploy CockroachDB. See [Prerequisites](#prerequisites) for details.
 1. `bank-of-anthos` repository. Bank of Anthos is the application you aim to deploy in your multicloud platform. This repository contains the source code (in the `/src` folder) and the service configuration files (in the `/services` folder) required to deploy all services.
-1. `shared-cd` repo. This repository contains deployment pipelines that can be _shared_ and used by application repositories to deploy multiple applications to the multi-cloud platform.
-1. Ensure all clusters (besides `gitlab`) are \*`SYNCED` to the ACM repo.
 1. Run the Gitlab CI pipeline in the `bank-of-anthos` repo which generates hydrated Kubernetes manifest files for each service and commits them to the `config` repo in the appropriate service namespace.
 1. Verify all Deployments are _Ready_.
 1. Ensure Bank of Anthos is functioning by browsing through the app and performing all user actions.
 
-## `config` Repository
-
-1. Run the following commands to initialize the `config` repository. If you have aready initialized the `config` repo, you can skip this step.
-
-```
-cd ${WORKDIR}
-# init git
-git config --global user.email "${GCLOUD_USER}"
-git config --global user.name "Cloud Shell"
-# pre-grab gitlab public key
-ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
-git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:platform-admins/config.git
-cd config
-cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/config/. .
-git add .
-git commit -m "initial commit"
-git branch -m master main
-git push -u origin main
-```
-
-1. Wait a few moments and ensure all clusters (except `gitlab` cluster) are `SYNCED` to the `config` repo. Run the following command.
-
-```
-nomos status
-```
-
-You may need to run this command multiple times until clusters are synced. The output should look as follows.
-
-```
-Current   Context                  Sync Status      Last Synced Token   Sync Branch   Resource Status
--------   -------                  -----------      -----------------   -----------   ---------------
-          eks-prod-us-west2ab-1    SYNCED           21887d8b                          Healthy
-          eks-prod-us-west2ab-2    SYNCED           21887d8b                          Healthy
-          eks-stage-us-east1ab-1   SYNCED           21887d8b                          Healthy
-          gitlab                   NOT INSTALLED
-          gke-dev-us-west1a-1      SYNCED           21887d8b                          Healthy
-          gke-dev-us-west1b-2      SYNCED           21887d8b                          Healthy
-*         gke-prod-us-west2a-1     SYNCED           21887d8b                          Healthy
-          gke-prod-us-west2b-2     SYNCED           21887d8b                          Healthy
-          gke-stage-us-east4b-1    SYNCED           21887d8b                          Healthy
-```
-
-Syncing to the `config` repo ensures that the namespaces for the Bank of Anthos application are created on all clusters. You can now deploy the Bank of Anthos app.
-
-## `shared-cd` Repository
-
-The `shared-cd` repository contains Gitlab CI/CD [jobs](https://docs.gitlab.com/ee/ci/introduction/#how-gitlab-cicd-works) required to deploy applications to the Anthos multi-cloud platform. These jobs can be used in application repositories' CI/CD pipelines to deploy the application. In this lab, the `bank-of-anthos` repo's CI/CD pipeline uses jobs defined in the `shared-cd` repo. This approach has the following benefits:
-
-- Allows the platform admins to define CI/CD best practices to be shared by the application owners. Having a separate repository ensures proper access control.
-- Allows consistent deployment methodology shared by all application teams. Applications do not have to maintain their own individual pipelines.
-- Avoids code duplication (which increases chance of errors and mistakes).
-
-1. Run the following commands to initialize the `shared-cd` repository. If you have aready initialized the `shared-cd` repo, you can skip this step.
-
-```
-cd ${WORKDIR}
-git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:platform-admins/shared-cd.git
-cd ${WORKDIR}/shared-cd
-cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/shared_cd/. .
-git add .
-git commit -m "initial commit"
-git branch -m master main
-git push -u origin main
-```
-
 ## `bank-of-anthos` Repository
 
-`config` repository ensures all namespaces are created on all clusters. `shared_cd` repository contains the CI/CD jobs that application repositories for their own CI/CD pipelines. `bank-of-anthos` repository is the application repository. This repository contains the source code (in the `/src` folder) as well as configuration files (in the `/services` folder) for all services.
+ `bank-of-anthos` repository is the application repository. This repository contains the source code (in the `/src` folder) as well as configuration files (in the `/services` folder) for all services.
 
 ### Deployment Pipeline
 
@@ -108,7 +43,7 @@ The `.gitlab-ci.yml` pipeline runs every time a commit is made to the `bank-of-a
 
 1. Run the following commands to initialize the `bank-of-anthos` repository.
 
-```
+```bash
 cd ${WORKDIR}
 git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:bank-of-anthos/bank-of-anthos.git
 cd $WORKDIR/bank-of-anthos
@@ -123,8 +58,8 @@ git push -u origin main
 
 Every time you commit to the `bank-of-anthos` repository, you can view the pipeline by accessing the following link. You can also navigate to the same link by clicking on the **CI/CD > Pipelines** link from the left hand nav bar.
 
-```
-echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog/bank_of_anthos/bank_of_anthos/-/pipelines"
+```bash
+echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog/bank-of-anthos/bank-of-anthos/-/pipelines"
 ```
 
 Wait until the pipeline successfully completes.
@@ -137,7 +72,7 @@ You can click on individual jobs to view details.
 
 After the pipeline successfully completes, click on the following link to get the workloads (i.e. Deployments) for the Bank of Anthos application.
 
-```
+```bash
 echo -e "https://console.cloud.google.com/kubernetes/workload?project=${GOOGLE_PROJECT}&pageState=(%22savedViews%22:(%22i%22:%223290aa8deba342dfaddb85d65a7ab6ba%22,%22c%22:%5B%5D,%22n%22:%5B%22boa-accounts-db%22,%22boa-balancereader%22,%22boa-contacts%22,%22boa-frontend%22,%22boa-ledger-db%22,%22boa-ledgerwriter%22,%22boa-loadgenerator%22,%22boa-transactionhistory%22,%22boa-userservice%22%5D))"
 ```
 
@@ -152,7 +87,8 @@ Ensure all workloads are _Ready_. Refresh the screen until all workloads are hea
 The deploy pipeline creates an implementation of multi-cloud ingress using Ingress for Anthos for the Bank of Anthos application. This creates a DNS name for the `frontend` service (using Cloud Endpoints) and a Google-managed certificate.
 
 1. Check that the managed certificate is proivisioned and `ACTIVE` by running the following command:
-```
+
+```bash
 gcloud compute ssl-certificates list
 ```
 
@@ -165,7 +101,8 @@ bank-of-anthos-ingress-ssl-certificate  MANAGED  2020-10-17T10:00:38.627-07:00  
 ```
 
 2. Once the certificate is `ACTIVE`, you can access the Bank of Anthos application by navigating to the following link:
-```
+
+```bash
 echo -e "https://bank.endpoints.${GOOGLE_PROJECT}.cloud.goog"
 ```
 

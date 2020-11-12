@@ -15,6 +15,6 @@
 service:
   workload: 
     environment: prod
-    provider: gcp
-    availability: ha
-    location: us-west
+    # provider: aws
+    # availability: non-ha
+    # location: us-west
