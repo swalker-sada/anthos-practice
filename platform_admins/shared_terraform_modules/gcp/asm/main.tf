@@ -22,6 +22,7 @@ resource "null_resource" "exec_create_asm_yamls" {
       GKE_NET                = var.gke_net
       ENV                    = var.env
       ASM_VERSION            = var.asm_version
+      ASM_REV_LABEL          = var.asm_rev_label
       PROJECT_ID             = var.project_id
       GKE_LIST_STRING        = var.gke_list
       GKE_LOC_STRING         = var.gke_location_list

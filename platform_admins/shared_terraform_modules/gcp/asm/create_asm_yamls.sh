@@ -57,7 +57,7 @@ done
 for EKS_IDX in ${!EKS_LIST[@]}
 do
     echo -e "Building file for ${EKS_LIST[EKS_IDX]}..."
-    echo -e "${HEADER}" > asm_${EKS_LIST[EKS_IDX]}.yaml
+    echo -e "${HEADER}" | sed -e s/ASM_REV_LABEL/${ASM_REV_LABEL}/g > asm_${EKS_LIST[EKS_IDX]}.yaml
 
     # Add istio ingress gateway annotations to get EIPs
     let EIP_IDX_1="($EKS_IDX + 1) * 2 - 2"

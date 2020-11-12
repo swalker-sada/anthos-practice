@@ -18,17 +18,21 @@
 set -e
 
 # Functions
-get_svc_ingress_ip() { 
-    export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer.ingress[].hostname')
-export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
-        while [[ ${ingress_ip} == *"127."*  ]]
-            do 
-                sleep 5
-                echo -e "Waiting for service $2 in cluster $1 to get an IP address..."
-                export ingress=$(kubectl --context $1 -n istio-system get svc $2 -o json | jq -r '.status.loadBalancer.ingress[].hostname')
-                export ingress_ip=$(nslookup ${ingress} | grep Address | awk 'END {print $2}')
-            done
-        echo -e "$2 in cluster $1 has an ip address of ${ingress_ip}."
+# ex: retry "command args" 2 10
+retry() {
+    COMMAND=${1}
+    # Default retry count 5
+    RETRY_COUNT=${2:-5}
+    # Default retry sleep 10s
+    RETRY_SLEEP=${3:-10}
+    COUNT=1
+
+    while [ ${COUNT} -le ${RETRY_COUNT} ]; do
+      ${COMMAND} && break
+      echo "### Count ${COUNT} | Failed Command: ${COMMAND}"
+      let COUNT=${COUNT}+1
+      sleep ${RETRY_SLEEP}
+    done
 }
 
 # Create bash arrays from lists

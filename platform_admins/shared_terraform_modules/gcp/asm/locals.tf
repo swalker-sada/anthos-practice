@@ -20,6 +20,7 @@ apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 spec:
   profile: asm-multicloud
+  revision: ASM_REV_LABEL
   addonComponents:
     # commented out because asm-multicloud already has this enabled
     # could not overlay user config over base: json merge error (unable to find api field in struct externalComponentSpec...
