@@ -30,6 +30,10 @@ retry() {
     while [ ${COUNT} -le ${RETRY_COUNT} ]; do
       ${COMMAND} && break
       echo "### Count ${COUNT}/${RETRY_COUNT} | Failed Command: ${COMMAND}"
+      if [ ${COUNT} -eq ${RETRY_COUNT} ]; then
+        echo "### Exit Failed: ${COMMAND}"
+        exit 1
+      fi      
       let COUNT=${COUNT}+1
       sleep ${RETRY_SLEEP}
     done

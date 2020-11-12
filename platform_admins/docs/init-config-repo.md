@@ -27,12 +27,19 @@ fi
 ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
 git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:platform-admins/config.git
 cd config
-cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/config/. .
+touch README.md
 git add .
 git commit -m "initial commit"
 git branch -m master main
 git push -u origin main
+git checkout -b prep
+cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/config/. .
+git add .
+# issues with auto-merge -- https://gitlab.com/gitlab-org/gitlab/-/issues/260311
+git push -u origin prep -o merge_request.create -o merge_request.merge_when_pipeline_succeeds -o merge_request.target=main 
 ```
+
+1. Login to gitlab with the outputted link above and select "Merge when pipeline succeeds"
 
 1. Wait a few moments and ensure all clusters (except `gitlab` cluster) are `SYNCED` to the `config` repo. Run the following command.
 
