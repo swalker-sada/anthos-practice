@@ -58,13 +58,14 @@ Open a command line to pod _gke-crdb-1_ as follows in glcloud:
 kubectl exec -it gke-crdb-1 -- bash
 cockroach sql --insecure --host=crdb
 ```
+
 Now you can run database commands. To show all databases run
 
 ```
 show databases;
 ```
 
-Select _postgresdb_:
+Select database _postgresdb_:
 
 ```
 use postgresdb;
@@ -76,17 +77,21 @@ Show all tables in that database:
 show tables;
 ```
 
-Show the schema of _transactions_:
+Show the schema of table _transactions_:
 
 ```
 \d transactions;
 ```
+
+The result shows you the columns of the table, including the data types for each column.
 
 And finally, find the transaction that you executed in the user interface. First, select the 10 most recent transactions:
 
 ```
 select * from transactions order by timestamp desc limit 10;
 ```
+
+Unless you created other transactions in the meanwhile, the amount you added in the user interface earlier should be the first in the list.
 
 As you can see, the amount is stored in USD times 100. So to find your transaction run
 
