@@ -107,6 +107,32 @@ select now();
 
 The time shows the current time and your interface interaction might have been a few minutes earlier.
 
+To exit out of the command line interface run
+
+```
+exit
+```
+
+And to exit out of the shell run _exit_ again.
+
+## Connecting to the database using the CLI (again)
+
+CockroachDB is an active-active system and so all pods have the same data as those are synchronized transactionally. To explore this, log into a different pod:
+
+```
+kubectl exec -it gke-crdb-2 -- bash
+cockroach sql --insecure --host=crdb
+```
+
+and select your transaction:
+
+```
+use postgresdb;
+select * from transactions where amount = 543200;
+```
+
+This demonstrated that every pod has all data fully synchronized.
+
 ## Connecting to the database using an IDE
 
 TBD Chris
