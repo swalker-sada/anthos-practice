@@ -135,13 +135,36 @@ This demonstrated that every pod has all data fully synchronized.
 
 ## Connecting to the database using an IDE
 
-TBD Chris
-- GUI-based IDE
-    - DBeaver possible, port forward from kubectl directly for e.g. DBeaver to connect
-    - ideally: web-based GUI so that it can be deployed as container as well (pdAdmin?)
-    - maybe DBeaver or Beekeeper Studio [here](https://www.cockroachlabs.com/docs/v20.1/third-party-database-tools.html#graphical-user-interfaces-guis) if no web-based UI available
-- have student find transaction from above
-- have student open connection to Google Cloud and AWS separately
+In many cases you might prefer using an IDE like [DBeaver](https://dbeaver.io/) to access a database instead of using a command line interface. The IDE runs on your laptop and the following instructions show how you can access CockroachDB with DBeaver.
+
+Open a terminal on your laptop and execute the following commands.
+
+Set the project ID as follows
+
+```
+gcloud config set project PROJECT_ID
+```
+
+Authenticate with the project (use the account that you use to run Bank of Anthos)
+
+```
+gcloud auth login
+```
+
+<more necessary>
+
+
+Establish a port forward like this:
+
+```
+kubectl --context=${GKE_PROD_1} -n db-crdb port-forward gke-crdb-0 5432:8080
+```
+
+The port 5432 is the customary PostgreSQL port.
+
+<more necessary>
+
+In context of CockroachDB these are the IDEs mentioned on the CockroachDB site [here](https://www.cockroachlabs.com/docs/v20.1/third-party-database-tools.html#graphical-user-interfaces-guis).
 
 ## Verifying that the database is synchronized between Google Cloud and AWS
 
