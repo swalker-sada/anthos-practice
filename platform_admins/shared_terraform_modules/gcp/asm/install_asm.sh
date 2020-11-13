@@ -89,17 +89,17 @@ echo -e "${ISTIOD_SERVICE}" | sed -e s/ASM_REV_LABEL/${ASM_REV_LABEL}/g > istiod
 prepareASMCommon() {
     CTX=${1}
     kubectl --context=${CTX} get po --all-namespaces
-    retry "kubectl --context=${CTX} apply -f istio-system.yaml"
-    retry "kubectl --context=${CTX} apply -f cacerts.yaml"
+    kubectl --context=${CTX} apply -f istio-system.yaml
+    kubectl --context=${CTX} apply -f cacerts.yaml
 }
 
 postASMCommon() {
     CTX=${1}
-    retry "kubectl --context=${CTX} apply -f cluster_aware_gateway.yaml"
-    retry "kubectl --context=${CTX} apply -f istiod-service.yaml"
-    retry "kubectl --context=${CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
-    retry "kubectl --context=${CTX} apply -f ${ASM_DIR}/samples/addons/kiali.yaml"
-    retry "kubectl --context=${CTX} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
+    kubectl --context=${CTX} apply -f cluster_aware_gateway.yaml
+    kubectl --context=${CTX} apply -f istiod-service.yaml
+    kubectl --context=${CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml
+    kubectl --context=${CTX} apply -f ${ASM_DIR}/samples/addons/kiali.yaml
+    kubectl --context=${CTX} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml
 }
 
 # install asm and process secrets
@@ -110,9 +110,9 @@ processEKS() {
     # kubectl --context=eks_${EKS} get po --all-namespaces
     # retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
     # retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
-    prepareASMCommon() eks_${EKS}
+    retry "prepareASMCommon() eks_${EKS}"
     retry "istioctl --context=eks_${EKS} install -f asm_${EKS}.yaml"
-    postASMCommon() eks_${EKS}
+    retry "postASMCommon() eks_${EKS}"
     # retry "kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml"
     # retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
     # retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
@@ -129,9 +129,9 @@ processGKE() {
     # kubectl --context=${GKE_CTX} get po --all-namespaces
     # retry "kubectl --context=${GKE_CTX} apply -f istio-system.yaml"
     # retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
-    prepareASMCommon() ${GKE_CTX}
+    retry "prepareASMCommon() ${GKE_CTX}"
     retry "istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml"
-    postASMCommon() ${GKE_CTX}
+    retry "postASMCommon() ${GKE_CTX}"
     # retry "kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml"
     # retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
     # retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"

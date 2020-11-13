@@ -104,10 +104,12 @@ for GKE in ${GKE_LIST[@]}
 do
     echo -e "\n######### $GKE YAML ###########\n"
     cat asm_$GKE.yaml
+    gsutil cp -r asm_$GKE.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_$GKE.yaml
 done
 
 for EKS in ${EKS_LIST[@]}
 do
     echo -e "\n######### $EKS YAML ###########\n"
     cat asm_$EKS.yaml
+    gsutil cp -r asm_$EKS.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_$EKS.yaml
 done
