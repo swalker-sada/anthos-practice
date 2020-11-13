@@ -2,6 +2,10 @@
 
 1. Deploy a microservices based application in all environments split across multiple clusters.
 
+## Videos
+
+- [📽️ Video Walk Through](https://app.threadit.area120.com/thread/sdfe3ogb2jqbzycu1tm8?utm_medium=referral-link)
+
 ## Deploying Online Boutique application
 
 1. Deploy the [Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo) sample application in all environments by running the following scripts.

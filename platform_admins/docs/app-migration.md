@@ -2,6 +2,11 @@
 
 1. Manually migrating a Service from a cluster in AWS (EKS) to a cluster in GCP (GKE)
 
+## Videos
+
+- [📽️ Video Walk Through](https://app.threadit.area120.com/thread/eznntzqjwlcfl87gyluz?utm_medium=referral-link)
+- [📽️ Video Walk Through Bonus: Cart migration with items preserved ](https://app.threadit.area120.com/thread/u95qmhlt3bmq9812nman?utm_medium=referral-link)
+
 ## Prerequisite
 
 1. Follow the steps in the [Lab 1: Multicloud Applications](/platform_admins/docs/multicluster-networking.md) before proceeding.

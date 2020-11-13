@@ -3,6 +3,10 @@
 1. Configure Cloud Monitoring to receive metrics from all services running in all clusters in all environments.
 1. Create a metrics dashboard for Online Boutique app in all environments for `service request counts` and `service latency`.
 
+## Videos
+
+- [📽️ Video Walk Through](https://app.threadit.area120.com/thread/z8mxvsldgfjdpkx8ti4z?utm_medium=referral-link)
+
 ## Prerequisite
 
 1. Follow the steps in the [Lab 1: Multicloud Applications](/platform_admins/docs/multicluster-networking.md) before proceeding.
