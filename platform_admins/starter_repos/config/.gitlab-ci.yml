@@ -31,6 +31,6 @@ prepare-asm-build:
   stage: build
   extends: .prepare-asm-label
  
-commit-to-acm:
+commit-to-config:
   stage: commit
   extends: .commit-to-config

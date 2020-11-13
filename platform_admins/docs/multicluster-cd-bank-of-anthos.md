@@ -4,8 +4,8 @@
 
 ## Prerequisites
 
-1. Initialize the `config` repository. Follow the steps [here](/platform_admins/docs/init-config-repo.md). `config` repository ensures that the Online Boutique namespaces are created in all clusters in the `prod` environment.
 1. Initialize the `shared-cd` repository. Follow the steps [here](/platform_admins/docs/init-shared-cd-repo.md). `shared-cd` repository contains the CI/CD jobs/stages required to deploy Online Boutique to the platform.
+1. Initialize the `config` repository. Follow the steps [here](/platform_admins/docs/init-config-repo.md). `config` repository ensures that the Online Boutique namespaces are created in all clusters in the `prod` environment.
 1. Ensure Cockroach DB is already deployed and two databases (`accountsdb` and `postgresdb`) are  created and hydrated. Follow the instructions [here](/platform_admins/docs/crdb.md).
 
 ## Multicloud Continuous Delivery

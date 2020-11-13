@@ -31,7 +31,7 @@
     - |
       set -x
       cd ${CI_PROJECT_DIR}/namespaces
-      export APPS="bank-of-anthos cockroachdb online-boutique"
+      export APPS="bank-of-anthos cockroachdb online-boutique redis"
  
       export SERVICES=""
       for APP in ${APPS}

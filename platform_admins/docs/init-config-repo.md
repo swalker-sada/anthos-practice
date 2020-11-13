@@ -35,6 +35,7 @@ git push -u origin main
 git checkout -b prep
 cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/config/. .
 git add .
+git commit -m 'apply appropriate istio rev label'
 # issues with auto-merge -- https://gitlab.com/gitlab-org/gitlab/-/issues/260311
 git push -u origin prep -o merge_request.create -o merge_request.merge_when_pipeline_succeeds -o merge_request.target=main 
 ```

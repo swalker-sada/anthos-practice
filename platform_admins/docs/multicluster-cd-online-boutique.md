@@ -4,8 +4,8 @@
 
 ## Prerequisites
 
-1. Initialize the `config` repository. Follow the steps [here](/platform_admins/docs/init-config-repo.md). `config` repository ensures that the Online Boutique namespaces are created in all clusters in the `prod` environment.
 1. Initialize the `shared-cd` repository. Follow the steps [here](/platform_admins/docs/init-shared-cd-repo.md). `shared-cd` repository contains the CI/CD jobs/stages required to deploy Online Boutique to the platform.
+1. Initialize the `config` repository. Follow the steps [here](/platform_admins/docs/init-config-repo.md). `config` repository ensures that the Online Boutique namespaces are created in all clusters in the `prod` environment.
 1. Initialize the `redis` repository. Follow the steps [here](/platform_admins/docs/redis.md). `redis` repository contains the CI/CD jobs/stages required to deploy a multicloud Redis cluster.
 
 ## Multicloud Continuous Delivery
