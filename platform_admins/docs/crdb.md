@@ -117,7 +117,7 @@ kubectl --context=${GKE_PROD_1} -n db-crdb port-forward gke-crdb-0 9080:8080 &
 ```bash
 kubectl ctx ${GKE_PROD_1}
 kubectl ns db-crdb
-kubectl exec -it gke-crdb-0 -- mkdir -p /cockroach/cockroach-data/extern
+kubectl exec -t gke-crdb-0 -- mkdir -p /cockroach/cockroach-data/extern
 kubectl cp ${WORKDIR}/cockroachdb/templates/dump-accounts-db.sql gke-crdb-0:/cockroach/cockroach-data/extern/dump-accounts-db.sql
 kubectl cp ${WORKDIR}/cockroachdb/templates/dump-postgresdb.sql gke-crdb-0:/cockroach/cockroach-data/extern/dump-postgresdb.sql
 ```
