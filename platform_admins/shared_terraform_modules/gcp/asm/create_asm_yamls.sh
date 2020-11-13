@@ -27,7 +27,7 @@ IFS=',' read -r -a EKS_EIP_LIST <<< "${EKS_EIP_LIST_STRING}"
 for GKE in ${GKE_LIST[@]}
 do
     echo -e "Building file for $GKE..."
-    echo -e "${HEADER}" > asm_$GKE.yaml
+    echo -e "${HEADER}" | sed -e s/ASM_REV_LABEL/${ASM_REV_LABEL}/g > asm_$GKE.yaml
 
     echo -e "${GKE_COMPONENT}" | sed -e s/ENV/$ENV/g >> asm_$GKE.yaml
 

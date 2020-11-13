@@ -86,38 +86,20 @@ export KUBECONFIG=${DEFAULT_KUBECONFIG}
 # prepare istiod-service
 echo -e "${ISTIOD_SERVICE}" | sed -e s/ASM_REV_LABEL/${ASM_REV_LABEL}/g > istiod-service.yaml
 
-prepareASMCommon() {
-    CTX=${1}
-    kubectl --context=${CTX} get po --all-namespaces
-    kubectl --context=${CTX} apply -f istio-system.yaml
-    kubectl --context=${CTX} apply -f cacerts.yaml
-}
-
-postASMCommon() {
-    CTX=${1}
-    kubectl --context=${CTX} apply -f cluster_aware_gateway.yaml
-    kubectl --context=${CTX} apply -f istiod-service.yaml
-    kubectl --context=${CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml
-    kubectl --context=${CTX} apply -f ${ASM_DIR}/samples/addons/kiali.yaml
-    kubectl --context=${CTX} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml
-}
-
 # install asm and process secrets
 processEKS() {
     EKS=${1}
     exec 1> >(sed "s/^/${EKS} SO: /")
     exec 2> >(sed "s/^/${EKS} SE: /" >&2)
-    # kubectl --context=eks_${EKS} get po --all-namespaces
-    # retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
-    # retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
-    retry "prepareASMCommon() eks_${EKS}"
+    kubectl --context=eks_${EKS} get po --all-namespaces
+    retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
     retry "istioctl --context=eks_${EKS} install -f asm_${EKS}.yaml"
-    retry "postASMCommon() eks_${EKS}"
-    # retry "kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml"
-    # retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
-    # retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
-    # retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/kiali.yaml"
-    # retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/kiali.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
     istioctl x create-remote-secret --context=eks_${EKS} --name ${EKS} > kubeconfig_secret_${EKS}.yaml
 }
 
@@ -126,17 +108,15 @@ processGKE() {
     exec 1> >(sed "s/^/${IDX} SO: /")
     exec 2> >(sed "s/^/${IDX} SE: /" >&2)
     GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
-    # kubectl --context=${GKE_CTX} get po --all-namespaces
-    # retry "kubectl --context=${GKE_CTX} apply -f istio-system.yaml"
-    # retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
-    retry "prepareASMCommon() ${GKE_CTX}"
+    kubectl --context=${GKE_CTX} get po --all-namespaces
+    retry "kubectl --context=${GKE_CTX} apply -f istio-system.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
     retry "istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml"
-    retry "postASMCommon() ${GKE_CTX}"
-    # retry "kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml"
-    # retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
-    # retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
-    # retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/kiali.yaml"
-    # retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/kiali.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
     istioctl x create-remote-secret --context=${GKE_CTX} --name ${GKE_LIST[IDX]} > kubeconfig_secret_${GKE_LIST[IDX]}.yaml
 }
 
