@@ -39,6 +39,48 @@ class db-crdb-gke,db-crdb-eks pod;
 1. `config` repository is initialized and `nomos status` shows `SYNCED` for all clusters (except Gitlab). This is done in the [Multicluster CD](/platform_admins/docs/multicluster-cd.md) user journey.
 1. `shared-cd` respository is initialized, which contains the CD pipeline jobs used to deploy cockroachdb. This is done in the [Multicluster CD](/platform_admins/docs/multicluster-cd.md) user journey.
 
+## Istio patch to support cockroachdb instance communication
+
+1.  There is currently an istio [issue](https://github.com/istio/istio/issues/27909#issuecomment-713211833) which impacts TCP traffic in 1.7, that cockroachdb across clusters depends on.
+
+```bash
+cat << EOF > patch.yaml
+spec:
+  configPatches:
+  - applyTo: NETWORK_FILTER
+    match:
+      context: GATEWAY
+      listener:
+        filterChain:
+          filter:
+            name: envoy.filters.network.sni_cluster
+        portNumber: 15443
+    patch:
+      operation: INSERT_AFTER
+      value:
+        name: envoy.filters.network.tcp_cluster_rewrite
+        typed_config:
+          '@type': type.googleapis.com/istio.envoy.config.filter.network.tcp_cluster_rewrite.v2alpha1.TcpClusterRewrite
+          cluster_pattern: \.global$
+          cluster_replacement: .svc.cluster.local
+EOF
+ 
+for CLUSTER in ${GKE_PROD_1} ${GKE_PROD_2} ${EKS_PROD_1} ${EKS_PROD_2}
+do
+  kubectl --context ${CLUSTER} patch envoyfilter istio-multicluster-ingressgateway -n istio-system --patch "$(cat patch.yaml)" --type=merge
+done
+```
+
+Confirm the outputs below.
+
+```
+# Output (Do not copy)
+envoyfilter.networking.istio.io/istio-multicluster-ingressgateway patched
+envoyfilter.networking.istio.io/istio-multicluster-ingressgateway patched
+envoyfilter.networking.istio.io/istio-multicluster-ingressgateway patched
+envoyfilter.networking.istio.io/istio-multicluster-ingressgateway patched
+```
+
 ## `cockroachdb` repository
 
 1. Run the following set of commands to initialize the `cockroachdb` repository in Gitlab. Committing to this repository will initiate the CD pipeline which deploys cockroackdb cluster on the two Kubernetes clusters.
@@ -63,7 +105,6 @@ echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog/databases/cockroa
 ```
 
 1. Wait until the pipeline finishes successfully.
-
 
 ## Verify installation
 

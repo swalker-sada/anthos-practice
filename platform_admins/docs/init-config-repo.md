@@ -40,7 +40,24 @@ git commit -m 'apply appropriate istio rev label'
 git push -u origin prep -o merge_request.create -o merge_request.merge_when_pipeline_succeeds -o merge_request.target=main 
 ```
 
-1. Login to gitlab with the outputted link above and select "Merge when pipeline succeeds"
+```
+# Output (Do not copy)
+remote:
+remote: View merge request for prep:
+remote:   https://gitlab.endpoints.qwiklabs-gcp-02-3b55f8d468d3.cloud.goog/platform-admins/config/-/merge_requests/1
+remote:
+To gitlab.endpoints.qwiklabs-gcp-02-3b55f8d468d3.cloud.goog:platform-admins/config.git
+ * [new branch]      prep -> prep
+Branch 'prep' set up to track remote branch 'prep' from 'origin'.
+```
+
+1. Access gitlab with the provided link and select `Merge` to update the applicable namespace istio revision label.
+
+```bash
+echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog/platform-admins/config/-/merge_requests/1" 
+```
+
+<img src="/platform_admins/docs/img/gitlab-config-merge.png" width=50% height=50%>
 
 1. Wait a few moments and ensure all clusters (except `gitlab` cluster) are `SYNCED` to the `config` repo. Run the following command.
 
