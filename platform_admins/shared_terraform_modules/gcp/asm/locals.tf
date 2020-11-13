@@ -24,11 +24,13 @@ spec:
   addonComponents:
     # commented out because asm-multicloud already has this enabled
     # could not overlay user config over base: json merge error (unable to find api field in struct externalComponentSpec...
-    #
-    # kiali:
-    #   enabled: true
-    # grafana:
-    #   enabled: true
+    # preparing for removal in 1.8 after deprecation in 1.7
+    kiali:
+      enabled: false
+    grafana:
+      enabled: false
+    prometheus:
+      enabled: false
     istiocoredns:
       enabled: true
 EOT
