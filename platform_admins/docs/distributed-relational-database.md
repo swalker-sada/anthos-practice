@@ -139,30 +139,37 @@ In many cases you might prefer using an IDE like [DBeaver](https://dbeaver.io/) 
 
 Open a terminal on your laptop and execute the following commands.
 
-Set the project ID as follows
+Set the project ID as follows by providing your project id
 
 ```
 gcloud config set project PROJECT_ID
 ```
 
-Authenticate with the project (use the account that you use to run Bank of Anthos)
+Authenticate with the project (use the same account that you use to run Bank of Anthos)
 
 ```
 gcloud auth login
 ```
 
-<more necessary>
-
-
 Establish a port forward like this:
 
 ```
-kubectl --context=${GKE_PROD_1} -n db-crdb port-forward gke-crdb-0 5432:8080
+PROJECT_ID=$(gcloud config get-value core/project 2>/dev/null)
+gcloud container clusters get-credentials gke-prod-us-west2a-1 --zone us-west2-a --project $PROJECT_ID \
+ && kubectl port-forward --namespace db-crdb $(kubectl get pod --namespace db-crdb --selector="app=cockroachdb" --output jsonpath='{.items[0].metadata.name}') 5432:26257
 ```
 
 The port 5432 is the customary PostgreSQL port.
 
-<more necessary>
+At this point you have a connection from your laptop to one of the pods that run CockroachDB. Based on this connect you can create a database connection in the IDE. Use the following configuration values to create a database connection
+
+```
+database name: postgresdb
+database user: admin
+database password: password
+database host: 127.0.0.1
+database port: 5432
+```
 
 In context of CockroachDB these are the IDEs mentioned on the CockroachDB site [here](https://www.cockroachlabs.com/docs/v20.1/third-party-database-tools.html#graphical-user-interfaces-guis).
 
