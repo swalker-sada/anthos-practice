@@ -43,6 +43,7 @@ echo -e "https://bank.endpoints.${GOOGLE_PROJECT}.cloud.goog"
 
 Once the user interface is up and running, make a deposit and remember the amount, e.g., 5432.00 USD. Later you will lookup this amount in the database directly using a database client.
 
+<img src="/platform_admins/docs/img/bank-of-anthos-sample-transaction.png" width=50% height=50%>
 
 ## Connecting to the database using the CLI
 
