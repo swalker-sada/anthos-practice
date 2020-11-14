@@ -27,11 +27,15 @@ CockroachDB is a distributed relational database management system implemeting P
 
 In context of the Anthos Multicloud Workshop 6 CockroachDB instances are deployed, 3 in the Google Cloud cluster, and 3 in the EKS cluster. All form a single CockroachDB cluster and the database that hosts the data of Bank Of Anthos spans all 6 nodes across the two clusters in the two clouds.
 
+And active-active database management system has advantages and disadvantages. Some important are
+
+- **Reliability/Consistency**: All transactions are replicated to all instances in the cluster. As a result, the outage of an instance does not impact the reliability and consistency of the system.
+- **Latency**: since the different instances have to communicate with each other, additional latency can be observed if the the network between GCP and AWS is not that fast or experiencing a temporary slowdown.
+- **Transparency**: Since each instance is active-active, an application does not have to be aware of a primary or standby configuration and therefore can be implemented indepednent of the specific database topology.
 TBD Chris to discuss
-- benefit: reliability/consistency
-- downside: latency/slowdown
-- app does not have to know about primary/standby, locations, etc. distributed management is transparent
-- optimization: geolocation
+- **Outage**: If there is a network outage, the impact is severe if the database cannot establish a majority quorum for continued processing. This will affect application availability.
+
+The last section below provides additional resources for you to review in order to decide if CockroachDB is the right database for you. However, in order for you to experience some aspects, follow the instructions in the following sections.
 
 ## Creating a transaction using Bank Of Anthos
 
