@@ -178,6 +178,19 @@ In context of CockroachDB these are the IDEs mentioned on the CockroachDB site [
 TBD Chris
 - with IDE connection to both clouds, observe that changes are happening in both clouds
 
+TBD Debug:
+
+```
+└─⪧ kubectl --context=${EKS_PROD_1} -n db-crdb get pods
+NAME         READY   STATUS    RESTARTS   AGE
+eks-crdb-0   2/2     Running   0          3d6h
+eks-crdb-1   2/2     Running   0          3d6h
+eks-crdb-2   2/2     Running   0          3d6h
+
+└─⪧ kubectl --context=${EKS_PROD_1} exec -it eks-crdb-0 -- bash
+Error from server (NotFound): pods "eks-crdb-0" not found
+```
+
 ## Using the administration UI of CockroachDB
 
 TBD Chris
