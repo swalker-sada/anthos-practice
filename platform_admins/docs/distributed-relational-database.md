@@ -193,9 +193,23 @@ Error from server (NotFound): pods "eks-crdb-0" not found
 
 ## Using the administration UI of CockroachDB
 
-TBD Chris
-- guide student how to invoke
-- point out interesting admin functionality, esp. latency
+CockroachDB has an administration interface. Invoke it like follows:
+
+```
+kubectl --context=${GKE_PROD_1} -n db-crdb port-forward gke-crdb-0 9080:8080
+```
+
+Use the web preview of the Cloud Shell Editor, change the port to _9080_ and observe the administration user interface starting up in its own browser tab.
+
+Explore the following sections in the user interface:
+
+- Go to the _Network Latency_ tab on the left side and observe on the right a grid that displays the network latency between every of the nodes. In the _Filter_ dropdown you can select different subset of nodes to see the latency within GCP or AWS and across the network.
+- Go to the _Statements_ tab on the left to see queries that you executed earlier. Click on a query to get details about its execution performance, query plan, and other details.
+- Go to the _Databases_ tab to find the list of all databases and their tables. For each table you can observe details about it.
+
+Keep exploring the remaining tabs to see what is available in the administration user interface, like database metrics, debugging options and support.
+
+Close the user interface when you are done and cancel out of the port forwarding.
 
 ## Simulating a pod crash
 
