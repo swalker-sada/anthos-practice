@@ -201,6 +201,8 @@ kubectl --context=${GKE_PROD_1} -n db-crdb port-forward gke-crdb-0 9080:8080
 
 Use the web preview of the Cloud Shell Editor, change the port to _9080_ and observe the administration user interface starting up in its own browser tab.
 
+<img src="/platform_admins/docs/img/crdb-ui-main.png" width=50% height=50%>
+
 Explore the following sections in the user interface:
 
 - Go to the _Network Latency_ tab on the left side and observe on the right a grid that displays the network latency between every of the nodes. In the _Filter_ dropdown you can select different subset of nodes to see the latency within GCP or AWS and across the network.
