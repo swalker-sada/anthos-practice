@@ -2,6 +2,10 @@
 
 1. Deploy a [Distributed Service](https://medium.com/google-cloud/gke-multi-cluster-life-cycle-management-series-b0d39080ac6b) to multiple clusters in multiple cloud environments.
 
+## Videos
+
+- [📽️ Video Walk Through](https://app.threadit.area120.com/thread/sy487f0vjhmsl3qwponh?utm_medium=referral-link)
+
 ## Prerequisites
 
 1. Follow the steps in the [Lab 1: Multicloud Applications](/platform_admins/docs/multicluster-networking.md) before proceeding.

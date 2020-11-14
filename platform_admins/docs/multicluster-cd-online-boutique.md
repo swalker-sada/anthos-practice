@@ -2,6 +2,13 @@
 
 1. Deploy a microservice based application to multiple clusters in multiple cloud environments using a CI/CD pipeline.
 
+## Videos
+
+- [📽️ Video Walk Through I: Prerequisites and starting pipeline](https://app.threadit.area120.com/thread/p6x3vqj8teqz14uq7yzw?utm_medium=referral-link)
+- [📽️ Video Walk Through II: Accessing the application](https://app.threadit.area120.com/thread/xzyd9mrwfeiaqy0jj8vf?utm_medium=referral-link)
+- [📽️ Video Walk Through III: Inspecting CI/CD pipeline](https://app.threadit.area120.com/thread/qrfyuy161o9jdofhfwfm?utm_medium=referral-link)
+- [📽️ Video Walk Through IV: Migrating workloads using CI/CD pipelines and inspecting metrics](https://app.threadit.area120.com/thread/m996p5nfkxh9aokg3yh6?utm_medium=referral-link)
+
 ## Prerequisites
 
 1. Initialize the `shared-cd` repository. Follow the steps [here](/platform_admins/docs/init-shared-cd-repo.md). `shared-cd` repository contains the CI/CD jobs/stages required to deploy Online Boutique to the platform.

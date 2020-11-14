@@ -2,6 +2,13 @@
 
 1. Add a new Google Kubernetes Engine (GKE) and an Amazon Elastic Kubernetes Service (EKS) cluster to multi-cloud environment
 
+## Videos
+
+- [📽️ Video Walk Through I: Build initiated](https://app.threadit.area120.com/thread/vd6fdq23s10czizj5pn9?utm_medium=referral-link)
+- [📽️ Video Walk Through II: Build completed](https://app.threadit.area120.com/thread/bzzcyzj0wsew1f2yedjz?utm_medium=referral-link)
+- [📽️ Video Walk Through Bonus: Migrating services to new clusters](https://app.threadit.area120.com/thread/dx0chqp3nyuk15276z9b?utm_medium=referral-link)
+
+
 ## Prerequisite
 
 1. Initial workshop build completed successfully (using the `build.sh` script).

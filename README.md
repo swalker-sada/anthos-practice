@@ -111,6 +111,9 @@ The workshop is divided into two main sections:
 
 ## Foundation - Building Anthos platform
 
+### [📽️ Video Walk Through: Building Anthos platform](https://app.threadit.area120.com/thread/h2pq6jkd7nck89ej0wsh?utm_medium=referral-link)
+[📽️ Video Walk Through: Troubleshooting failed pipelines](https://app.threadit.area120.com/thread/vff54h8fep4xsxyoqkh3?utm_medium=referral-link)
+
 To set up the Anthos platform foundation, you accomplish the following:
 
 - Setting up an Anthos multi-environment multi-cloud environment on GCP and AWS using GKE and EKS (Anthos attached clusters, registered via Hub).
@@ -349,6 +352,8 @@ class Prod_Pipeline,Stage_Pipeline,Dev_Pipeline,Gitlab_Pipeline,Project_Pipeline
 ```
 
 ## User setup
+
+### [📽️ Video Walk Through: User setup](https://app.threadit.area120.com/thread/xxkgaitp7spclcmt7vqj?utm_medium=referral-link)
 
 - Verify that all pipelines finish successfully.
 
