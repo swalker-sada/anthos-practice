@@ -221,8 +221,12 @@ Close the user interface when you are done and cancel out of the port forwarding
 ## Simulating a pod crash
 
 TBD Chris
-- guide student to crash a pod
-- guide student to show that db continues to be accessible
+- tried to scale down, but it does not stay scaled down, why not?
+```
+kubectl get statefulsets gke-crdb
+kubectl scale statefulsets gke-crdb --replicas=2
+kubectl patch statefulsets <stateful-set-name> -p '{"spec":{"replicas":<new-replicas>}}'
+```
 
 ## Simulating a cluster outage
 
