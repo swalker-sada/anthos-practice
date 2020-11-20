@@ -280,3 +280,61 @@ resource "gitlab_deploy_key" "redis" {
   can_push   = "true"
   depends_on = [gitlab_project.redis]
 }
+
+# test harness
+resource "gitlab_group" "test-harness" {
+  name             = var.test_harness_group
+  path             = var.test_harness_group
+  description      = "Test Harness related projects"
+  visibility_level = "internal"
+}
+
+resource "gitlab_group_variable" "test-harness-cicd-gsa-private-key" {
+  group     = gitlab_group.test-harness.id
+  key       = "GCP_CICD_SA_KEY"
+  value     = data.terraform_remote_state.prod_gcp_cicd_gsa.outputs.cicd_sa_key_base64
+  protected = false
+  masked    = false
+}
+
+resource "gitlab_group_variable" "test-harness-ssh-private-key" {
+  group     = gitlab_group.test-harness.id
+  key       = "MANIFEST_WRITER_KEY"
+  value     = data.terraform_remote_state.prod_gcp_ssh_key.outputs.private_key
+  protected = false
+  masked    = false
+}
+
+resource "gitlab_group_variable" "test-harness-acm-repo" {
+  group     = gitlab_group.test-harness.id
+  key       = "ACM_REPO_SSH_URL"
+  value     = gitlab_project.anthos-config-management.ssh_url_to_repo
+  protected = false
+  masked    = false
+}
+
+resource "gitlab_group_variable" "test-harness-gcp-project" {
+  group     = gitlab_group.test-harness.id
+  key       = "PROJECT_ID"
+  value     = var.project_id
+  protected = false
+  masked    = false
+}
+
+resource "gitlab_deploy_key" "test-harness" {
+  project    = gitlab_project.test-harness.id
+  title      = "ssh deploy key"
+  key        = data.terraform_remote_state.prod_gcp_ssh_key.outputs.public_key_openssh
+  can_push   = "true"
+  depends_on = [gitlab_project.test-harness]
+}
+
+resource "gitlab_project" "test-harness" {
+  name                   = var.test_harness_project
+  description            = "Test Harness repo"
+  namespace_id           = gitlab_group.test-harness.id
+  visibility_level       = "internal"
+  shared_runners_enabled = true
+  default_branch         = "main"
+  depends_on             = [gitlab_group.test-harness]
+}
