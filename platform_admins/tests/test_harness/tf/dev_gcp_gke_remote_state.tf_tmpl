@@ -1,0 +1,8 @@
+data "terraform_remote_state" "dev_gcp_gke" {
+  backend = "gcs"
+
+  config = {
+    bucket  = "PROJECT_ID"
+    prefix  = "tfstate/dev/gcp/gke"
+  }
+}

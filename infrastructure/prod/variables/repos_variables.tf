@@ -27,3 +27,6 @@ variable "bank_of_anthos_project" { default = "bank-of-anthos" }
 variable "databases_group" { default = "databases" }
 variable "crdb" { default = "cockroachdb" }
 variable "redis" { default = "redis" }
+
+variable "test_harness_group" { default = "test-harness" }
+variable "test_harness_project" { default = "test-harness" }

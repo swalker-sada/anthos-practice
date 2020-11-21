@@ -1,0 +1,696 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+stages:
+  - provisioned
+  - connectivity
+  - deploy-apps
+  - test-apps
+  - test-app-migration
+  - test-app-distributed
+  - deploy-shared-cd
+  - deploy-common
+  - deploy-redis
+  - deploy-app-ob
+  - deploy-crdb
+  - deploy-app-boa
+  - cleanup
+
+variables:
+  BRANCH: "main"
+ 
+cluster_access:
+  stage: provisioned
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/setup-tf.sh
+    - gcloud container clusters get-credentials ${GKE_PROD_1_NAME} --zone ${GKE_PROD_1_LOCATION} --project ${PROJECT_ID}
+    - gcloud container clusters get-credentials ${GKE_PROD_2_NAME} --zone ${GKE_PROD_2_LOCATION} --project ${PROJECT_ID}
+    - gcloud container clusters get-credentials ${GKE_STAGE_1_NAME} --zone ${GKE_STAGE_1_LOCATION} --project ${PROJECT_ID}
+    - gcloud container clusters get-credentials ${GKE_DEV_1_NAME} --zone ${GKE_DEV_1_LOCATION} --project ${PROJECT_ID}
+    - gcloud container clusters get-credentials ${GKE_DEV_2_NAME} --zone ${GKE_DEV_2_LOCATION} --project ${PROJECT_ID}
+    - gsutil cp -r gs://${PROJECT_ID}/kubeconfig/kubeconfig_${EKS_PROD_1_NAME} ${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_1_NAME}
+    - gsutil cp -r gs://${PROJECT_ID}/kubeconfig/kubeconfig_${EKS_PROD_2_NAME} ${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_2_NAME}
+    - gsutil cp -r gs://${PROJECT_ID}/kubeconfig/kubeconfig_${EKS_STAGE_1_NAME} ${CI_PROJECT_DIR}/kubeconfig_${EKS_STAGE_1_NAME}
+    - KUBECONFIG=${HOME}/.kube/config:${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_1_NAME}:${CI_PROJECT_DIR}/kubeconfig_${EKS_PROD_2_NAME}:${CI_PROJECT_DIR}/kubeconfig_${EKS_STAGE_1_NAME} kubectl config view --flatten --merge > ${CI_PROJECT_DIR}/kubeconfig_merged
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - kubectl config view
+    # prod
+    - echo "Testing eks_${EKS_PROD_1_NAME}"
+    - kubectl --context eks_${EKS_PROD_1_NAME} get nodes
+    - echo "Testing eks_${EKS_PROD_2_NAME}"
+    - kubectl --context eks_${EKS_PROD_2_NAME} get nodes
+    - echo "Testing gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}"
+    - kubectl --context gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME} get nodes
+    - echo "Testing gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}"
+    - kubectl --context gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME} get nodes
+    # stage
+    - echo "Testing eks_${EKS_STAGE_1_NAME}"
+    - kubectl --context eks_${EKS_STAGE_1_NAME} get nodes
+    - echo "Testing gke_${PROJECT_ID}_${GKE_STAGE_1_LOCATION}_${GKE_STAGE_1_NAME}"
+    - kubectl --context gke_${PROJECT_ID}_${GKE_STAGE_1_LOCATION}_${GKE_STAGE_1_NAME} get nodes
+    # dev
+    - echo "Testing gke_${PROJECT_ID}_${GKE_DEV_1_LOCATION}_${GKE_DEV_1_NAME}"
+    - kubectl --context gke_${PROJECT_ID}_${GKE_DEV_1_LOCATION}_${GKE_DEV_1_NAME} get nodes
+    - echo "Testing gke_${PROJECT_ID}_${GKE_DEV_2_LOCATION}_${GKE_DEV_2_NAME}"
+    - kubectl --context gke_${PROJECT_ID}_${GKE_DEV_2_LOCATION}_${GKE_DEV_2_NAME} get nodes
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+eks:
+  stage: connectivity
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - echo "Testing eks_${EKS_PROD_1_NAME}"
+    - kubectl --context eks_${EKS_PROD_1_NAME} describe svc -n istio-system -l app=istio-ingressgateway | grep "LoadBalancer Ingress"
+    - echo "Testing eks_${EKS_PROD_2_NAME}"
+    - kubectl --context eks_${EKS_PROD_2_NAME} describe svc -n istio-system -l app=istio-ingressgateway | grep "LoadBalancer Ingress"
+    - echo "Testing eks_${EKS_STAGE_1_NAME}"
+    - kubectl --context eks_${EKS_STAGE_1_NAME} describe svc -n istio-system -l app=istio-ingressgateway | grep "LoadBalancer Ingress"
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+deploy-dev:
+  stage: deploy-apps
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - mkdir -p ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloudopsgsa
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_DEV_1=gke_${PROJECT_ID}_${GKE_DEV_1_LOCATION}_${GKE_DEV_1_NAME}
+    - export GKE_DEV_2=gke_${PROJECT_ID}_${GKE_DEV_2_LOCATION}_${GKE_DEV_2_NAME}
+    - cd anthos-multicloud-workshop/platform_admins/tests
+    - ./ob_dev.sh
+    - export DEV_URL=$(kubectl --context=${GKE_DEV_1} -n istio-system get svc istio-ingressgateway -o jsonpath={.status.loadBalancer.ingress[].ip})
+    - echo "L1_DEV_URL=${DEV_URL}" > ${CI_PROJECT_DIR}/deploy-dev.env
+  artifacts:
+    reports:
+      dotenv: deploy-dev.env
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+deploy-stage:
+  stage: deploy-apps
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - mkdir -p ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloudopsgsa
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_STAGE_1=gke_${PROJECT_ID}_${GKE_STAGE_1_LOCATION}_${GKE_STAGE_1_NAME}
+    - export EKS_STAGE_1=eks_${EKS_STAGE_1_NAME}
+    - cd anthos-multicloud-workshop/platform_admins/tests
+    - ./ob_stage.sh
+    - export STAGE_URL=$(kubectl --context=${GKE_STAGE_1} -n istio-system get svc istio-ingressgateway -o jsonpath={.status.loadBalancer.ingress[].ip})
+    - echo "L1_STAGE_URL=${STAGE_URL}" > ${CI_PROJECT_DIR}/deploy-stage.env
+  artifacts:
+    reports:
+      dotenv: deploy-stage.env
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+deploy-prod:
+  stage: deploy-apps
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - mkdir -p ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloudopsgsa
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_PROD_1=gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}
+    - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
+    - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
+    - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - cd anthos-multicloud-workshop/platform_admins/tests
+    - ./ob_prod.sh
+    - export PROD_URL=$(kubectl --context=${GKE_PROD_1} -n istio-system get svc istio-ingressgateway -o jsonpath={.status.loadBalancer.ingress[].ip})
+    - echo "L1_PROD_URL=${PROD_URL}" > ${CI_PROJECT_DIR}/deploy-prod.env
+  artifacts:
+    reports:
+      dotenv: deploy-prod.env
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+test-apps:
+  stage: test-apps
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - echo "Testing Dev"
+    - curl ${L1_DEV_URL} -I -f -s
+    - echo "Testing Stage"
+    - curl ${L1_STAGE_URL} -I -f -s
+    - echo "Testing Prod"
+    - curl ${L1_PROD_URL} -I -f -s
+  dependencies:
+    - deploy-dev
+    - deploy-stage
+    - deploy-prod
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+test-app-migration:
+  stage: test-app-migration
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_PROD_1=gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}
+    - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
+    - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
+    - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - |
+      kubectl --context ${EKS_PROD_2} -n ob-prod get deployment cartservice
+      if [ $? == 0 ]; then
+        echo "Cart Service exists in ${EKS_PROD_2}, deleting..."
+        kubectl --context ${EKS_PROD_2} -n ob-prod delete deployment cartservice
+        echo "Cart Service being installed on ${GKE_PROD_2}"
+        kubectl --context ${GKE_PROD_2} -n ob-prod apply -f ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ob/cart-deployment.yaml
+      fi
+    - |
+      for i in {1..20} 
+      do
+        curl ${L1_PROD_URL} -I -f -s && break
+        sleep 10
+      done
+  needs:
+    - deploy-prod
+    - test-apps
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+test-app-distributed:
+  stage: test-app-distributed
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_PROD_1=gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}
+    - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
+    - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
+    - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - kubectl --context ${EKS_PROD_1} -n ob-prod apply -f ${WORKDIR}/anthos-multicloud-workshop/platform_admins/tests/ob/frontend-deployment-aws.yaml
+    - |
+      for i in {1..30} 
+      do
+        OUTPUT=$(curl ${L1_PROD_URL} -s | { grep "AWS" || true; } | wc -l)
+        if [ ${OUTPUT} == 1 ]; then
+          echo "AWS Frontend served"
+          break
+        fi
+        sleep 10
+      done
+  needs:
+    - deploy-prod
+    - test-app-migration
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+deploy-shared-cd:
+  stage: deploy-shared-cd
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - mkdir -p ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp -r gs://${GOOGLE_PROJECT}/ssh-keys ${WORKDIR}/.
+    - chmod 0600 ${WORKDIR}/ssh-keys/ssh-key-private
+    - eval `ssh-agent` && ssh-add ${WORKDIR}/ssh-keys/ssh-key-private
+    - git config --global user.email "${GCLOUD_USER}"
+    - git config --global user.name "Cloud Shell"
+    - |
+      if [ ! -d ${HOME}/.ssh ]; then
+        mkdir ${HOME}/.ssh
+        chmod 700 ${HOME}/.ssh
+      fi
+    - ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_PROD_1=gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}
+    - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
+    - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
+    - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:platform-admins/shared-cd.git
+    - cd ${WORKDIR}/shared-cd
+    - |
+      FILE="commit-to-acm.yaml"
+      if [ ! -f "$FILE" ]; then
+        cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/shared_cd/. .
+        git add .
+        git commit -m "initial commit"
+        git branch -m master main
+        git push -u origin main
+      else
+        echo "Repo exists, do not change"
+      fi
+  needs:
+    - eks
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+deploy-config:
+  stage: deploy-common
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - mkdir -p ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp -r gs://${GOOGLE_PROJECT}/ssh-keys ${WORKDIR}/.
+    - chmod 0600 ${WORKDIR}/ssh-keys/ssh-key-private
+    - eval `ssh-agent` && ssh-add ${WORKDIR}/ssh-keys/ssh-key-private
+    - git config --global user.email "${GCLOUD_USER}"
+    - git config --global user.name "Cloud Shell"
+    - |
+      if [ ! -d ${HOME}/.ssh ]; then
+        mkdir ${HOME}/.ssh
+        chmod 700 ${HOME}/.ssh
+      fi
+    - ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_PROD_1=gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}
+    - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
+    - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
+    - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:platform-admins/config.git
+    - cd ${WORKDIR}/config
+    - |
+      FILE="README.md"
+      if [ ! -f "$FILE" ]; then
+        cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/config/. .
+        git add .
+        git commit -m "initial commit"
+        git branch -m master main
+        git push -u origin main
+        echo "Give time for acm controllers to initialize, 60"
+        sleep 60
+      else
+        echo "Repo exists, do not change"
+      fi
+    - gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos ${CI_PROJECT_DIR}/nomos
+    - chmod 755 ${CI_PROJECT_DIR}/nomos
+    - |
+      SYNC_COUNT="0"
+      for i in {1..50}
+      do
+        SYNC_COUNT=$(${CI_PROJECT_DIR}/nomos status | { grep "SYNCED" || true; } | wc -l)
+        if [ "${SYNC_COUNT}" == "8" ]; then
+          break
+        fi
+        sleep 10
+      done
+      if [ ! "${SYNC_COUNT}" == "8" ]; then
+        echo "Issues with a cluster not syncing, do not have the expected 8 clusters SYNCED"
+        exit 1
+      fi
+  needs:
+  - deploy-shared-cd
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+deploy-redis:
+  stage: deploy-redis
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - mkdir -p ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp -r gs://${GOOGLE_PROJECT}/ssh-keys ${WORKDIR}/.
+    - chmod 0600 ${WORKDIR}/ssh-keys/ssh-key-private
+    - eval `ssh-agent` && ssh-add ${WORKDIR}/ssh-keys/ssh-key-private
+    - git config --global user.email "${GCLOUD_USER}"
+    - git config --global user.name "Cloud Shell"
+    - |
+      if [ ! -d ${HOME}/.ssh ]; then
+        mkdir ${HOME}/.ssh
+        chmod 700 ${HOME}/.ssh
+      fi
+    - ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_PROD_1=gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}
+    - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
+    - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
+    - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:databases/redis.git
+    - cd ${WORKDIR}/redis
+    - |
+      FILE=".gitlab-ci.yml"
+      if [ ! -f "$FILE" ]; then
+        cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/redis/. .
+        git add .
+        git commit -m "initial commit"
+        git branch -m master main
+        git push -u origin main
+        echo "Give time for the pipeline, 120"
+        sleep 120
+      else
+        echo "Repo exists, do not change"
+      fi
+    - |
+      SYNC_COUNT="0"
+      for i in {1..50}
+      do
+        SYNC_COUNT=$(kubectl --context=${GKE_PROD_1} -n db-redis exec -t gke-redis-0 -- redis-cli cluster nodes | wc -l)
+        if [ "${SYNC_COUNT}" == "6" ]; then
+          break
+        fi
+        sleep 10
+      done
+      if [ ! "${SYNC_COUNT}" == "6" ]; then
+        echo "Error validting redis, check the redis CICD pipeline and retry if necessary"
+        exit 1
+      fi
+  needs:
+    - deploy-config
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+deploy-app-ob:
+  stage: deploy-app-ob
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - mkdir -p ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp -r gs://${GOOGLE_PROJECT}/ssh-keys ${WORKDIR}/.
+    - chmod 0600 ${WORKDIR}/ssh-keys/ssh-key-private
+    - eval `ssh-agent` && ssh-add ${WORKDIR}/ssh-keys/ssh-key-private
+    - git config --global user.email "${GCLOUD_USER}"
+    - git config --global user.name "Cloud Shell"
+    - |
+      if [ ! -d ${HOME}/.ssh ]; then
+        mkdir ${HOME}/.ssh
+        chmod 700 ${HOME}/.ssh
+      fi
+    - ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_PROD_1=gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}
+    - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
+    - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
+    - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:online-boutique/online-boutique.git
+    - cd ${WORKDIR}/online-boutique
+    - |
+      FILE=".gitlab-ci.yml"
+      if [ ! -f "$FILE" ]; then
+        cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/online_boutique/. .
+        git add .
+        git commit -m "initial commit"
+        git branch -m master main
+        git push -u origin main
+        echo "Give time for the pipeline, 720, takes about ~11-12min"
+        sleep 720
+      else
+        echo "Repo exists, do not change"
+      fi
+    - echo "Checking if certificate is active"
+    - |
+      SYNC_COUNT="0"
+      for i in {1..50}
+      do
+        SYNC_COUNT=$(gcloud compute ssl-certificates list | { grep shop-managed || true; } | { grep ACTIVE || true; } | wc -l)
+        if [ "${SYNC_COUNT}" == "1" ]; then
+          break
+        fi
+        sleep 10
+      done
+      if [ ! "${SYNC_COUNT}" == "1" ]; then
+        exit 1
+      fi
+    - echo "Check ob endpoint via curl"
+    - |
+      for i in {1..50}
+      do
+        curl https://shop.endpoints.${GOOGLE_PROJECT}.cloud.goog -I -f -s && break
+        sleep 10
+      done
+    - curl https://shop.endpoints.${GOOGLE_PROJECT}.cloud.goog -I -f -s
+  needs:
+    - deploy-redis
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+deploy-crdb:
+  stage: deploy-crdb
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - mkdir -p ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp -r gs://${GOOGLE_PROJECT}/ssh-keys ${WORKDIR}/.
+    - chmod 0600 ${WORKDIR}/ssh-keys/ssh-key-private
+    - eval `ssh-agent` && ssh-add ${WORKDIR}/ssh-keys/ssh-key-private
+    - git config --global user.email "${GCLOUD_USER}"
+    - git config --global user.name "Cloud Shell"
+    - |
+      if [ ! -d ${HOME}/.ssh ]; then
+        mkdir ${HOME}/.ssh
+        chmod 700 ${HOME}/.ssh
+      fi
+    - ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_PROD_1=gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}
+    - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
+    - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
+    - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:databases/cockroachdb.git
+    - cd ${WORKDIR}/cockroachdb
+    - |
+      FILE=".gitlab-ci.yml"
+      if [ ! -f "$FILE" ]; then
+        cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/cockroachdb/. .
+        git add .
+        git commit -m "initial commit"
+        git branch -m master main
+        git push -u origin main
+        echo "Give time for the pipeline, 120"
+        sleep 120
+      else
+        echo "Repo exists, do not change"
+      fi
+    - |
+      echo "Check ${GKE_PROD_1}"
+      SYNC_COUNT="0"
+      for i in {1..50}
+      do
+        SYNC_COUNT=$(kubectl --context=${GKE_PROD_1} -n db-crdb get pods | { grep Running || true; } | wc -l)
+        if [ "${SYNC_COUNT}" == "3" ]; then
+          break
+        fi
+        sleep 10
+      done
+      if [ ! "${SYNC_COUNT}" == "3" ]; then
+        echo "Issues with ${GKE_PROD_1} crdb pods, check cockroachdb CICD pipeline and retry if necessary"
+        exit 1
+      fi
+    - |
+      echo "Check ${EKS_PROD_1}"
+      SYNC_COUNT="0"
+      for i in {1..50}
+      do
+        SYNC_COUNT=$(kubectl --context=${EKS_PROD_1} -n db-crdb get pods | { grep Running || true; } | wc -l)
+        if [ "${SYNC_COUNT}" == "3" ]; then
+          break
+        fi
+        sleep 10
+      done
+      if [ ! "${SYNC_COUNT}" == "3" ]; then
+        echo "Issues with ${EKS_PROD_1} crdb pods, check cockroachdb CICD pipeline and retry if necessary"
+        exit 1
+      fi
+    - |
+      DB_COUNT=$(kubectl --context ${GKE_PROD_1} -n db-crdb exec -t gke-crdb-0 -- cockroach sql --insecure --host=crdb --execute="show databases;" | { grep -e accountsdb -e postgresdb || true; } | wc -l)
+      if [ ! "${DB_COUNT}" == "2" ]; then
+        echo "Create and initialize databases"
+        kubectl --context ${GKE_PROD_1} -n db-crdb exec -t gke-crdb-0 -- mkdir -p /cockroach/cockroach-data/extern
+        kubectl --context ${GKE_PROD_1} -n db-crdb cp ${WORKDIR}/cockroachdb/templates/dump-accounts-db.sql gke-crdb-0:/cockroach/cockroach-data/extern/dump-accounts-db.sql
+        kubectl --context ${GKE_PROD_1} -n db-crdb cp ${WORKDIR}/cockroachdb/templates/dump-postgresdb.sql gke-crdb-0:/cockroach/cockroach-data/extern/dump-postgresdb.sql
+        kubectl --context ${GKE_PROD_1} -n db-crdb exec -t gke-crdb-0 -- cockroach sql --insecure --host=crdb \
+          --execute="CREATE DATABASE accountsdb;" \
+          --execute="CREATE DATABASE postgresdb;" \
+          --execute="USE accountsdb;IMPORT PGDUMP 'nodelocal://1/dump-accounts-db.sql';SHOW TABLES;SELECT * FROM contacts;SELECT * FROM users;" \
+          --execute="USE postgresdb;IMPORT PGDUMP 'nodelocal://1/dump-postgresdb.sql';SHOW TABLES;SELECT * FROM transactions;"
+      else
+        echo "Databases already created, count: ${DB_COUNT}"
+      fi
+  needs:
+    - deploy-app-ob
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
+
+deploy-app-boa:
+  stage: deploy-app-boa
+  image:
+    name: gcr.io/${PROJECT_ID}/platform-installer
+  script:
+    - source ${CI_PROJECT_DIR}/setup-base.sh
+    - source ${CI_PROJECT_DIR}/cluster_variables.env
+    - export KUBECONFIG=${CI_PROJECT_DIR}/kubeconfig_merged
+    - export GOOGLE_PROJECT=${PROJECT_ID}
+    - export WORKDIR=${CI_PROJECT_DIR}
+    - mkdir -p ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp gs://${PROJECT_ID}/cloudopsgsa/cloud_ops_sa_key.json ${CI_PROJECT_DIR}/cloudopsgsa
+    - gsutil cp -r gs://${GOOGLE_PROJECT}/ssh-keys ${WORKDIR}/.
+    - chmod 0600 ${WORKDIR}/ssh-keys/ssh-key-private
+    - eval `ssh-agent` && ssh-add ${WORKDIR}/ssh-keys/ssh-key-private
+    - git config --global user.email "${GCLOUD_USER}"
+    - git config --global user.name "Cloud Shell"
+    - |
+      if [ ! -d ${HOME}/.ssh ]; then
+        mkdir ${HOME}/.ssh
+        chmod 700 ${HOME}/.ssh
+      fi
+    - ssh-keyscan -t ecdsa-sha2-nistp256 -H gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog >> ~/.ssh/known_hosts
+    - git clone -b ${BRANCH} https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop
+    - export GKE_PROD_1=gke_${PROJECT_ID}_${GKE_PROD_1_LOCATION}_${GKE_PROD_1_NAME}
+    - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
+    - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
+    - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:bank-of-anthos/bank-of-anthos.git
+    - cd ${WORKDIR}/bank-of-anthos
+    - |
+      FILE=".gitlab-ci.yml"
+      if [ ! -f "$FILE" ]; then
+        cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/bank_of_anthos/. .
+        git add .
+        git commit -m "initial commit"
+        git branch -m master main
+        git push -u origin main
+        echo "Give time for the pipeline, 480, takes about ~7-8min"
+        sleep 480
+      else
+        echo "Repo exists, do not change"
+      fi
+    - echo "Checking if certificate is active"
+    - |
+      SYNC_COUNT="0"
+      for i in {1..50}
+      do
+        SYNC_COUNT=$(gcloud compute ssl-certificates list | { grep bank-managed || true; } | { grep ACTIVE || true; } | wc -l)
+        if [ "${SYNC_COUNT}" == "1" ]; then
+          break
+        fi
+        sleep 10
+      done
+      if [ ! "${SYNC_COUNT}" == "1" ]; then
+        exit 1
+      fi
+    - echo "Check boa endpoint via curl"
+    - |
+      for i in {1..50}
+      do
+        curl https://bank.endpoints.${GOOGLE_PROJECT}.cloud.goog -I -f -s && break
+        sleep 10
+      done
+    # not sure why this errors out, but passes above
+    #- curl https://bank.endpoints.${GOOGLE_PROJECT}.cloud.goog -I -f -s
+  needs:
+    - deploy-crdb
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ${CI_PROJECT_DIR}/kubeconfig_merged
+      - ${CI_PROJECT_DIR}/cluster_variables.env
