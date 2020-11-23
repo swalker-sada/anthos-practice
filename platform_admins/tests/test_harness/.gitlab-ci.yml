@@ -353,13 +353,44 @@ deploy-config:
     - |
       FILE="README.md"
       if [ ! -f "$FILE" ]; then
-        cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/config/. .
+        touch README.md
         git add .
         git commit -m "initial commit"
         git branch -m master main
         git push -u origin main
+        git checkout -b prep
+        cp -r ${WORKDIR}/anthos-multicloud-workshop/platform_admins/starter_repos/config/. .
+        git add .
+        git commit -m 'apply appropriate istio rev label'
+        git push -u origin prep -o merge_request.create -o merge_request.merge_when_pipeline_succeeds -o merge_request.target=main
         echo "Give time for acm controllers to initialize, 60"
         sleep 60
+        # need to automatically merge mr
+        # https://docs.gitlab.com/ee/api/merge_requests.html#accept-mr
+        # 
+        # get the gitlab creds
+        gsutil cp -r gs://${PROJECT_ID}/gitlab/gitlab_creds.txt ${CI_PROJECT_DIR}/gitlab_creds.txt
+        # grab the PW
+        GITLAB_CONFIG_PROJECT_NAME="config"
+        GITLAB_CONFIG_MR_TITLE="apply appropriate istio rev label"
+        GITLAB_PW=$(sed -n '2p' ${CI_PROJECT_DIR}/gitlab_creds.txt)
+        # get config project ID
+        GITLAB_CONFIG_PROJECT_ID=$(curl -s -H "PRIVATE-TOKEN: ${GITLAB_PW}" \
+          "https://gitlab.endpoints.${PROJECT_ID}.cloud.goog/api/v4/projects" \
+          | jq -r ".[] | select (.name==\"${GITLAB_CONFIG_PROJECT_NAME}\") | .id")
+        # get the MR iid
+        GITLAB_CONFIG_MR_IID=$(curl -s -H "PRIVATE-TOKEN: ${GITLAB_PW}" \
+          "https://gitlab.endpoints.${PROJECT_ID}.cloud.goog/api/v4/projects/${GITLAB_CONFIG_PROJECT_ID}/merge_requests" \
+          | jq -r ".[] | select (.title==\"${GITLAB_CONFIG_MR_TITLE}\") | .iid")
+        # if the state is "merged", don't merge
+        GITLAB_CONFIG_MR_STATUS=$(curl -s -H "PRIVATE-TOKEN: ${GITLAB_PW}" \
+          "https://gitlab.endpoints.${PROJECT_ID}.cloud.goog/api/v4/projects/${GITLAB_CONFIG_PROJECT_ID}/merge_requests" \
+          | jq -r ".[] | select (.title==\"${GITLAB_CONFIG_MR_TITLE}\") | .state")
+        if [ ! "${GITLAB_CONFIG_MR_STATUS}" == "merged" ]; then
+          echo "Merging ${GITLAB_CONFIG_PROJECT_NAME}, IID ${GITLAB_CONFIG_MR_IID}"
+          curl -s -X PUT -H "PRIVATE-TOKEN: ${GITLAB_PW}" \
+          "https://gitlab.endpoints.${PROJECT_ID}.cloud.goog/api/v4/projects/${GITLAB_CONFIG_PROJECT_ID}/merge_requests/${GITLAB_CONFIG_MR_IID}/merge"
+        fi
       else
         echo "Repo exists, do not change"
       fi
@@ -553,6 +584,32 @@ deploy-crdb:
     - export GKE_PROD_2=gke_${PROJECT_ID}_${GKE_PROD_2_LOCATION}_${GKE_PROD_2_NAME}
     - export EKS_PROD_1=eks_${EKS_PROD_1_NAME}
     - export EKS_PROD_2=eks_${EKS_PROD_2_NAME}
+    - |
+      cat << EOF > patch.yaml
+      spec:
+        configPatches:
+        - applyTo: NETWORK_FILTER
+          match:
+            context: GATEWAY
+            listener:
+              filterChain:
+                filter:
+                  name: envoy.filters.network.sni_cluster
+              portNumber: 15443
+          patch:
+            operation: INSERT_AFTER
+            value:
+              name: envoy.filters.network.tcp_cluster_rewrite
+              typed_config:
+                '@type': type.googleapis.com/istio.envoy.config.filter.network.tcp_cluster_rewrite.v2alpha1.TcpClusterRewrite
+                cluster_pattern: \.global$
+                cluster_replacement: .svc.cluster.local
+      EOF
+
+      for CLUSTER in ${GKE_PROD_1} ${GKE_PROD_2} ${EKS_PROD_1} ${EKS_PROD_2}
+      do
+        kubectl --context ${CLUSTER} patch envoyfilter istio-multicluster-ingressgateway -n istio-system --patch "$(cat patch.yaml)" --type=merge
+      done
     - git clone git@gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog:databases/cockroachdb.git
     - cd ${WORKDIR}/cockroachdb
     - |
