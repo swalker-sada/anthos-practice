@@ -456,6 +456,10 @@ echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog"
 
 <img src="/platform_admins/docs/img/gitlab_repos.png" width=50% height=50%>
 
+## Testing
+
+The platform includes a [test pipeline](/platform_admins/docs/test-harness.md) that can also be used to prepare the environment for a demo.
+
 ## Labs
 
 With the setup complete, you can proceed with the following labs.
