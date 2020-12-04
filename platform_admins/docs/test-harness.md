@@ -34,7 +34,7 @@
 
 ## Observing the pipeline
 
-1.  Check out the status of the pipeline using the link below.
+1.  Check out the status of the pipeline using the link below.  Based on the current setup of the pipeline, it can take upwards of 45-60 minutes to complete due to dependencies.
 
     ```bash
     echo -e "https://gitlab.endpoints.${GOOGLE_PROJECT}.cloud.goog/test-harness/test-harness/-/pipelines"
