@@ -22,8 +22,8 @@ variable "asm_properties" {
     branch    = string
   })
   default = {
-    version   = "1.7.3-asm.6"
-    rev_label = "asm-173-6"
-    branch    = "1.7.3-asm.6+config1"
+    version   = "1.8.1-asm.5"
+    rev_label = "asm-181-5"
+    branch    = "1.8.1-asm.5+config3"
   }
 }

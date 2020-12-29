@@ -19,11 +19,11 @@ variable "gke_net" {
 }
 
 variable "asm_version" {
-  default = "1.7.3-asm.6"
+  default = "1.8.1-asm.5"
 }
 
 variable "asm_rev_label" {
-  default = "asm-173-6"
+  default = "asm-181-5"
 }
 
 variable "env" {

@@ -46,7 +46,7 @@ title_no_wait "*** BOOTSTRAP ***"
 echo -e "\n"
 
 # Pin ASM version, needed for tools.sh script
-grep -q "export ASM_VERSION.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export ASM_VERSION=1.7.3-asm.6" >> ${SCRIPT_DIR}/../../../vars.sh
+grep -q "export ASM_VERSION.*" ${SCRIPT_DIR}/../../../vars.sh || echo -e "export ASM_VERSION=1.8.1-asm.5" >> ${SCRIPT_DIR}/../../../vars.sh
 
 source ${SCRIPT_DIR}/../scripts/tools.sh
 
