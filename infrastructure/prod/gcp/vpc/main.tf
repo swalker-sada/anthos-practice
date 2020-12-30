@@ -24,6 +24,7 @@ module "prod_gcp_vpc_01" {
 # create firewall rules to allow-all inernally and SSH from external
 module "prod-net-firewall" {
   source                  = "terraform-google-modules/network/google//modules/fabric-net-firewall"
+  version                 = "2.6.0"
   project_id              = module.prod_gcp_vpc_01.project_id
   network                 = module.prod_gcp_vpc_01.network_name
   internal_ranges_enabled = true
