@@ -31,6 +31,9 @@ do
 
     echo -e "${GKE_COMPONENT}" | sed -e s/ENV/$ENV/g >> asm_$GKE.yaml
 
+    # Add meshconfig
+    echo -e "${GKE_MESHCONFIG}" >> asm_$GKE.yaml
+
     # Add values
     echo -e "${GCP_VALUES}" | sed -e s/GKE/$GKE/g -e s/GCP_NET/$GKE_NET/g >> asm_$GKE.yaml
 

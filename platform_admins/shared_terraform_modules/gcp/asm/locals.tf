@@ -21,11 +21,6 @@ kind: IstioOperator
 spec:
   profile: asm-multicloud
   revision: ASM_REV_LABEL
-  addonComponents:
-    # could not overlay user config over base: json merge error (unable to find api field in struct externalComponentSpec...
-    # prometheus, grafana, kiali in the asm-multicloud profile
-    istiocoredns:
-      enabled: true
 EOT
   eks_component         = <<EOT
   components:
@@ -47,10 +42,21 @@ EOT
           cloud.google.com/neg: '{"exposed_ports": {"80":{}}}'
           anthos.cft.dev/autoneg: '{"name":"ENV-istio-ingressgateway-backend-svc", "max_rate_per_endpoint":100}'
 EOT
+  gke_meshconfig        = <<EOT
+  meshConfig:
+    defaultConfig:
+      proxyMetadata:
+        # istiocoredns deprecation
+        ISTIO_META_DNS_CAPTURE: "true"
+        ISTIO_META_PROXY_XDS_VIA_AGENT: "true"
+EOT
   eks_meshconfig        = <<EOT
   meshConfig:
     defaultConfig:
       proxyMetadata:
+        # istiocoredns deprecation
+        ISTIO_META_DNS_CAPTURE: "true"
+        ISTIO_META_PROXY_XDS_VIA_AGENT: "true"      
         ISTIO_METAJSON_PLATFORM_METADATA: |-
           {\"PLATFORM_METADATA\":{\"gcp_gke_cluster_name\":\"EKS\",\"gcp_project\":\"PROJECT_ID\",\"gcp_location\":\"CLUSTER_LOCATION\"}}
 EOT

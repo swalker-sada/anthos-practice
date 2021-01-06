@@ -31,8 +31,9 @@ resource "null_resource" "exec_create_asm_yamls" {
       EKS_EIP_LIST_STRING    = var.eks_eip_list
       # ASM yaml patches below
       HEADER             = local.header
-      EKS_COMPONENT      = local.eks_component
       GKE_COMPONENT      = local.gke_component
+      EKS_COMPONENT      = local.eks_component
+      GKE_MESHCONFIG     = local.gke_meshconfig
       EKS_MESHCONFIG     = local.eks_meshconfig
       GCP_VALUES         = local.gcp_values
       EKS_VALUES         = local.eks_values
