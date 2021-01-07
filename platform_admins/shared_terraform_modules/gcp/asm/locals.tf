@@ -68,8 +68,6 @@ EOT
         enabled: true
         stackdriver:
           enabled: true  # This enables Stackdriver metrics
-    kiali:
-      createDemoSecret: true
     global:
       podDNSSearchNamespaces:
         - global
@@ -90,8 +88,6 @@ EOT
         enabled: true
         stackdriver:
           enabled: true  # This enables Stackdriver metrics       
-    kiali:
-      createDemoSecret: true
     global:
       podDNSSearchNamespaces:
         - global

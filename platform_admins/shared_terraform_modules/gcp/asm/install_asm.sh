@@ -94,7 +94,7 @@ processEKS() {
     kubectl --context=eks_${EKS} get po --all-namespaces
     retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
     retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
-    retry "istioctl --context=eks_${EKS} install -f asm_${EKS}.yaml"
+    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}.yaml"
     retry "kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml"
     retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
     retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
@@ -111,7 +111,7 @@ processGKE() {
     kubectl --context=${GKE_CTX} get po --all-namespaces
     retry "kubectl --context=${GKE_CTX} apply -f istio-system.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
-    retry "istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml"
+    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
