@@ -70,13 +70,14 @@ do
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ gcloud.compute.location "${CLUSTER_LOCS[$i]}"
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ gcloud.project.environProjectNumber ${ENVIRON_PROJECT_NUMBER}
   kpt cfg set "${CLUSTER_NAMES[$i]}"/ anthos.servicemesh.rev "${ASM_REV_LABEL}"
+  kpt cfg set "${CLUSTER_NAMES[$i]}"/ anthos.servicemesh.tag "${ASM_VERSION}"
   kpt cfg list-setters "${CLUSTER_NAMES[$i]}"/
   
   # Create istio-system namespace
   kubectl --context=${GKE_CTX} create ns istio-system
   
   # Install ASM
-  istioctl install -f "${CLUSTER_NAMES[$i]}"/istio/istio-operator.yaml --revision="${ASM_REV_LABEL}"
+  istioctl install -y -f "${CLUSTER_NAMES[$i]}"/istio/istio-operator.yaml --revision="${ASM_REV_LABEL}"
 
   # Install validating webhook to locate istiod via rev label
   kubectl --context=${GKE_CTX} apply -f "${CLUSTER_NAMES[$i]}"/istio/istiod-service.yaml
