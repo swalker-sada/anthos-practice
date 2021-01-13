@@ -137,10 +137,10 @@ wait < <(jobs -p)
 # Create cross-cluster service discovery
 for EKS in ${EKS_LIST[@]}
 do
-    echo -e "##### Kube DNS configmap for ${EKS}... #####\n"
-    COREDNS_IP=$(kubectl --context=eks_${EKS} get svc -n istio-system istiocoredns -o jsonpath={.spec.clusterIP})
-    echo -e "${EKS_COREDNS_CONFIGMAP}" | sed -e s/COREDNS_IP/$COREDNS_IP/g >> eks_coredns_configmap_${EKS}.yaml
-    retry "kubectl --context=eks_${EKS} apply -f eks_coredns_configmap_${EKS}.yaml"
+    #echo -e "##### Kube DNS configmap for ${EKS}... #####\n"
+    #COREDNS_IP=$(kubectl --context=eks_${EKS} get svc -n istio-system istiocoredns -o jsonpath={.spec.clusterIP})
+    #echo -e "${EKS_COREDNS_CONFIGMAP}" | sed -e s/COREDNS_IP/$COREDNS_IP/g >> eks_coredns_configmap_${EKS}.yaml
+    #retry "kubectl --context=eks_${EKS} apply -f eks_coredns_configmap_${EKS}.yaml"
 
     echo -e "##### Secrets for ${EKS}... #####\n"
     for EKS_SECRET in ${EKS_LIST[@]}
@@ -160,11 +160,11 @@ done
 
 for IDX in ${!GKE_LIST[@]}
 do
-    echo -e "##### KubeDNS configmap for ${GKE_LIST[IDX]}... #####\n"
-    GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
-    COREDNS_IP=$(kubectl --context=${GKE_CTX} get svc -n istio-system istiocoredns -o jsonpath={.spec.clusterIP})
-    echo -e "${GKE_KUBEDNS_CONFIGMAP}" | sed -e s/COREDNS_IP/$COREDNS_IP/g >> gke_kubedns_configmap_${GKE_CTX}.yaml
-    retry "kubectl --context=${GKE_CTX} apply -f gke_kubedns_configmap_${GKE_CTX}.yaml"
+    #echo -e "##### KubeDNS configmap for ${GKE_LIST[IDX]}... #####\n"
+    #GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
+    #COREDNS_IP=$(kubectl --context=${GKE_CTX} get svc -n istio-system istiocoredns -o jsonpath={.spec.clusterIP})
+    #echo -e "${GKE_KUBEDNS_CONFIGMAP}" | sed -e s/COREDNS_IP/$COREDNS_IP/g >> gke_kubedns_configmap_${GKE_CTX}.yaml
+    #retry "kubectl --context=${GKE_CTX} apply -f gke_kubedns_configmap_${GKE_CTX}.yaml"
 
     echo -e "##### Secrets for ${GKE_LIST[IDX]}... #####\n"
     for EKS_SECRET in ${EKS_LIST[@]}
