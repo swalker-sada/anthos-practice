@@ -44,6 +44,7 @@ EOT
 EOT
   gke_meshconfig        = <<EOT
   meshConfig:
+    accessLogFile: "/dev/stdout"
     defaultConfig:
       proxyMetadata:
         # istiocoredns deprecation
@@ -52,6 +53,7 @@ EOT
 EOT
   eks_meshconfig        = <<EOT
   meshConfig:
+    accessLogFile: "/dev/stdout"
     defaultConfig:
       proxyMetadata:
         # istiocoredns deprecation
