@@ -62,8 +62,8 @@ kubectl create secret generic cacerts -n istio-system \
 --from-file=${ASM_DIR}/samples/certs/root-cert.pem \
 --from-file=${ASM_DIR}/samples/certs/cert-chain.pem --dry-run -o yaml > cacerts.yaml
 
-echo -e "${CLUSTER_AWARE_GATEWAY}" > cluster_aware_gateway.yaml
-cat cluster_aware_gateway.yaml
+echo -e "${CLUSTER_NETWORK_GATEWAY}" > cluster_network_gateway.yaml
+cat cluster_network_gateway.yaml
 
 # Get all EKS clusters' kubeconfig files
 for IDX in ${!GKE_LIST[@]}
@@ -91,11 +91,20 @@ processEKS() {
     EKS=${1}
     exec 1> >(sed "s/^/${EKS} SO: /")
     exec 2> >(sed "s/^/${EKS} SE: /" >&2)
+    # generate eastwestgateway
+    ${ASM_DIR}/samples/multicluster/gen-eastwest-gateway.sh \
+      --mesh proj-${PROJECT_NUMBER} --cluster ${EKS} --network ${EKS}-net > asm_${EKS}-eastwestgateway.yaml
+
     kubectl --context=eks_${EKS} get po --all-namespaces
     retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
+    # make this declarative later?
+    retry kubectl --context=eks_${EKS} get namespace istio-system && \
+      retry kubectl --context=eks_${EKS} label namespace istio-system topology.istio.io/network=${EKS}-net
+
     retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
     retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}.yaml"
-    retry "kubectl --context=eks_${EKS} apply -f cluster_aware_gateway.yaml"
+    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}-eastwestgateway.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f cluster_network_gateway.yaml"
     retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
     retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
     retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
@@ -108,11 +117,20 @@ processGKE() {
     exec 1> >(sed "s/^/${IDX} SO: /")
     exec 2> >(sed "s/^/${IDX} SE: /" >&2)
     GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
+    # generate eastwestgateway
+    ${ASM_DIR}/samples/multicluster/gen-eastwest-gateway.sh \
+      --mesh proj-${PROJECT_NUMBER} --cluster ${GKE_LIST[IDX]} --network ${GKE_NET} > asm_${GKE_LIST[IDX]}-eastwestgateway.yaml
+
     kubectl --context=${GKE_CTX} get po --all-namespaces
     retry "kubectl --context=${GKE_CTX} apply -f istio-system.yaml"
+    # make this declarative later?
+    retry kubectl --context=${GKE_CTX} get namespace istio-system && \
+      retry kubectl --context=${GKE_CTX} label namespace istio-system topology.istio.io/network=${GKE_NET}
+
     retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
     retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}.yaml"
-    retry "kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml"
+    retry "istioctl --context=eks_${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f cluster_network_gateway.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"

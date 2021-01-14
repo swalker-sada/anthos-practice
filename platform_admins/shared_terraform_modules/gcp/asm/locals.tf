@@ -116,24 +116,24 @@ EOT
           - address: ISTIOINGRESS_IP
             port: 443
 EOT
-  cluster_aware_gateway = <<EOT
+  cluster_network_gateway = <<EOT
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: cluster-aware-gateway
+  name: cross-network-gateway
   namespace: istio-system
 spec:
   selector:
-    istio: ingressgateway
+    istio: eastwestgateway
   servers:
   - port:
-      number: 443
+      number: 15443
       name: tls
       protocol: TLS
     tls:
       mode: AUTO_PASSTHROUGH
     hosts:
-    - "*.local"
+      - "*.local"
 EOT
   gke_kubedns_configmap = <<EOT
 apiVersion: v1

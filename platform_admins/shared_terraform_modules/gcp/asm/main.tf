@@ -61,10 +61,12 @@ resource "null_resource" "exec_install_asm" {
       ASM_VERSION           = var.asm_version
       ASM_REV_LABEL         = var.asm_rev_label
       PROJECT_ID            = var.project_id
+      PROJECT_NUMBER         = data.google_project.project.number
+      GKE_NET                = var.gke_net
       GKE_LIST_STRING       = var.gke_list
       GKE_LOC_STRING        = var.gke_location_list
       EKS_LIST_STRING       = var.eks_list
-      CLUSTER_AWARE_GATEWAY = local.cluster_aware_gateway
+      CLUSTER_NETWORK_GATEWAY = local.cluster_network_gateway
       GKE_KUBEDNS_CONFIGMAP = local.gke_kubedns_configmap
       EKS_COREDNS_CONFIGMAP = local.eks_coredns_configmap
       ISTIOD_SERVICE        = local.istiod_service
