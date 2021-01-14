@@ -98,12 +98,13 @@ processEKS() {
     kubectl --context=eks_${EKS} get po --all-namespaces
     retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
     # make this declarative later?
-    retry kubectl --context=eks_${EKS} get namespace istio-system && \
-      retry kubectl --context=eks_${EKS} label namespace istio-system topology.istio.io/network=${EKS}-net
+    retry "kubectl --context=eks_${EKS} get namespace istio-system" && \
+      retry "kubectl --context=eks_${EKS} label namespace istio-system topology.istio.io/network=${EKS}-net --overwrite"
 
     retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
     retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}.yaml"
-    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}-eastwestgateway.yaml"
+    # rev label, otherwise need istiod-service first
+    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}"
     retry "kubectl --context=eks_${EKS} apply -f cluster_network_gateway.yaml"
     retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
     retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
@@ -124,12 +125,13 @@ processGKE() {
     kubectl --context=${GKE_CTX} get po --all-namespaces
     retry "kubectl --context=${GKE_CTX} apply -f istio-system.yaml"
     # make this declarative later?
-    retry kubectl --context=${GKE_CTX} get namespace istio-system && \
-      retry kubectl --context=${GKE_CTX} label namespace istio-system topology.istio.io/network=${GKE_NET}
+    retry "kubectl --context=${GKE_CTX} get namespace istio-system" && \
+      retry "kubectl --context=${GKE_CTX} label namespace istio-system topology.istio.io/network=${GKE_NET} --overwrite"
 
     retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
     retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}.yaml"
-    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml"
+    # rev label, otherwise need istiod-service first
+    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}"
     retry "kubectl --context=${GKE_CTX} apply -f cluster_network_gateway.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
