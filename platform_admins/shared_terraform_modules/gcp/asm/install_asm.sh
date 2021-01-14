@@ -129,7 +129,7 @@ processGKE() {
 
     retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
     retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}.yaml"
-    retry "istioctl --context=eks_${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml"
+    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f cluster_network_gateway.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
