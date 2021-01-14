@@ -77,7 +77,10 @@ do
   kubectl --context=${GKE_CTX} create ns istio-system
   
   # Install ASM
-  istioctl install -y -f "${CLUSTER_NAMES[$i]}"/istio/istio-operator.yaml --revision="${ASM_REV_LABEL}"
+  istioctl install -y \
+    -f "${CLUSTER_NAMES[$i]}"/istio/istio-operator.yaml \
+    -f "${CLUSTER_NAMES[$i]}"/istio/options/multicluster.yaml \
+    --revision="${ASM_REV_LABEL}"
 
   # Install validating webhook to locate istiod via rev label
   kubectl --context=${GKE_CTX} apply -f "${CLUSTER_NAMES[$i]}"/istio/istiod-service.yaml
