@@ -95,6 +95,9 @@ processEKS() {
     ${ASM_DIR}/samples/multicluster/gen-eastwest-gateway.sh \
       --mesh proj-${PROJECT_NUMBER} --cluster ${EKS} --network ${EKS}-net > asm_${EKS}-eastwestgateway.yaml
 
+    # patch with nlb for EKS
+    sed -i '/^        k8s:$/a\          service_annotations:\n            service.beta.kubernetes.io/aws-load-balancer-type: nlb' asm_${EKS}-eastwestgateway.yaml
+
     kubectl --context=eks_${EKS} get po --all-namespaces
     retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
     # make this declarative later?
