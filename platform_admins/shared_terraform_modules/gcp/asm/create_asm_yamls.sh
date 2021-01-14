@@ -38,21 +38,21 @@ do
     echo -e "${GCP_VALUES}" | sed -e s/GKE/$GKE/g -e s/GCP_NET/$GKE_NET/g -e s/MESH_ID/proj-$PROJECT_NUMBER/g >> asm_$GKE.yaml
 
     # Add registries
-    for GKE_NAME in ${GKE_LIST[@]}
-    do
-       #echo -e "$GCP_REGISTRY" | sed -e s/GKE/$GKE_NAME/g >> asm_$GKE.yaml
-    done
+    # for GKE_NAME in ${GKE_LIST[@]}
+    # do
+    #    echo -e "$GCP_REGISTRY" | sed -e s/GKE/$GKE_NAME/g >> asm_$GKE.yaml
+    # done
 
     # Add GCP bottom
-    #echo -e "$GATEWAYS_REGISTRY" >> asm_$GKE.yaml
+    # echo -e "$GATEWAYS_REGISTRY" >> asm_$GKE.yaml
 
     # Add EKS cluster sections
-    for IDX in ${!EKS_LIST[@]}
-    do
-        let INGRESS_IP_IDX="($IDX + 1) * 2 - 2"
-        #echo -e "${EKS_REMOTE_NETWORK}" | sed -e s/EKS/${EKS_LIST[IDX]}/g -e \
-        #s/ISTIOINGRESS_IP/${EKS_INGRESS_IPS[INGRESS_IP_IDX]}/g >> asm_$GKE.yaml
-    done
+    # for IDX in ${!EKS_LIST[@]}
+    # do
+    #     let INGRESS_IP_IDX="($IDX + 1) * 2 - 2"
+    #     echo -e "${EKS_REMOTE_NETWORK}" | sed -e s/EKS/${EKS_LIST[IDX]}/g -e \
+    #     s/ISTIOINGRESS_IP/${EKS_INGRESS_IPS[INGRESS_IP_IDX]}/g >> asm_$GKE.yaml
+    # done
 done
 
 ##### CREATE EKS YAMLs
@@ -78,29 +78,29 @@ do
     echo -e "${EKS_VALUES}" | sed -e s/EKS/${EKS_LIST[EKS_IDX]}/g -e s/GCP_NET/$GKE_NET/g -e s/MESH_ID/proj-$PROJECT_NUMBER/g >> asm_${EKS_LIST[EKS_IDX]}.yaml
 
     # Add registries
-    for GKE_NAME in ${GKE_LIST[@]}
-    do
-        #echo -e "${GCP_REGISTRY}" | sed -e s/GKE/$GKE_NAME/g >> asm_${EKS_LIST[EKS_IDX]}.yaml
-    done
+    # for GKE_NAME in ${GKE_LIST[@]}
+    # do
+    #     echo -e "${GCP_REGISTRY}" | sed -e s/GKE/$GKE_NAME/g >> asm_${EKS_LIST[EKS_IDX]}.yaml
+    # done
 
     # Add GCP bottom
     #echo -e "${GATEWAYS_REGISTRY}" >> asm_${EKS_LIST[EKS_IDX]}.yaml
 
     # Add EKS cluster sections
-    for IDX in ${!EKS_LIST[@]}
-    do
-        if [[ $EKS_IDX == $IDX ]]; then
-            echo -e "Building network patch for ${EKS_LIST[EKS_IDX]} and small IDX is $IDX"
-            #echo -e "${EKS_SELF_NETWORK}" | sed -e s/EKS/${EKS_LIST[IDX]}/g \
-            #>> asm_${EKS_LIST[EKS_IDX]}.yaml
-        else
-            echo -e "Building network patch for ${EKS_LIST[EKS_IDX]} and small IDX is $IDX"
-            let INGRESS_IP_IDX="($IDX + 1) * 2 - 2"
-            #echo -e "${EKS_REMOTE_NETWORK}" | sed -e s/EKS/${EKS_LIST[IDX]}/g -e \
-            #s/ISTIOINGRESS_IP/${EKS_INGRESS_IPS[INGRESS_IP_IDX]}/g \
-            #>> asm_${EKS_LIST[EKS_IDX]}.yaml
-        fi
-    done
+    # for IDX in ${!EKS_LIST[@]}
+    # do
+    #     if [[ $EKS_IDX == $IDX ]]; then
+    #         echo -e "Building network patch for ${EKS_LIST[EKS_IDX]} and small IDX is $IDX"
+    #         echo -e "${EKS_SELF_NETWORK}" | sed -e s/EKS/${EKS_LIST[IDX]}/g \
+    #         >> asm_${EKS_LIST[EKS_IDX]}.yaml
+    #     else
+    #         echo -e "Building network patch for ${EKS_LIST[EKS_IDX]} and small IDX is $IDX"
+    #         let INGRESS_IP_IDX="($IDX + 1) * 2 - 2"
+    #         echo -e "${EKS_REMOTE_NETWORK}" | sed -e s/EKS/${EKS_LIST[IDX]}/g -e \
+    #         s/ISTIOINGRESS_IP/${EKS_INGRESS_IPS[INGRESS_IP_IDX]}/g \
+    #         >> asm_${EKS_LIST[EKS_IDX]}.yaml
+    #     fi
+    # done
 done
 
 for GKE in ${GKE_LIST[@]}

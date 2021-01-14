@@ -15,6 +15,7 @@
  */
 
 data "google_project" "project" {
+  project_id = var.project_id
 }
 
 resource "null_resource" "exec_create_asm_yamls" {
