@@ -71,14 +71,10 @@ EOT
     global:
       podDNSSearchNamespaces:
         - global
+      meshID: MESH_ID
       multiCluster:
         clusterName: GKE
-        enabled: true
       network: GCP_NET
-      meshNetworks:
-        GCP_NET:
-          endpoints:
-          # Always use Kubernetes as the registry name for the main cluster in the mesh network configuration
 EOT
   eks_values            = <<EOT
   values:
@@ -91,14 +87,10 @@ EOT
     global:
       podDNSSearchNamespaces:
         - global
+      meshID: MESH_ID
       multiCluster:
         clusterName: EKS
-        enabled: true
       network: EKS-net
-      meshNetworks:
-        GCP_NET:
-          endpoints:
-          # Always use Kubernetes as the registry name for the main cluster in the mesh network configuration
 EOT
   gcp_registry          = <<EOT
           - fromRegistry: GKE

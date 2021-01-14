@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+data "google_project" "project" {
+}
+
 resource "null_resource" "exec_create_asm_yamls" {
   provisioner "local-exec" {
     interpreter = ["bash", "-exc"]
@@ -24,6 +27,7 @@ resource "null_resource" "exec_create_asm_yamls" {
       ASM_VERSION            = var.asm_version
       ASM_REV_LABEL          = var.asm_rev_label
       PROJECT_ID             = var.project_id
+      PROJECT_NUMBER         = data.google_project.project.number
       GKE_LIST_STRING        = var.gke_list
       GKE_LOC_STRING         = var.gke_location_list
       EKS_LIST_STRING        = var.eks_list
