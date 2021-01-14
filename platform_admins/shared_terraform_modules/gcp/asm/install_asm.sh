@@ -201,3 +201,15 @@ do
         fi
     done
 done
+
+for GKE in ${GKE_LIST[@]}
+do
+    echo -e "\n######### $GKE eastwestgateway YAML ###########\n"
+    gsutil cp -r asm_${GKE}-eastwestgateway.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_${GKE}-eastwestgateway.yaml
+done
+
+for EKS in ${EKS_LIST[@]}
+do
+    echo -e "\n######### $EKS eastwestgateway YAML ###########\n"
+    gsutil cp -r asm_${EKS}-eastwestgateway.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_${EKS}-eastwestgateway.yaml
+done
