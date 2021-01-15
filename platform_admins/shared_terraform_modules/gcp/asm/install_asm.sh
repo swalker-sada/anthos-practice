@@ -94,17 +94,6 @@ processEKS() {
     exec 1> >(sed "s/^/${EKS} SO: /")
     exec 2> >(sed "s/^/${EKS} SE: /" >&2)
 
-    # Add istio ingress gateway annotations to get EIPs
-    let EIP_IDX_1="($EKS + 1) * 2 - 2"
-    let EIP_IDX_2="($EKS + 1) * 2 - 1"
-
-    # generate eastwestgateway
-    ${ASM_DIR}/samples/multicluster/gen-eastwest-gateway.sh \
-      --mesh proj-${PROJECT_NUMBER} --cluster ${EKS} --network ${EKS}-net > asm_${EKS}-eastwestgateway.yaml
-
-    # patch with nlb for EKS
-    sed -i "/^        k8s:$/a\          service_annotations:\n            service.beta.kubernetes.io/aws-load-balancer-type: nlb\n            service.beta.kubernetes.io/aws-load-balancer-eip-allocations: \"${EKS_EIP_LIST[EIP_IDX_1]},${EKS_EIP_LIST[EIP_IDX_2]}\"" asm_${EKS}-eastwestgateway.yaml
-    
     kubectl --context=eks_${EKS} get po --all-namespaces
     retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
     # make this declarative later?
@@ -113,9 +102,9 @@ processEKS() {
 
     retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
     retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}.yaml"
-    # rev label, otherwise need istiod-service first
-    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}"
-    retry "kubectl --context=eks_${EKS} apply -f cluster_network_gateway.yaml"
+    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}-eastwestgateway.yaml"
+    # cluster network gateway
+    retry "kubectl --context=eks_${EKS} apply -f samples/multicluster/expose-services.yaml"
     retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
     retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
     retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
@@ -140,9 +129,9 @@ processGKE() {
 
     retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
     retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}.yaml"
-    # rev label, otherwise need istiod-service first
-    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}"
-    retry "kubectl --context=${GKE_CTX} apply -f cluster_network_gateway.yaml"
+    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml"
+    # cluster network gateway
+    retry "kubectl --context=${GKE_CTX} apply -f samples/multicluster/expose-services.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"

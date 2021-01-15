@@ -53,6 +53,9 @@ do
         echo -e "${EKS_REMOTE_NETWORK}" | sed -e s/EKS/${EKS_LIST[IDX]}/g -e \
         s/ISTIOINGRESS_IP/${EKS_INGRESS_IPS[INGRESS_IP_IDX]}/g >> asm_$GKE.yaml
     done
+
+    # East West Gateway
+    echo -e ${EASTWESTGATEWAY} | sed -e s/CLUSTER/$GKE/g -e s/CLUSTER_NETWORK/$GKE_NET/g -e s/PROJECT_NUMBER/$PROJECT_NUMBER/g -e s/ASM_REV_LABEL/$ASM_REV_LABEL/g > asm_$GKE-eastwestgateway.yaml
 done
 
 ##### CREATE EKS YAMLs
@@ -65,6 +68,8 @@ do
     # Add istio ingress gateway annotations to get EIPs
     let EIP_IDX_1="($EKS_IDX + 1) * 2 - 2"
     let EIP_IDX_2="($EKS_IDX + 1) * 2 - 1"
+
+    echo -e "Ingress IP List: ${EKS_INGRESS_IPS}"
 
     # echo -e "for ${EKS_LIST[EKS_IDX]}, the first EIP index is $EIP_IDX_1"
     # echo -e "for ${EKS_LIST[EKS_IDX]}, the second EIP index is $EIP_IDX_2"
@@ -103,6 +108,12 @@ do
             >> asm_${EKS_LIST[EKS_IDX]}.yaml
         fi
     done
+    
+    # East West Gateway
+    echo -e ${EASTWESTGATEWAY} | sed -e s/CLUSTER/${EKS_LIST[EKS_IDX]}/g -e s/CLUSTER_NETWORK/${EKS_LIST[EKS_IDX]}-net/g -e s/PROJECT_NUMBER/$PROJECT_NUMBER/g -e s/ASM_REV_LABEL/$ASM_REV_LABEL/g > asm_${EKS_LIST[EKS_IDX]}-eastwestgateway.yaml
+
+    # patch with nlb for EKS
+    sed -i "/^        k8s:$/a\          service_annotations:\n            service.beta.kubernetes.io/aws-load-balancer-type: nlb\n            service.beta.kubernetes.io/aws-load-balancer-eip-allocations: \"${EKS_EIP_LIST[EIP_IDX_1]},${EKS_EIP_LIST[EIP_IDX_2]}\"" asm_${EKS_LIST[EKS_IDX]}-eastwestgateway.yaml
 done
 
 for GKE in ${GKE_LIST[@]}
@@ -110,6 +121,10 @@ do
     echo -e "\n######### $GKE YAML ###########\n"
     cat asm_$GKE.yaml
     gsutil cp -r asm_$GKE.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_$GKE.yaml
+    
+    echo -e "\n######### $GKE eastwestgateway YAML ###########\n"
+    cat asm_${GKE}-eastwestgateway.yaml
+    gsutil cp -r asm_${GKE}-eastwestgateway.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_${GKE}-eastwestgateway.yaml
 done
 
 for EKS in ${EKS_LIST[@]}
@@ -117,4 +132,8 @@ do
     echo -e "\n######### $EKS YAML ###########\n"
     cat asm_$EKS.yaml
     gsutil cp -r asm_$EKS.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_$EKS.yaml
+    
+    echo -e "\n######### $EKS eastwestgateway YAML ###########\n"
+    cat asm_${EKS}-eastwestgateway.yaml
+    gsutil cp -r asm_${EKS}-eastwestgateway.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_${EKS}-eastwestgateway.yaml
 done

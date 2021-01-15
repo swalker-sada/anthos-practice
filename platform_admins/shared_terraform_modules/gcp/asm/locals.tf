@@ -125,25 +125,6 @@ EOT
           - address: ISTIOINGRESS_IP
             port: 15443
 EOT
-  cluster_network_gateway = <<EOT
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: cross-network-gateway
-  namespace: istio-system
-spec:
-  selector:
-    istio: eastwestgateway
-  servers:
-  - port:
-      number: 15443
-      name: tls
-      protocol: TLS
-    tls:
-      mode: AUTO_PASSTHROUGH
-    hosts:
-      - "*.local"
-EOT
   gke_kubedns_configmap = <<EOT
 apiVersion: v1
 kind: ConfigMap
@@ -213,5 +194,50 @@ spec:
   selector:
     app: istiod
     istio.io/rev: ASM_REV_LABEL
+EOT
+  eastwestgateway = <<EOT
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: eastwest
+spec:
+  revision: ASM_REV_LABEL
+  profile: empty
+  components:
+    ingressGateways:
+      - name: istio-eastwestgateway
+        label:
+          istio: eastwestgateway
+          app: istio-eastwestgateway
+          topology.istio.io/network: CLUSTER_NETWORK
+        enabled: true
+        k8s:
+          env:
+            # sni-dnat adds the clusters required for AUTO_PASSTHROUGH mode
+            - name: ISTIO_META_ROUTER_MODE
+              value: "sni-dnat"
+            # traffic through this gateway should be routed inside the network
+            - name: ISTIO_META_REQUESTED_NETWORK_VIEW
+              value: CLUSTER_NETWORK
+          service:
+            ports:
+              - name: status-port
+                port: 15021
+                targetPort: 15021
+              - name: tls
+                port: 15443
+                targetPort: 15443
+              - name: tls-istiod
+                port: 15012
+                targetPort: 15012
+              - name: tls-webhook
+                port: 15017
+                targetPort: 15017
+  values:
+    global:
+      meshID: proj-PROJECT_NUMBER
+      network: CLUSTER_NETWORK
+      multiCluster:
+        clusterName: CLUSTER
 EOT
 }

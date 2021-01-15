@@ -46,6 +46,7 @@ resource "null_resource" "exec_create_asm_yamls" {
       GATEWAYS_REGISTRY  = local.gateways_registry
       EKS_SELF_NETWORK   = local.eks_self_network
       EKS_REMOTE_NETWORK = local.eks_remote_network
+      EASTWESTGATEWAY    = local.eastwestgateway
     }
   }
   triggers = {
@@ -67,7 +68,6 @@ resource "null_resource" "exec_install_asm" {
       GKE_LOC_STRING          = var.gke_location_list
       EKS_LIST_STRING         = var.eks_list
       EKS_EIP_LIST_STRING     = var.eks_eip_list
-      CLUSTER_NETWORK_GATEWAY = local.cluster_network_gateway
       GKE_KUBEDNS_CONFIGMAP   = local.gke_kubedns_configmap
       EKS_COREDNS_CONFIGMAP   = local.eks_coredns_configmap
       ISTIOD_SERVICE          = local.istiod_service
