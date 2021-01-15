@@ -60,7 +60,7 @@ export SCRIPT_DIR=$(dirname $(readlink -f $0 2>/dev/null) 2>/dev/null || echo "$
 
 ## Stage 1: Preparation
 # Retrieve & replace asm rev label 
-ASM_REV_LABEL=$(kubectl get deploy -n istio-system -l app=istiod -o jsonpath={.items[*].metadata.labels.'istio\.io\/rev'})
+ASM_REV_LABEL=$(kubectl --context ${GKE1} get deploy -n istio-system -l app=istiod -o jsonpath={.items[*].metadata.labels.'istio\.io\/rev'})
 
 sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/prod/gke1/ob-namespace-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke1/ob-namespace-patch.yaml
 sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/prod/gke2/ob-namespace-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke2/ob-namespace-patch.yaml
