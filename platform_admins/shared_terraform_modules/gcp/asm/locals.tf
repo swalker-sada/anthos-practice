@@ -30,7 +30,6 @@ EOT
       k8s:
         service_annotations:
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "EIP1,EIP2"
 EOT
   gke_component         = <<EOT
   components:

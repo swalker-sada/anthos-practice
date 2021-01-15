@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# issues with EKS hostnames for LB
+# https://github.com/istio/istio/issues/29359
 
 # Exit on any error
 set -e
@@ -91,13 +93,18 @@ processEKS() {
     EKS=${1}
     exec 1> >(sed "s/^/${EKS} SO: /")
     exec 2> >(sed "s/^/${EKS} SE: /" >&2)
+
+    # Add istio ingress gateway annotations to get EIPs
+    let EIP_IDX_1="($EKS + 1) * 2 - 2"
+    let EIP_IDX_2="($EKS + 1) * 2 - 1"
+
     # generate eastwestgateway
     ${ASM_DIR}/samples/multicluster/gen-eastwest-gateway.sh \
       --mesh proj-${PROJECT_NUMBER} --cluster ${EKS} --network ${EKS}-net > asm_${EKS}-eastwestgateway.yaml
 
     # patch with nlb for EKS
-    sed -i '/^        k8s:$/a\          service_annotations:\n            service.beta.kubernetes.io/aws-load-balancer-type: nlb' asm_${EKS}-eastwestgateway.yaml
-
+    sed -i "/^        k8s:$/a\          service_annotations:\n            service.beta.kubernetes.io/aws-load-balancer-type: nlb\n            service.beta.kubernetes.io/aws-load-balancer-eip-allocations: \"${EKS_EIP_LIST[EIP_IDX_1]},${EKS_EIP_LIST[EIP_IDX_2]}\"" asm_${EKS}-eastwestgateway.yaml
+    
     kubectl --context=eks_${EKS} get po --all-namespaces
     retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
     # make this declarative later?
