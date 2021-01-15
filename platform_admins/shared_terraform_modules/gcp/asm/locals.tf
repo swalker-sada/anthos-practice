@@ -76,6 +76,10 @@ EOT
       multiCluster:
         clusterName: GKE
       network: GCP_NET
+      meshNetworks:
+        GCP_NET:
+          endpoints:
+          # Always use Kubernetes as the registry name for the main cluster in the mesh network configuration
 EOT
   eks_values            = <<EOT
   values:
@@ -92,22 +96,26 @@ EOT
       multiCluster:
         clusterName: EKS
       network: EKS-net
+      meshNetworks:
+        GCP_NET:
+          endpoints:
+          # Always use Kubernetes as the registry name for the main cluster in the mesh network configuration
 EOT
   gcp_registry          = <<EOT
           - fromRegistry: GKE
 EOT
   gateways_registry     = <<EOT
           gateways:
-          - registry_service_name: istio-ingressgateway.istio-system.svc.cluster.local
-            port: 443
+          - registry_service_name: istio-eastwestgateway.istio-system.svc.cluster.local
+            port: 15443
 EOT
   eks_self_network      = <<EOT
         EKS-net:
           endpoints:
           - fromRegistry: EKS
           gateways:
-          - registry_service_name: istio-ingressgateway.istio-system.svc.cluster.local
-            port: 443
+          - registry_service_name: istio-eastwestgateway.istio-system.svc.cluster.local
+            port: 15443
 EOT
   eks_remote_network    = <<EOT
         EKS-net:
@@ -115,7 +123,7 @@ EOT
           - fromRegistry: EKS
           gateways:
           - address: ISTIOINGRESS_IP
-            port: 443
+            port: 15443
 EOT
   cluster_network_gateway = <<EOT
 apiVersion: networking.istio.io/v1alpha3

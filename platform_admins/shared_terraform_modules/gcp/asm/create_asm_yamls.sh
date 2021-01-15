@@ -75,7 +75,7 @@ do
     echo -e "${EKS_MESHCONFIG}" | sed -e s/EKS/${EKS_LIST[EKS_IDX]}/g -e s/PROJECT_ID/$PROJECT_ID/g -e s/CLUSTER_LOCATION/us-west1/g >> asm_${EKS_LIST[EKS_IDX]}.yaml
 
     # Add values
-    echo -e "${EKS_VALUES}" | sed -e s/EKS/${EKS_LIST[EKS_IDX]}/g -e s/GCP_NET/$GKE_NET/g -e s/EKS/$EKS-net/g -e s/MESH_ID/proj-$PROJECT_NUMBER/g >> asm_${EKS_LIST[EKS_IDX]}.yaml
+    echo -e "${EKS_VALUES}" | sed -e s/EKS/${EKS_LIST[EKS_IDX]}/g -e s/GCP_NET/$GKE_NET/g -e s/MESH_ID/proj-$PROJECT_NUMBER/g >> asm_${EKS_LIST[EKS_IDX]}.yaml
     #echo -e "${EKS_VALUES}" | sed -e s/EKS/${EKS_LIST[EKS_IDX]}/g -e s/EKS/$EKS-net/g -e s/MESH_ID/proj-$PROJECT_NUMBER/g >> asm_${EKS_LIST[EKS_IDX]}.yaml
 
     # Add registries
