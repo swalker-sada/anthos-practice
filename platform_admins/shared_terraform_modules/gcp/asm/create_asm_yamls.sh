@@ -70,6 +70,7 @@ do
     # echo -e "for ${EKS_LIST[EKS_IDX]}, the second EIP index is $EIP_IDX_2"
 
     # echo -e "${EKS_COMPONENT}" | sed -e s/EIP1/${EKS_EIP_LIST[EIP_IDX_1]}/g -e s/EIP2/${EKS_EIP_LIST[EIP_IDX_2]}/g >> asm_${EKS_LIST[EKS_IDX]}.yaml
+    echo -e "${EKS_COMPONENT}" >> asm_${EKS_LIST[EKS_IDX]}.yaml
 
     # Add meshconfig
     echo -e "${EKS_MESHCONFIG}" | sed -e s/EKS/${EKS_LIST[EKS_IDX]}/g -e s/PROJECT_ID/$PROJECT_ID/g -e s/CLUSTER_LOCATION/us-west1/g >> asm_${EKS_LIST[EKS_IDX]}.yaml
