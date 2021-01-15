@@ -104,7 +104,7 @@ processEKS() {
     retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}.yaml"
     retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}-eastwestgateway.yaml"
     # cluster network gateway
-    retry "kubectl --context=eks_${EKS} apply -f samples/multicluster/expose-services.yaml"
+    retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/multicluster/expose-services.yaml"
     retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
     retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
     retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
@@ -131,7 +131,7 @@ processGKE() {
     retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}.yaml"
     retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml"
     # cluster network gateway
-    retry "kubectl --context=${GKE_CTX} apply -f samples/multicluster/expose-services.yaml"
+    retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/multicluster/expose-services.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
