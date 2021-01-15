@@ -102,7 +102,8 @@ processEKS() {
 
     retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
     retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}.yaml"
-    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}-eastwestgateway.yaml"
+    # though it's in the IstioOperator, revision label is not honored
+    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}"
     # cluster network gateway
     retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/multicluster/expose-services.yaml"
     retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
@@ -129,7 +130,8 @@ processGKE() {
 
     retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
     retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}.yaml"
-    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml"
+    # though it's in the IstioOperator, revision label is not honored
+    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}"
     # cluster network gateway
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/multicluster/expose-services.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"
