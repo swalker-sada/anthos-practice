@@ -55,7 +55,7 @@ do
     done
 
     # East West Gateway
-    echo -e ${EASTWESTGATEWAY} | sed -e s/CLUSTER/$GKE/g -e s/CLUSTER_NETWORK/$GKE_NET/g -e s/PROJECT_NUMBER/$PROJECT_NUMBER/g -e s/ASM_REV_LABEL/$ASM_REV_LABEL/g > asm_$GKE-eastwestgateway.yaml
+    echo -e "${EASTWESTGATEWAY}" | sed -e s/CLUSTER/$GKE/g -e s/MESH_NETWORK/$GKE_NET/g -e s/PROJECT_NUMBER/$PROJECT_NUMBER/g -e s/ASM_REV_LABEL/$ASM_REV_LABEL/g > asm_$GKE-eastwestgateway.yaml
 done
 
 ##### CREATE EKS YAMLs
@@ -110,7 +110,7 @@ do
     done
     
     # East West Gateway
-    echo -e ${EASTWESTGATEWAY} | sed -e s/CLUSTER/${EKS_LIST[EKS_IDX]}/g -e s/CLUSTER_NETWORK/${EKS_LIST[EKS_IDX]}-net/g -e s/PROJECT_NUMBER/$PROJECT_NUMBER/g -e s/ASM_REV_LABEL/$ASM_REV_LABEL/g > asm_${EKS_LIST[EKS_IDX]}-eastwestgateway.yaml
+    echo -e "${EASTWESTGATEWAY}" | sed -e s/CLUSTER/${EKS_LIST[EKS_IDX]}/g -e s/MESH_NETWORK/${EKS_LIST[EKS_IDX]}-net/g -e s/PROJECT_NUMBER/$PROJECT_NUMBER/g -e s/ASM_REV_LABEL/$ASM_REV_LABEL/g > asm_${EKS_LIST[EKS_IDX]}-eastwestgateway.yaml
 
     # patch with nlb for EKS
     sed -i "/^        k8s:$/a\          service_annotations:\n            service.beta.kubernetes.io/aws-load-balancer-type: nlb\n            service.beta.kubernetes.io/aws-load-balancer-eip-allocations: \"${EKS_EIP_LIST[EIP_IDX_1]},${EKS_EIP_LIST[EIP_IDX_2]}\"" asm_${EKS_LIST[EKS_IDX]}-eastwestgateway.yaml

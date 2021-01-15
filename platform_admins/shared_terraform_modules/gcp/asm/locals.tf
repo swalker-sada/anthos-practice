@@ -209,7 +209,7 @@ spec:
         label:
           istio: eastwestgateway
           app: istio-eastwestgateway
-          topology.istio.io/network: CLUSTER_NETWORK
+          topology.istio.io/network: MESH_NETWORK
         enabled: true
         k8s:
           env:
@@ -218,7 +218,7 @@ spec:
               value: "sni-dnat"
             # traffic through this gateway should be routed inside the network
             - name: ISTIO_META_REQUESTED_NETWORK_VIEW
-              value: CLUSTER_NETWORK
+              value: MESH_NETWORK
           service:
             ports:
               - name: status-port
@@ -236,7 +236,7 @@ spec:
   values:
     global:
       meshID: proj-PROJECT_NUMBER
-      network: CLUSTER_NETWORK
+      network: MESH_NETWORK
       multiCluster:
         clusterName: CLUSTER
 EOT
