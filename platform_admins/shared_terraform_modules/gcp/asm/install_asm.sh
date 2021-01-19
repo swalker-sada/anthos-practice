@@ -155,6 +155,9 @@ done
 # wait for all background jobs to finish
 wait < <(jobs -p)
 
+# DNS .global issues
+# https://github.com/istio/istio/issues/29308
+
 # Create cross-cluster service discovery
 for EKS in ${EKS_LIST[@]}
 do
@@ -201,16 +204,4 @@ do
             retry "kubectl --context=${GKE_CTX} apply -f kubeconfig_secret_${GKE_LIST[IDX]}.yaml"
         fi
     done
-done
-
-for GKE in ${GKE_LIST[@]}
-do
-    echo -e "\n######### $GKE eastwestgateway YAML ###########\n"
-    gsutil cp -r asm_${GKE}-eastwestgateway.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_${GKE}-eastwestgateway.yaml
-done
-
-for EKS in ${EKS_LIST[@]}
-do
-    echo -e "\n######### $EKS eastwestgateway YAML ###########\n"
-    gsutil cp -r asm_${EKS}-eastwestgateway.yaml gs://$PROJECT_ID/asm_istiooperator_cr/asm_${EKS}-eastwestgateway.yaml
 done
