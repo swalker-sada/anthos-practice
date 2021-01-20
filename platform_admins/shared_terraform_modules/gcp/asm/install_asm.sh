@@ -88,29 +88,33 @@ export KUBECONFIG=${DEFAULT_KUBECONFIG}
 # prepare istiod-service
 echo -e "${ISTIOD_SERVICE}" | sed -e s/ASM_REV_LABEL/${ASM_REV_LABEL}/g > istiod-service.yaml
 
+# patch cross-network-gateway
+sed -i '/^      hosts:$/a\        - "*.global"' ${ASM_DIR}/samples/multicluster/expose-services.yaml
+
 # install asm and process secrets
 processEKS() {
     EKS=${1}
+    EKS_CTX=eks_${EKS}
     exec 1> >(sed "s/^/${EKS} SO: /")
     exec 2> >(sed "s/^/${EKS} SE: /" >&2)
 
-    kubectl --context=eks_${EKS} get po --all-namespaces
-    retry "kubectl --context=eks_${EKS} apply -f istio-system.yaml"
+    kubectl --context=${EKS_CTX} get po --all-namespaces
+    retry "kubectl --context=${EKS_CTX} apply -f istio-system.yaml"
     # make this declarative later?
-    retry "kubectl --context=eks_${EKS} get namespace istio-system" && \
-      retry "kubectl --context=eks_${EKS} label namespace istio-system topology.istio.io/network=${EKS}-net --overwrite"
+    retry "kubectl --context=${EKS_CTX} get namespace istio-system" && \
+      retry "kubectl --context=${EKS_CTX} label namespace istio-system topology.istio.io/network=${EKS}-net --overwrite"
 
-    retry "kubectl --context=eks_${EKS} apply -f cacerts.yaml"
-    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}.yaml"
+    retry "kubectl --context=${EKS_CTX} apply -f cacerts.yaml"
+    retry "istioctl --context=${EKS_CTX} install -y -f asm_${EKS}.yaml"
     # though it's in the IstioOperator, revision label is not honored
-    retry "istioctl --context=eks_${EKS} install -y -f asm_${EKS}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}"
+    retry "istioctl --context=${EKS_CTX} install -y -f asm_${EKS}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}"
     # cluster network gateway
-    retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/multicluster/expose-services.yaml"
-    retry "kubectl --context=eks_${EKS} apply -f istiod-service.yaml"
-    retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
-    retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
-    retry "kubectl --context=eks_${EKS} apply -f ${ASM_DIR}/samples/addons/kiali.yaml"
-    istioctl x create-remote-secret --context=eks_${EKS} --name ${EKS} > kubeconfig_secret_${EKS}.yaml
+    retry "kubectl --context=${EKS_CTX} apply -f ${ASM_DIR}/samples/multicluster/expose-services.yaml"
+    retry "kubectl --context=${EKS_CTX} apply -f istiod-service.yaml"
+    retry "kubectl --context=${EKS_CTX} apply -f ${ASM_DIR}/samples/addons/grafana.yaml"
+    retry "kubectl --context=${EKS_CTX} apply -f ${ASM_DIR}/samples/addons/prometheus.yaml"
+    retry "kubectl --context=${EKS_CTX} apply -f ${ASM_DIR}/samples/addons/kiali.yaml"
+    istioctl x create-remote-secret --context=${EKS_CTX} --name ${EKS} > kubeconfig_secret_${EKS}.yaml
 }
 
 processGKE() {
