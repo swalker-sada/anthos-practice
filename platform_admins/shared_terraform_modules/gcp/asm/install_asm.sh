@@ -161,6 +161,10 @@ wait < <(jobs -p)
 
 # DNS .global issues
 # https://github.com/istio/istio/issues/29308
+# issues continued
+# https://github.com/istio/istio/issues/27321
+# documentation WIP
+# https://github.com/istio/istio/issues/29335
 
 # Create cross-cluster service discovery
 for EKS in ${EKS_LIST[@]}
