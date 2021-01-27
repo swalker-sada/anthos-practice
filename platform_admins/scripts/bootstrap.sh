@@ -96,6 +96,11 @@ title_no_wait "Setting GCP project..."
 print_and_execute "gcloud config set project ${GOOGLE_PROJECT}"
 
 if [[ ! $API_ENABLED ]]; then
+  title_no_wait "Disable CloudBuild API to force cloudbuild SA creation when re-enabled..."
+  print_and_execute "gcloud services disable cloudbuild.googleapis.com --force"
+fi
+
+if [[ ! $API_ENABLED ]]; then
   title_no_wait "Enabling APIs..."
   print_and_execute "gcloud services enable cloudresourcemanager.googleapis.com \
   cloudbilling.googleapis.com \
