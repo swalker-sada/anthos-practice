@@ -32,7 +32,7 @@ module "cloud-endpoints-dns-gitlab" {
 
   project     = var.project_id
   name        = "gitlab"
-  external_ip = module.gke-gitlab.gitlab.address
+  external_ip = module.gke-gitlab.gitlab_address
 }
 
 resource "google_compute_address" "gitlab" {
