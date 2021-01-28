@@ -33,7 +33,7 @@ data "google_project" "project" {
 }
 
 module "gke" {
-  source                  = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/beta-public-cluster"
+  source                  = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/beta-public-cluster?ref=v12.3.0"
   project_id              = local.project
   name                    = "gke-${local.env}-${local.region}${local.zone}-${local.suffix}"
   regional                = false
