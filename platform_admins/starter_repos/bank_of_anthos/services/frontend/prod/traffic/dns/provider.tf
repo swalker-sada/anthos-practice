@@ -20,6 +20,6 @@ terraform {
 }
 
 # Provider
-provider "google" { version = "~> 3.47" }
-provider "google-beta" { version = "~> 3.47" }
+provider "google" { version = "~> 3.54.0" }
+provider "google-beta" { version = "~> 3.54.0" }
 provider "kubernetes" { version = "~>1.11.0" }
