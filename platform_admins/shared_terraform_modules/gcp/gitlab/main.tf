@@ -23,7 +23,7 @@ module "gke-gitlab" {
   gitlab_runner_install = true
   gitlab_address_name   = google_compute_address.gitlab.name
   gitlab_db_name        = "gitlab-${lower(random_id.database_id.hex)}"
-  helm_chart_version    = "4.2.4"
+  helm_chart_version    = "4.0.7"
   gke_version           = "1.16"
 }
 
@@ -33,7 +33,7 @@ module "cloud-endpoints-dns-gitlab" {
 
   project     = var.project_id
   name        = "gitlab"
-  external_ip = module.gke-gitlab.gitlab_address
+  external_ip = google_compute_address.gitlab.address
 }
 
 resource "google_compute_address" "gitlab" {
