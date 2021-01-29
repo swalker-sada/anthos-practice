@@ -78,7 +78,7 @@ resource "aws_security_group" "all_worker_mgmt" {
 }
 
 module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
+  source          = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v14.0.0"
   cluster_name    = var.eks_cluster_name
   cluster_version = "1.17"
   subnets         = var.private_subnets
