@@ -14,33 +14,12 @@
  * limitations under the License.
  */
 
-variable "region" { default = "us-west-2" }
-
+# Version
 terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "3.26.0"
-    }
-  }
+  required_version = ">=0.13, <0.14"
 }
 
-provider "aws" {
-  region  = var.region
-}
-
-provider "random" {
-  version = "~> 2.1"
-}
-
-provider "local" {
-  version = "~> 1.2"
-}
-
-provider "null" {
-  version = "~> 2.1"
-}
-
-provider "template" {
-  version = "~> 2.1"
-}
+# Provider
+provider "google" { version = "~> 3.42.0" }
+provider "google-beta" { version = "~> 3.42.0" }
+provider "kubernetes" { version = "~>1.11.0" }
