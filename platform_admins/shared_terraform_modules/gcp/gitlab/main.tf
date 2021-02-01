@@ -18,12 +18,11 @@ module "gke-gitlab" {
   source = "github.com/terraform-google-modules/terraform-google-gke-gitlab?ref=release-v0.4.1"
 
   project_id            = var.project_id
-  domain                = "${trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")}"
+  domain                = "trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")"
   certmanager_email     = "no-reply@${var.project_id}.example.com"
   gitlab_runner_install = true
-  gitlab_address_name   = google_compute_address.gitlab.name
   gitlab_db_name        = "gitlab-${lower(random_id.database_id.hex)}"
-  helm_chart_version    = "4.0.7"
+  helm_chart_version    = "4.2.4"
   gke_version           = "1.16"
 }
 
@@ -33,7 +32,7 @@ module "cloud-endpoints-dns-gitlab" {
 
   project     = var.project_id
   name        = "gitlab"
-  external_ip = google_compute_address.gitlab.address
+  external_ip = module.gke-gitlab.gitlab_address
 }
 
 resource "google_compute_address" "gitlab" {
