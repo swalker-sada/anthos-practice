@@ -22,7 +22,7 @@ module "gke-gitlab" {
   certmanager_email     = "no-reply@${var.project_id}.example.com"
   gitlab_runner_install = true
   gitlab_db_name        = "gitlab-${lower(random_id.database_id.hex)}"
-  helm_chart_version    = "4.2.4"
+  helm_chart_version    = "4.8.2"
   gke_version           = "1.16"
 }
 
