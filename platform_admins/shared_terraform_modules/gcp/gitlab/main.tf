@@ -21,6 +21,7 @@ module "gke-gitlab" {
   domain                = "trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")"
   certmanager_email     = "no-reply@${var.project_id}.example.com"
   gitlab_runner_install = true
+#  gitlab_address_name   = google_compute_address.gitlab.name
   gitlab_db_name        = "gitlab-${lower(random_id.database_id.hex)}"
   helm_chart_version    = "4.2.4"
   gke_version           = "1.16"
@@ -35,11 +36,11 @@ module "cloud-endpoints-dns-gitlab" {
   external_ip = module.gke-gitlab.gitlab_address
 }
 
-resource "google_compute_address" "gitlab" {
-  project = var.project_id
-  region  = "us-central1"
-  name    = "gitlab"
-}
+#resource "google_compute_address" "gitlab" {
+#  project = var.project_id
+#  region  = "us-central1"
+#  name    = "gitlab"
+#}
 
 resource "random_id" "database_id" {
   byte_length = 8
