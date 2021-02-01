@@ -89,6 +89,12 @@ module "eks" {
 
   vpc_id = var.vpc_id
 
+# lack of gp3 support in launch config
+# https://github.com/terraform-aws-modules/terraform-aws-eks/issues/1205#issuecomment-769695873
+  workers_group_defaults = {
+  	root_volume_type = "gp2"
+  }
+  
   worker_groups = [
     {
       name                          = "worker-group-1"
