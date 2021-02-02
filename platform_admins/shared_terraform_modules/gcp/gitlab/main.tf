@@ -22,6 +22,7 @@ module "gke-gitlab" {
   certmanager_email     = "no-reply@${var.project_id}.example.com"
   gitlab_runner_install = true
   gitlab_db_name        = "gitlab-${lower(random_id.database_id.hex)}"
+  # bump helm version to support tf gitlab provider 3.0+
   helm_chart_version    = "4.8.2"
   gke_version           = "1.16"
 }
