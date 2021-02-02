@@ -59,8 +59,8 @@ export PROD_NS=ob-prod
 export SCRIPT_DIR=$(dirname $(readlink -f $0 2>/dev/null) 2>/dev/null || echo "${PWD}/$(dirname $0)")
 
 # Create Cloud-Ops GSA secret YAML
-kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/eks1/cloud-ops-sa-secret.yaml
-kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/prod/eks2/cloud-ops-sa-secret.yaml
+kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run -oyaml > ${SCRIPT_DIR}/ob/prod/eks1/cloud-ops-sa-secret.yaml
+kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run -oyaml > ${SCRIPT_DIR}/ob/prod/eks2/cloud-ops-sa-secret.yaml
 
 # Workload Identity for Cloud-Ops GSA/KSA Mapping
 sed -e "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/prod/gke1/default-ksa.yaml_tmpl > ${SCRIPT_DIR}/ob/prod/gke1/default-ksa.yaml
