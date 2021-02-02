@@ -24,7 +24,7 @@ retry() {
     # Default retry count 5
     RETRY_COUNT=${2:-5}
     # Default retry sleep 10s
-    RETRY_SLEEP=${3:-10}
+    RETRY_SLEEP=${3:-30}
     COUNT=1
 
     while [ ${COUNT} -le ${RETRY_COUNT} ]; do
