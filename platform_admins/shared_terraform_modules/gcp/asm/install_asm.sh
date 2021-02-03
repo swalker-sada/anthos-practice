@@ -122,9 +122,6 @@ processGKE() {
     exec 1> >(sed "s/^/${IDX} SO: /")
     exec 2> >(sed "s/^/${IDX} SE: /" >&2)
     GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
-    # generate eastwestgateway
-    ${ASM_DIR}/samples/multicluster/gen-eastwest-gateway.sh \
-      --mesh proj-${PROJECT_NUMBER} --cluster ${GKE_LIST[IDX]} --network ${GKE_NET} > asm_${GKE_LIST[IDX]}-eastwestgateway.yaml
 
     kubectl --context=${GKE_CTX} get po --all-namespaces
     retry "kubectl --context=${GKE_CTX} apply -f istio-system.yaml"
@@ -133,9 +130,10 @@ processGKE() {
       retry "kubectl --context=${GKE_CTX} label namespace istio-system topology.istio.io/network=${GKE_NET} --overwrite"
 
     retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
-    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}.yaml"
+    # gke prod 1, control plane issues during install, give it time to recover, specific to 1.6.8?
+    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}.yaml" 10 60
     # though it's in the IstioOperator, revision label is not honored
-    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}"
+    retry "istioctl --context=${GKE_CTX} install -y -f asm_${GKE_LIST[IDX]}-eastwestgateway.yaml --revision ${ASM_REV_LABEL}" 10 60
     # cluster network gateway
     retry "kubectl --context=${GKE_CTX} apply -f ${ASM_DIR}/samples/multicluster/expose-services.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f istiod-service.yaml"

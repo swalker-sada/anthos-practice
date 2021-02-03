@@ -65,7 +65,7 @@ sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/stage/gke1/ob-namesp
 sed -e "s/ASM_REV_LABEL/${ASM_REV_LABEL}/" ${SCRIPT_DIR}/ob/stage/eks1/ob-namespace-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/stage/eks1/ob-namespace-patch.yaml
 
 # Create Cloud-Ops GSA secret YAML for EKS
-kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run=client -oyaml > ${SCRIPT_DIR}/ob/stage/eks1/cloud-ops-sa-secret.yaml
+kubectl create secret generic cloud-ops-sa --from-file=application_default_credentials.json=${WORKDIR}/cloudopsgsa/cloud_ops_sa_key.json --dry-run -oyaml > ${SCRIPT_DIR}/ob/stage/eks1/cloud-ops-sa-secret.yaml
 
 # Workload Identity for Cloud-Ops GSA/KSA Mapping
 sed -e "s/GSA/${GSA}/" ${SCRIPT_DIR}/ob/stage/gke1/default-ksa-patch.yaml_tmpl > ${SCRIPT_DIR}/ob/stage/gke1/default-ksa-patch.yaml

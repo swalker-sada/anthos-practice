@@ -656,19 +656,27 @@ deploy-crdb:
         exit 1
       fi
     - |
-      DB_COUNT=$(kubectl --context ${GKE_PROD_1} -n db-crdb exec -t gke-crdb-0 -- cockroach sql --insecure --host=crdb --execute="show databases;" | { grep -e accountsdb -e postgresdb || true; } | wc -l)
+      DB_COUNT=$(kubectl --context ${GKE_PROD_1} -n db-crdb exec gke-crdb-0 -- cockroach sql --insecure --host=crdb --execute="show databases;" | { grep -e accountsdb -e postgresdb || true; } | wc -l)
       if [ ! "${DB_COUNT}" == "2" ]; then
-        echo "Create and initialize databases"
-        kubectl --context ${GKE_PROD_1} -n db-crdb exec -t gke-crdb-0 -- mkdir -p /cockroach/cockroach-data/extern
+        echo "Create databases"
+        kubectl --context ${GKE_PROD_1} -n db-crdb exec gke-crdb-0 -- cockroach sql --insecure --host=crdb \
+          --execute="CREATE DATABASE accountsdb;" \
+          --execute="CREATE DATABASE postgresdb;"
+      else
+        echo "Databases already created, count: ${DB_COUNT}"
+      fi
+    - |
+      DB_CHECK=$({ kubectl --context ${GKE_PROD_1} -n db-crdb exec gke-crdb-0 -- cockroach sql --insecure --host=crdb --execute "use accountsdb;select count(*) from users" || true; } | wc -l)
+      # a response of 2 means that db exist and rows exist
+      if [ ! "${DB_CHECK}" == "2" ]; then
+        kubectl --context ${GKE_PROD_1} -n db-crdb exec gke-crdb-0 -- mkdir -p /cockroach/cockroach-data/extern
         kubectl --context ${GKE_PROD_1} -n db-crdb cp ${WORKDIR}/cockroachdb/templates/dump-accounts-db.sql gke-crdb-0:/cockroach/cockroach-data/extern/dump-accounts-db.sql
         kubectl --context ${GKE_PROD_1} -n db-crdb cp ${WORKDIR}/cockroachdb/templates/dump-postgresdb.sql gke-crdb-0:/cockroach/cockroach-data/extern/dump-postgresdb.sql
-        kubectl --context ${GKE_PROD_1} -n db-crdb exec -t gke-crdb-0 -- cockroach sql --insecure --host=crdb \
-          --execute="CREATE DATABASE accountsdb;" \
-          --execute="CREATE DATABASE postgresdb;" \
+        kubectl --context ${GKE_PROD_1} -n db-crdb exec gke-crdb-0 -- cockroach sql --insecure --host=crdb \
           --execute="USE accountsdb;IMPORT PGDUMP 'nodelocal://1/dump-accounts-db.sql';SHOW TABLES;SELECT * FROM contacts;SELECT * FROM users;" \
           --execute="USE postgresdb;IMPORT PGDUMP 'nodelocal://1/dump-postgresdb.sql';SHOW TABLES;SELECT * FROM transactions;"
       else
-        echo "Databases already created, count: ${DB_COUNT}"
+        echo "Databases already initialied, response count: ${DB_CHECK}"
       fi
   needs:
     - deploy-app-ob

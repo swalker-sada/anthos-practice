@@ -39,7 +39,7 @@ module "gke" {
   regional                = false
   region                  = local.region
   zones                   = ["${local.region}-${local.zone}"]
-  release_channel         = "RAPID"
+  release_channel         = "REGULAR"
   network                 = local.network
   subnetwork              = local.node_subnet
   ip_range_pods           = local.pod_subnet

@@ -78,7 +78,7 @@ resource "aws_security_group" "all_worker_mgmt" {
 }
 
 module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
+  source          = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v14.0.0"
   cluster_name    = var.eks_cluster_name
   cluster_version = "1.17"
   subnets         = var.private_subnets
@@ -89,6 +89,12 @@ module "eks" {
 
   vpc_id = var.vpc_id
 
+# lack of gp3 support in launch config
+# https://github.com/terraform-aws-modules/terraform-aws-eks/issues/1205#issuecomment-769695873
+  workers_group_defaults = {
+  	root_volume_type = "gp2"
+  }
+  
   worker_groups = [
     {
       name                          = "worker-group-1"
