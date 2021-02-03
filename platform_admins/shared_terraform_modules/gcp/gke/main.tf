@@ -33,13 +33,13 @@ data "google_project" "project" {
 }
 
 module "gke" {
-  source                  = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/beta-public-cluster?ref=v12.3.0"
+  source                  = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/beta-public-cluster"
   project_id              = local.project
   name                    = "gke-${local.env}-${local.region}${local.zone}-${local.suffix}"
   regional                = false
   region                  = local.region
   zones                   = ["${local.region}-${local.zone}"]
-  release_channel         = "RAPID"
+  release_channel         = "REGULAR"
   network                 = local.network
   subnetwork              = local.node_subnet
   ip_range_pods           = local.pod_subnet

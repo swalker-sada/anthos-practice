@@ -104,7 +104,8 @@ processGKE() {
     GKE_CTX=gke_${PROJECT_ID}_${GKE_LOC[IDX]}_${GKE_LIST[IDX]}
     retry "kubectl --context=${GKE_CTX} apply -f istio-system.yaml"
     retry "kubectl --context=${GKE_CTX} apply -f cacerts.yaml"
-    retry "istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml"
+    # gke prod 1, control plane issues during install, give it time to recover, specific to 1.6.8?
+    retry "istioctl --context=${GKE_CTX} install -f asm_${GKE_LIST[IDX]}.yaml" 10 60
     retry "kubectl --context=${GKE_CTX} apply -f cluster_aware_gateway.yaml"
     istioctl x create-remote-secret --context=${GKE_CTX} --name ${GKE_LIST[IDX]} > kubeconfig_secret_${GKE_LIST[IDX]}.yaml
 }

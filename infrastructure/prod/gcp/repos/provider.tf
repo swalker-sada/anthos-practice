@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
+ terraform {
+  required_providers {
+    external = {
+      source = "hashicorp/external"
+    }
+    gitlab = {
+      source  = "gitlabhq/gitlab"
+      version = "3.4.0"
+    }
+  }
+  required_version = ">= 0.13"
+}
+
 data "external" "gitlab-creds" {
   program = ["bash", "${path.module}/get_gitlab_creds.sh"]
   query = {
@@ -22,7 +35,6 @@ data "external" "gitlab-creds" {
 }
 
 provider "gitlab" {
-  version  = "2.11.0"
   token    = data.external.gitlab-creds.result.gitlab_creds
   base_url = "https://${data.terraform_remote_state.prod_gcp_gitlab.outputs.gitlab_hostname}/api/v4/"
   insecure = true
